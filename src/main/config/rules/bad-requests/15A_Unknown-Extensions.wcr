@@ -1,0 +1,5 @@
+description=potentially unknown or disallowed file extension
+servletPath=.
+requestURI=(?i)(?:\\.(?:jspx?|action|do|jsf|faces|js|xml|xsd|dtd|txt|png|bmp|gif|jpe?g|css|htc|mxml|swf|svg|ico|s?html?|zip|t?gz|tar|xls|doc|ppt|pdf|csv))$|/[^.]*+$
+negation=requestURI
+enabled=false

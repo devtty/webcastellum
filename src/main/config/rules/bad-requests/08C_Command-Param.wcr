@@ -1,0 +1,6 @@
+description=potential command injection
+servletPath=.
+requestParam@prefilter=cmd dll uname shell format exec bin/
+requestParam=(?s)(?i)cmd(\\.exe|\=dir)|\\.dll|uname|cmdshell|format\\s+[CDE]['"]|\#exec|/bin/ls|;(/usr)?/s?bin/
+# disable for better performance, but less security
+enabled=true

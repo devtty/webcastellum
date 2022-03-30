@@ -1,0 +1,14 @@
+description=JavaScript window.open call (custom popup scripts often used)
+servletPath=.
+
+matchesScripts=true
+matchesTags=false
+# capturing group 1 = quote char // capturing group 2 = URL --> possible via the reluctant quantifier
+urlCapturingPattern@prefilter=PopUp
+urlCapturingPattern=(?i)(?s)(?:hilfe|show|open|oeffne|zeige)?PopUp(?:Window)?\\s*\\(\\s*('|"|`)(.{0,2500}?)\\1(\\s*\\+)?
+capturingGroupNumbers=2
+urlExclusionPattern=(?i)(?s)(?:hilfe|show|open|oeffne|zeige)?PopUp(?:Window)?\\s*\\(\\s*('|"|`)(.{0,2500}?)\\1\\s*\\+
+
+# those exclusions are matched against the complete tag/script (as always using find())
+tagExclusionPattern=
+scriptExclusionPattern=

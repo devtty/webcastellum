@@ -1,0 +1,4 @@
+description=rapid login calls (brute force attempt)
+servletPath=(?i)/(\\w){0,3}log[io]n(\\.(jspx?|action|do|jsf|faces))?$
+watchPeriod=60
+clientDenialOfServiceLimit=30

@@ -1,0 +1,5 @@
+description=missing or empty 'Host' HTTP header
+servletPath=.
+requestURI=(?i)\\.(?:png|gif|jpe?g|css|htc|html?|js)$
+header_Host=.+
+negation=header_Host,requestURI

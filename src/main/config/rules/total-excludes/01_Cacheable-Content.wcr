@@ -1,0 +1,5 @@
+description=Cacheable content
+#servletPathOrRequestURI=(?i).*\\.(gif|jpe?g|ico|swf|png|bmp|css|js|htc|html?)\\z
+servletPathOrRequestURI=(?i).*\\.(gif|jpe?g|ico|swf|png|bmp|css|js|htc)\\z
+# eventually disable when full path removal is enabled
+enabled=true

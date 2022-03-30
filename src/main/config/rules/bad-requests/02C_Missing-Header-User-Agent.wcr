@@ -1,0 +1,4 @@
+description=missing or empty 'User-Agent' HTTP header
+servletPath=.
+header_User-Agent=.+
+negation=header_User-Agent

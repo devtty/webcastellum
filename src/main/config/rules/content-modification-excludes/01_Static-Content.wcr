@@ -1,0 +1,9 @@
+description=Static content
+#servletPathOrRequestURI=(?i).*\\.(gif|jpe?g|ico|swf|svg|zip|t?gz|tar|xls|doc|ppt|pdf|csv|png|bmp|xsd|dtd|xml|css|js|htc|html?|class|jar|txt)\\z
+servletPathOrRequestURI=(?i).*\\.(gif|jpe?g|ico|swf|svg|zip|t?gz|tar|xls|doc|ppt|pdf|csv|png|bmp|xsd|dtd|xml|css|js|htc|class|jar|txt)\\z
+# remember to add the same matching rules to incoming-protction-excludes in order to complete the exclusion of static content from the token modification and token checking stuff
+excludeOutgoingResponsesFromModification=true
+excludeIncomingLinksFromModification=true
+
+# the following setting should be kept "false", so that when full path removal is enabled even these static resources are covered by the encryption to reconstruct their relative paths, since when full path removal is enabled all paths will be flattened to something like 123/../ thereby loosing non-encrypted local relative static resources, so setting this to false solves this
+excludeIncomingLinksFromModificationEvenWhenFullPathRemovalEnabled=false

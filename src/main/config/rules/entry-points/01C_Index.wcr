@@ -1,0 +1,3 @@
+description=website index (welcome) files
+servletPath=.?
+pathInfo=(?i)/(index|default|welcome|start)\\.(jspx?|s?html?|action|do|jsf|faces)$|^/$

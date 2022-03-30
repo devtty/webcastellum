@@ -1,0 +1,4 @@
+description=potential file disclosure
+servletPath@prefilter=log boot bin root etc bash notes php xml passwd conf windows system32
+servletPath=(?s)(?i)/(?\:var/log|boot|etc|sbin|root)/|etc/(?\:passwd|init\\.d|users|groups|hosts)|\\.bash_(?\:rc|history)|WS_FTP.LOG|_notes/.+\\.mno|(?\:phpinfo|test)\\.php|(?\:web|config|ejb-jar|weblogic|citydesk|contribute)\\.xml|\\.ht(?\:access|passwd)|httpd\\.conf|conf\\.d|c\:[/\\\\](?\:windows|system32|boot\\.ini)
+enabled=true

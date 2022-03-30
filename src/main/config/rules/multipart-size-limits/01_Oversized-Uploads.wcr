@@ -1,0 +1,17 @@
+# these multipart rules require that the multipart form submit inspection feature is enabled
+description=Oversized uploads
+servletPathOrRequestURI=.
+
+# possibility to allow/forbid multipart requests for certain resources
+# by default *all* multipart requests are blocked... if your app has multipart fileuploads then allow this but better be more specific to allow only for certain form submit targets, etc.
+multipartAllowed=false
+
+maxInputStreamLength=20000000
+maxFileUploadCount=100
+maxFileUploadSize=15000000
+maxFileNameLength=1000
+
+zipBombThresholdTotalSize=100000000
+zipBombThresholdFileCount=500
+
+enabled=true

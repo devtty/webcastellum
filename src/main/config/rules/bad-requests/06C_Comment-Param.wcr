@@ -1,0 +1,4 @@
+description=potential comment injection to circumvent content scans
+servletPath=.
+# (?s)(/\\*.*\\*/|<!--.*-->)
+requestParam=(?s)/\\*.*?\\*/|<?\!--

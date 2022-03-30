@@ -1,0 +1,7 @@
+description=login target page or action
+servletPath=(?i)^/log[io]n\\.(jspx?|action|do|jsf|faces)$
+
+renewSession=true
+renewSecretToken=true
+renewParamAndFormToken=true
+renewCryptoKey=true

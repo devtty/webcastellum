@@ -1,0 +1,7 @@
+description=potential known scanner probing
+servletPath=.
+queryString@prefilter=nonexist nasl ssus 55u5
+queryString=(?i)(nonexist[ea]nt|\\.nasl|n[e3][s5][s5]u[s5])
+
+# disabled since the request param checking rule already matches this... enable if you wish to match the query string separately
+enabled=false

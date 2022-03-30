@@ -1,0 +1,4 @@
+description=just testing
+servletPath=^/index\\.jsp$
+negation=servletPath
+enabled=false

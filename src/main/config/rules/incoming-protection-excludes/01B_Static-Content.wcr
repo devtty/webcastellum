@@ -1,0 +1,13 @@
+description=Static content
+servletPath=.?
+requestURI=(?i).*\\.(gif|jpe?g|ico|swf|mxml|svg|zip|t?gz|tar|xls|doc|ppt|pdf|csv|png|bmp|xsd|dtd|xml|properties|css|js|htc|html?|class|jar|cab|txt)\\z
+# remember to add the same matching rules to content-modification-excludes in order to complete the exclusion of static content from the token modification and token checking stuff
+excludeForceEntranceProtection=true
+excludeParameterAndFormProtection=true
+excludeSelectboxFieldProtection=true
+excludeCheckboxFieldProtection=true
+excludeRadiobuttonFieldProtection=true
+excludeReferrerProtection=true
+excludeSecretTokenProtection=true
+excludeSessionToHeaderBindingProtection=true
+

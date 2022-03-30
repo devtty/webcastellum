@@ -1,0 +1,66 @@
+This file lists the major changes of the last few WebCastellum releases:
+
+
+
+
+Version 1.8.3 major new features (released on 2009-09-26):
+===========================================
+
+- Added feature "flexible configuration loading" to enable the optional externalization
+  of configuration data (the filter's init-params of web.xml) into other configuration 
+  sources. The new configuration setting "ConfigurationLoader" (default value
+  "org.webcastellum.DefaultConfigurationLoader") specifies the classname of
+  the loader responsible for loading configuration data (this class implements
+  the new interface "org.webcastellum.ConfigurationLoader"). The default
+  implementation loads the configuration data from web.xml via filter init-params as usual.
+  Another implementation available is "org.webcastellum.PropertiesFileConfigurationLoader",
+  which uses a properties file from the filesystem to load configuration data. When using
+  this configuration loader the filename of the properties file to hold the configuration values
+  must be specified via init-param "PropertiesFileConfigurationLoader_File". Unless you set
+  "PropertiesFileConfigurationLoader_FallbackToWebXml" to "false" (defualt is "true")
+  configuration data not found in the properties file will be loaded as a fallback from the
+  web.xml file. This way you can externalize (overwrite) certain parts of your configuration
+  into properties files and keep other parts still inside the web.xml file.
+
+- Added configuration setting "ConfigurationReinitializationInterval" (default 0) 
+  to specify configuration reinitialization intervals (in minutes). This is useful
+  when externalizing parts of your configuration out of web.xml into another
+  configuration storage and you wan't automatic reconfiguration.
+
+- Improvements for usage of URL encryption within Spring Tiles2/WebFlow
+  applications (see README.txt for details)
+
+
+
+
+Version 1.8.2 major new features (released on 2009-08-08):
+===========================================
+
+- Added feature "transparent forwarding" to be more transparent for the
+  web application when URL encryption is enabled (especially interesting
+  for users of the Apache Wicket web framework). This new feature is
+  enabled by default and can be disabled (legacy mode) by setting the
+  boolean config param "TransparentForwarding" to false)
+
+- Added feature "transparent querystring" to be more transparent for the
+  web application when secret token injection is enabled (especially
+  interesting for users of the Apache Wicket web framework). This new
+  feature is enabled by default and can be disabled (legacy mode) by
+  setting the boolean config param "TransparentQuerystring" to false)
+
+- Better integration with reverse proxy infrastructures
+  (the "localAddr thing")
+
+
+
+
+Version 1.8.1 major new features (released on 2009-02-28):
+===========================================
+
+- Attack logging enhanced with a flexible interface for custom
+  integration in alerting systems
+
+- Honeypot-like feature "honeylinks"
+
+- Performance optimizations for response protection
+

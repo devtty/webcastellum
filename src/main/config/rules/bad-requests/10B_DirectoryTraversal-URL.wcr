@@ -1,0 +1,6 @@
+description=potential directory traversal
+servletPath=.
+queryString=(?s)((\\.(\\.)?[/|\\\\]){2}|/\\./)
+
+# disabled since the request param checking rule already matches this... enable if you wish to match the query string separately
+enabled=false

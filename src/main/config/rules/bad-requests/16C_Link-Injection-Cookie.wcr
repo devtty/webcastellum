@@ -1,0 +1,6 @@
+# NOTE: This rule could cause false alarms when your application has input data with "http://" inside the value... then better disable this rule
+description=potential link injection (reframing?) - via cookie
+servletPath=.
+cookie@prefilter=http:// https:// mailto: ftp://
+cookie=(?i)https?://|mailto:|ftp://
+enabled=true

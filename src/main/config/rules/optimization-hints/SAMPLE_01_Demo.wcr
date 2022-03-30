@@ -1,0 +1,7 @@
+# Optimization Hints are simply all pages on which WebCastellum can safely rely upon the application developers usage of response.encodeURL() to encode all URLs... 
+# So Optimizing Hints should point to pages that use encodeURL() properly and have *no* forms (in case you've got form protection enabled)
+
+description=Sample rule
+servletPath=/someFileOrAction\\.jsp
+
+enabled=false

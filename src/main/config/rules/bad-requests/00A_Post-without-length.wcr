@@ -1,0 +1,5 @@
+description=potential manual server access (POST without Content-Length)
+servletPath=.
+method=POST
+header_Content-Length=.+
+negation=header_Content-Length

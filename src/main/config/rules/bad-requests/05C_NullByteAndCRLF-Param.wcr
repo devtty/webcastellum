@@ -1,0 +1,4 @@
+description=potential null-byte evasion to circumvent content scans / potential CRLF injection (used in HTTP response splitting)
+servletPath=.
+requestParam@prefilter=00 FF 0D 015 \\r
+requestParam=(?i)%00|\\\\000|\\\\u0000|0x00|&\#x0000;|%FE%FF%|%FF%FE%|%0d%0a|\\\\r\\\\n|\\\\015\\\\012|0x0D0x0A|\\\\u000D\\\\u000A|&\#x0013;&\#x0010;

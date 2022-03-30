@@ -1,0 +1,7 @@
+description=rapid non-static (i.e. servlet) calls
+servletPath=(?i)(\\.(gif|jpe?g|ico|swf|css|js|svg|png|htc)|LoadFile)$
+negation=servletPath
+watchPeriod=120
+clientDenialOfServiceLimit=800
+# enable if you want general DoS type attack to be mitigated a bit
+enabled=false

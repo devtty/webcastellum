@@ -1,0 +1,3 @@
+description=potential command injection
+servletPath@prefilter=cmd dll uname shell format exec bin/
+servletPath=(?s)(?i)cmd(\\.exe|\=dir)|\\.dll|uname|cmdshell|format\\s+[CDE]['"]|\#exec|/bin/ls|;(/usr)?/s?bin/

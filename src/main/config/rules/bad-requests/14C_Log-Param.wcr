@@ -1,0 +1,4 @@
+description=potential log disclosure
+servletPath=.
+requestParam@prefilter=log stat server root nobody apache tomcat admin
+requestParam=(?i)(/(logs|stats|weblogs|webstat|webstatus|ftplog|https?log|server-status|server-info|mod_gzip[-_]status))|~(root|nobody|apache|tomcat|weblogic|admin|administrator)/

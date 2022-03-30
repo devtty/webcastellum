@@ -1,0 +1,4 @@
+description=potential null-byte evasion to circumvent content scans
+servletPath@prefilter=00 FF
+servletPath=%00|\\\\000|\\\\u0000|0x00|&\#x0000;|%FE%FF%|%FF%FE%
+enabled=false

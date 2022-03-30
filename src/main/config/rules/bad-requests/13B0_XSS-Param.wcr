@@ -1,0 +1,5 @@
+# eventually adjust this rule when having trouble with false positives with WebServices that allow full blown XML content to be submitted
+description=potential XSS (script injection) evasion
+servletPath=.
+#prefilter=[CDATA [DATA action ActiveXObject alert applet area background base behavior bgsound binding blockquote body captureEvents class cookie createAttribute createElement createTextNode div document embed entity escape eval execScript expression form frame fromCharCode getElement href html http-equiv image img import input layer link map meta Microsoft msgbox namespace object onabort onbeforeunload onblur onchange onclick ondblclick ondragdrop onerror onfocus onkeydown onkeypress onkeyup onload onmouse onmove onreset onresize onselect onsubmit onunload option parent reload replace schemas-microsoft-com script source span src style table this top url void window write xml XMLHTTP XMLHttpRequest xss
+requestParam=(?s)(?i)(?:\\\\u[0-9a-fA-F]{4})|&#x[0-9a-fA-F]{2}|(?:\\x5cx[0-9a-fA-F]{2}|[\\"']\\s*+>)|(?:<|&lt;?|%3C|\u00BC|&#0*+60;?|&#x0*+3c;?|\\\\(?:x|u00)3c)!--

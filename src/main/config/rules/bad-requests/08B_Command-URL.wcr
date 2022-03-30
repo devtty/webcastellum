@@ -1,0 +1,7 @@
+description=potential command injection
+servletPath=.
+queryString@prefilter=cmd dll uname shell format exec bin/
+queryString=(?s)(?i)cmd(\\.exe|\=dir)|\\.dll|uname|cmdshell|format\\s+[CDE]['"]|\#exec|/bin/ls|;(/usr)?/s?bin/
+
+# disabled since the request param checking rule already matches this... enable if you wish to match the query string separately
+enabled=false

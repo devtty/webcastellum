@@ -1,0 +1,14 @@
+description=JavaScript window.open call
+servletPath=.
+
+matchesScripts=true
+matchesTags=false
+# capturing group 1 = quote char // capturing group 2 = URL --> possible via the reluctant quantifier
+urlCapturingPattern@prefilter=window
+urlCapturingPattern=(?i)(?s)window\\s*\\.\\s*open\\s*\\(\\s*('|"|`)(.{0,2500}?)\\1(\\s*\\+)?
+capturingGroupNumbers=2
+urlExclusionPattern=(?i)(?s)window\\s*\\.\\s*open\\s*\\(\\s*('|"|`)(.{0,2500}?)\\1\\s*\\+
+
+# those exclusions are matched against the complete tag/script (as always using find())
+tagExclusionPattern=
+scriptExclusionPattern=

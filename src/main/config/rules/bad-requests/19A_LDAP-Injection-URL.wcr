@@ -1,0 +1,6 @@
+description=potential LDAP injection
+servletPath=.
+queryString=(?s)(?i)\\s*+\\)\\s*+\\(\\s*+\\|\\s*+\\([a-zA-Z0-9\\s]++\=
+
+# disabled since the request param checking rule already matches this... enable if you wish to match the query string separately
+enabled=false

@@ -1,0 +1,4 @@
+description=potential known scanner probing - via cookie
+servletPath=.
+cookie@prefilter=nonexist nasl ssus 55u5
+cookie=(?i)(nonexist[ea]nt|\\.nasl|n[e3][s5][s5]u[s5])

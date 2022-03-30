@@ -1,0 +1,21 @@
+This release contains:
+======================
+
+webcastellum.jar
+  the binary (including the default rule set) to include in your web application's classpath
+
+WebCastellum_ReferenceGuide.pdf
+  Draft version of the reference guide (also available as a separate download).
+  This document is currently only available in German, an English version is in the works.
+
+README.txt
+  Notes for initial integration inside a web application
+
+CHANGELOG.txt
+  The changelog for the recent releases
+
+LICENSE.txt
+  The Open Source license
+
+RELEASENOTES.txt
+  This file :-)

@@ -1,0 +1,9 @@
+# NOTE: This rule could cause false alarms when your application has input data with "http://" inside the value... then better disable this rule
+description=potential link injection (reframing?)
+servletPath=.
+# without https?:// here to avoid false positives when the application acceppts links as URL params (which some applications do)
+queryString@prefilter=mailto: ftp://
+queryString=(?i)mailto:|ftp://
+
+# disabled since the request param checking rule already matches this... enable if you wish to match the query string separately
+enabled=false

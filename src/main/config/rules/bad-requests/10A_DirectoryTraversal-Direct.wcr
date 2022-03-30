@@ -1,0 +1,2 @@
+description=potential directory traversal
+servletPath=((\\.(\\.)?[/|\\\\]){2}|/\\./)

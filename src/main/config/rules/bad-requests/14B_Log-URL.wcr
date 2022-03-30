@@ -1,0 +1,7 @@
+description=potential log disclosure
+servletPath=.
+queryString@prefilter=log stat server root nobody apache tomcat admin
+queryString=(?i)(/(logs|stats|weblogs|webstat|webstatus|ftplog|https?log|server-status|server-info|mod_gzip[-_]status))|~(root|nobody|apache|tomcat|weblogic|admin|administrator)/
+
+# disabled since the request param checking rule already matches this... enable if you wish to match the query string separately
+enabled=false

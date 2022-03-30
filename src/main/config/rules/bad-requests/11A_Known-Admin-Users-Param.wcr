@@ -1,0 +1,11 @@
+description=potential known admin users access
+servletPath=.
+requestParam_name=(?s)(?i)sysdba|sys_dba|system|sysman|admin
+requestParam_user=(?s)(?i)sysdba|sys_dba|system|sysman|admin
+requestParam_username=(?s)(?i)sysdba|sys_dba|system|sysman|admin
+requestParam_userid=(?s)(?i)sysdba|sys_dba|system|sysman|admin
+requestParam_login=(?s)(?i)sysdba|sys_dba|system|sysman|admin
+requestParam_logon=(?s)(?i)sysdba|sys_dba|system|sysman|admin
+requestParam_loginid=(?s)(?i)sysdba|sys_dba|system|sysman|admin
+requestParam_logonid=(?s)(?i)sysdba|sys_dba|system|sysman|admin
+enabled=false

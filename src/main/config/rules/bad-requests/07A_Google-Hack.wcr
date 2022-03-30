@@ -1,0 +1,5 @@
+description=potential google hack
+servletPath=.
+header_referer@prefilter=inurl
+header_referer=(?s)(?i)google.*?inurl.*?(?:(?:pass|(?:wd|word|wort|list))|admin|(?:up|down)load|sendmail)
+enabled=true

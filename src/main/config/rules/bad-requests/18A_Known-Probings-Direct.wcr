@@ -1,0 +1,3 @@
+description=potential known scanner probing
+servletPath@prefilter=nonexist nasl ssus 55u5
+servletPath=(?i)(nonexist[ea]nt|\\.nasl|n[e3][s5][s5]u[s5])

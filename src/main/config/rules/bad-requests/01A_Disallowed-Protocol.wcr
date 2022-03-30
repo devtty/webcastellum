@@ -1,0 +1,4 @@
+description=potential manual server access (protocol mismatch)
+servletPath=.
+protocol=HTTP/(?:0\\.9|1\\.0|1\\.1)
+negation=protocol

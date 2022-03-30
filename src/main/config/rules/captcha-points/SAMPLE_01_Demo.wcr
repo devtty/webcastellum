@@ -1,0 +1,8 @@
+description=just a sample (disabled by default)
+servletPath=/somePageOrAction.jsp
+
+captchaPageContent=org/webcastellum/captcha.html
+captchaImageHTML=<img src\="{0}" width\="{1}" height\="{2}" border\="1" />
+captchaFormHTML=<form action\="{0}" method\="{1}"><input type\="text" name\="{2}" /><input type\="submit" value\="OK" /><input type\="hidden" name\="{3}" value\="{4}" /></form>
+
+enabled=false

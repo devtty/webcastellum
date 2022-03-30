@@ -1,0 +1,6 @@
+description=missing or empty 'Accept' HTTP header
+servletPath=.
+requestURI=(?i)\\.(?:png|gif|jpe?g|css|htc|html?|js)$
+header_Accept=.+
+negation=header_Accept,requestURI
+enabled=false

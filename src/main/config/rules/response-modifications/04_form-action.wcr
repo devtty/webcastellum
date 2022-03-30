@@ -1,0 +1,14 @@
+description=JavaScript form action setting
+servletPath=.
+
+matchesScripts=true
+matchesTags=false
+# capturing group 1 = quote char // capturing group 2 = URL --> possible via the reluctant quantifier
+urlCapturingPattern@prefilter=action
+urlCapturingPattern=(?i)(?s)\\.\\s*action\\s*\=\\s*('|"|`)([^\\+]{0,2500}?)\\1
+capturingGroupNumbers=2
+urlExclusionPattern=
+
+# those exclusions are matched against the complete tag/script (as always using find())
+tagExclusionPattern=
+scriptExclusionPattern=

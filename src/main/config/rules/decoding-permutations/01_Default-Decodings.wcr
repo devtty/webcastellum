@@ -1,0 +1,4 @@
+description=default decoding permutations
+servletPathOrRequestURI=.
+# possible levels are:  0=no decodings  1=some decodings   2=many decodings   3=many many decodings   4=insane decodings
+level=2

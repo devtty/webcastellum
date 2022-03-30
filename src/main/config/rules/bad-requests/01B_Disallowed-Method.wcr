@@ -1,0 +1,7 @@
+description=potential manual server access (method mismatch)
+servletPath=.
+# method=(?i)GET|POST|HEAD
+# some clients (like MS Excel when accessing exports) may require the OPTIONS method
+# RESTful clients may wish to access resources using PUT
+method=(?i)GET|POST|HEAD|OPTIONS|PUT
+negation=method

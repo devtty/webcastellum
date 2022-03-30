@@ -1,0 +1,5 @@
+# eventually adjust this rule to allow your internal IP range to access these pages
+description=potential known admin pages
+servletPath@prefilter=console manager shutdown reboot tomcat RELEASE changelog examples webdav admin
+servletPath=(?i)/(console|manager|shutdown|reboot|tomcat-(docs|users)|RELEASE-?NOTES|changelog\\.html?|(js[pf]x?|servlets?)-?examples?|webdav|admin(istrat(or|ion))?)((\\.(jspx?|do|html?|jsf|faces|php|cfm|asp|pl|cgi|ssi|xml|properties|conf(ig)?))|/|$)
+enabled=false

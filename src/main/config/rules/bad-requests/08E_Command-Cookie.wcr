@@ -1,0 +1,4 @@
+description=potential command injection - via cookie
+servletPath=.
+cookie@prefilter=cmd dll uname shell format exec bin/
+cookie=(?s)(?i)cmd(\\.exe|\=dir)|\\.dll|uname|cmdshell|format\\s+[CDE]['"]|\#exec|/bin/ls|;(/usr)?/s?bin/

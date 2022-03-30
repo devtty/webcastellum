@@ -1,0 +1,21 @@
+description=Oversized requests
+servletPathOrRequestURI=.
+
+maxHeaderCount=100
+maxHeaderNameLength=2000
+maxHeaderValueLength=25000
+maxTotalHeaderSize=500000
+
+maxCookieCount=100
+maxCookieNameLength=2000
+maxCookieValueLength=25000
+maxTotalCookieSize=500000
+
+maxRequestParamCount=2000
+maxRequestParamNameLength=10000
+maxRequestParamValueLength=100000
+maxTotalRequestParamSize=1000000
+
+maxQueryStringLength=100000
+
+enabled=true

@@ -1,0 +1,6 @@
+description=rapid dynamic page calls
+servletPath=(?i)\\.(jspx?|jsf|faces|action|do)$
+watchPeriod=120
+clientDenialOfServiceLimit=300
+# enable if you want general DoS type attack to be mitigated a bit
+enabled=false

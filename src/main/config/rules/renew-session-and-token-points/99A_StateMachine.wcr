@@ -1,0 +1,14 @@
+description=permutating state machine within application
+# NOTE: either restrict the matching scope of pages/actions within your application a bit or be aware that frameset based application don't work well with permutating statemachines by design...
+# NOTE: since ordering is important and the first matching file is used, to avoid breaking the renew-session on login thing, name this rule file so that it will be alphabetically AFTER the renew-session on login rule file...!
+# NOTE: using this ordering you can even exclude certain servlet-paths from the statemachine token renewal by placing a rule file ordered *before* this file which has a match for all your servlet-paths on which you don't want a renewal to happen and set all renew properties (renewSession,renewSecretToken,renewParamAndFormToken,renewCryptoKey) to false
+servletPath=(?i)\\.(jspx?|action|do|jsf|faces)$
+
+# renewSession is false so that when already logged in and an attacker manages it somehow to share the same session with the user, as soon as when the attacker or the user clicks on a link after the other one clicked on an link, the shared session will be invalidated (since an old token was used)
+renewSession=false
+renewSecretToken=true
+renewParamAndFormToken=true
+renewCryptoKey=true
+
+# this rule is disabled by default
+enabled=false

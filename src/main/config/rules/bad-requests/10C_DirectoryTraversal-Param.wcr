@@ -1,0 +1,3 @@
+description=potential directory traversal
+servletPath=.
+requestParam=(?s)((\\.(\\.)?[/|\\\\]){2}|/\\./)
