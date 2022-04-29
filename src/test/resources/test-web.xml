@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="3.1" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd">
+
+  <filter>
+    <filter-name>WebCastellum</filter-name>
+    <filter-class>org.webcastellum.WebCastellumFilter</filter-class>
+    <init-param>
+      <param-name>ApplicationName</param-name>
+      <param-value>Testpplication</param-value>
+    </init-param>
+    <init-param>
+      <param-name>LogVerboseForDevelopmentMode</param-name>
+      <param-value>true</param-value>
+    </init-param>
+    <init-param>
+      <param-name>DefaultProductionModeCheckerValue</param-name>
+      <param-value>false</param-value>
+    </init-param>
+    <init-param>
+      <param-name>LogClientUserData</param-name>
+      <param-value>true</param-value>
+    </init-param>
+    <init-param>
+      <param-name>Debug</param-name>
+      <param-value>true</param-value>
+    </init-param>
+    <init-param>
+      <param-name>AttackLogDirectory</param-name>
+      <param-value>logs</param-value>
+    </init-param>
+    <init-param>
+      <param-name>DefaultAttackLoggerDirectory</param-name>
+      <param-value>/home/user/</param-value>
+    </init-param>
+
+    
+    <!-- Basisschutz -->
+    <init-param>
+      <param-name>BlockInvalidEncodedQueryString</param-name>
+      <param-value>true</param-value>
+    </init-param>
+    
+    <init-param>
+      <param-name>DevelopmentAttackReplyStatusCodeOrMessageResource</param-name>
+      <param-value>503</param-value>
+    </init-param>
+    <init-param>
+      <param-name>ProductionAttackReplyStatusCodeOrMessageResource</param-name>
+      <param-value>503</param-value>
+    </init-param>
+    <init-param>
+      <param-name>ParameterAndFormProtection</param-name>
+      <param-value>true</param-value>
+    </init-param>
+    <init-param>
+      <param-name>SecretTokenLinkInjection</param-name>
+      <param-value>true</param-value>
+    </init-param>
+    <init-param>
+      <param-name>QueryStringEncryption</param-name>
+      <param-value>true</param-value>
+    </init-param>
+     <init-param>
+      <param-name>ExtraCheckboxProtection</param-name>
+      <param-value>true</param-value>
+    </init-param>
+
+   
+  </filter>
+  <filter-mapping>
+    <filter-name>WebCastellum</filter-name>
+    <url-pattern>/*</url-pattern>
+    <dispatcher>REQUEST</dispatcher>
+    <dispatcher>INCLUDE</dispatcher>
+    <dispatcher>FORWARD</dispatcher>
+  </filter-mapping>  
+    
+</web-app>
