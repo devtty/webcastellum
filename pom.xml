@@ -247,18 +247,6 @@
 		 <execution><goals><goal>check</goal></goals></execution>
                </executions>
             </plugin>
-<!--	     <plugin>
-               <groupId>org.openrewrite.maven</groupId>
-               <artifactId>rewrite-maven-plugin</artifactId>
-               <version>4.23.0</version>
-	       <configuration>
-		 <activeRecipes> -->
-		   <!--		   <recipe>org.openrewrite.java.format.AutoFormat</recipe>-->
-		   <!--		   <recipe>org.openrewrite.java.cleanup.CommonStaticAnalysis</recipe>-->
-<!--		 </activeRecipes>
-	       </configuration> -->
-            </plugin>
-	   
         </plugins>
     </build>
     
