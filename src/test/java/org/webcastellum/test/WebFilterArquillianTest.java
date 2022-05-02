@@ -44,6 +44,8 @@ import static org.junit.Assert.*;
 public class WebFilterArquillianTest {
 
 
+    public static final int HTTP_I_AM_A_TEAPOT = 418;
+    
     @ArquillianResource
     private URL contextPath;
     @Drone
@@ -67,7 +69,7 @@ public class WebFilterArquillianTest {
     public void testRoot(){
 	webdriver.get(contextPath.toExternalForm());
 	
-	assertTrue("TITLE: " + webdriver.getTitle(), webdriver.getTitle().contains("Web Castellum Test JSP"));
+	assertTrue("TITLE: " + webdriver.getTitle(), webdriver.getTitle().contains("WebCastellum Test Index Page"));
 	assertTrue(webdriver.getCurrentUrl().equals("http://localhost:8080/test/"));	
     }
 
@@ -94,8 +96,9 @@ public class WebFilterArquillianTest {
 
 	//same as getCurrentUrl
 	System.out.println("C" + contextPath.toExternalForm() + "E");
+	//System.out.println("W3: " + webdriver.getTitle());
 	
-	assertTrue("AS: " + webdriver.getTitle(), webdriver.getTitle().contains("Web Castellum Test JSP"));
+	assertTrue("AS: " + webdriver.getTitle(), webdriver.getTitle().contains("WebCastellum Test Index Page"));
 	//	assertTrue("msg: " + webdriver.getCurrentUrl(), webdriver.getCurrentUrl().equals("http://localhost:8080/test/.."));	
     }
 
@@ -131,12 +134,16 @@ public class WebFilterArquillianTest {
 
     @Test
     public void testSQLInjectionViaGetParam7(){
-	webdriver.get(contextPath.toExternalForm() + "?test=1'%20or%20'1'%20=%20'1&amp;password=1'%20or%20'1'%20=%20'1");
+	webdriver.get(contextPath.toExternalForm() + "test.jsp");
+
 
 	//same as getCurrentUrl
 	System.out.println("C" + contextPath.toExternalForm() + "E");
+	System.out.println("EC" + webdriver.getCurrentUrl() + "E");
+	System.out.println("ET" + webdriver.getTitle() + "E");
 	
-	assertTrue("AS: " + webdriver.getTitle(), webdriver.getTitle().contains("HTTP Status 503"));
+	webdriver.get(contextPath.toExternalForm() + "test.jsp?test=1'%20or%20'1'%20=%20'1&amp;password=1'%20or%20'1'%20=%20'1");	
+	assertTrue("AS: " + webdriver.getTitle(), webdriver.getTitle().contains("HTTP Status 418"));
 	//	assertTrue("msg: " + webdriver.getCurrentUrl(), webdriver.getCurrentUrl().equals("http://localhost:8080/test/.."));	
     }
 
@@ -160,8 +167,8 @@ public class WebFilterArquillianTest {
 
 	try{
 	    HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
-	    
-	    assertEquals(response.statusCode(), HttpURLConnection.HTTP_UNAVAILABLE);
+	    	   
+    	    assertEquals(response.statusCode(), HTTP_I_AM_A_TEAPOT);
 	    assertEquals(response.uri().toString(), requestUri);
 	}catch(IOException | InterruptedException e){
 	    fail();
