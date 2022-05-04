@@ -3,7 +3,8 @@
   
     <container qualifier="tomcat" default="true">
         <configuration>
-          <property name="catalinaHome">${user.home}/Programs/apache-tomcat-8.5.78</property>
+	  <!--          <property name="catalinaHome">${user.home}/Programs/apache-tomcat-8.5.78</property> -->
+	  <property name="catalinaHome">/usr/share/tomcat9</property>
 	  <property name="user">arquillian</property>
 	   <property name="pass">arquillian</property>
         </configuration>
