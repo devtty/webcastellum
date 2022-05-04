@@ -20,6 +20,8 @@ jobs:
           java-version: 11
       - name: Install Tomcat
         run: sudo apt-get install -y tomcat9
+      - name: echo env
+        run: echo $CATALINA_HOME
       - name: Cache Maven packages
         uses: actions/cache@v1
         with:
@@ -27,5 +29,5 @@ jobs:
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
       - name: Build and test
-        run: mvn clean package -P tomcat -Dmaven.test.skip=true
+        run: mvn clean package -P tomcat
 
