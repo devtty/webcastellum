@@ -28,7 +28,7 @@ jobs:
             ls -al
             cd apache-tomcat-9.0.62
             ls -al
-            sed -i '/<\/tomcat-users>/ i\<user username="arquillian" password="arquillian" roles="manager-script"/>' apache-tomcat-9.0.92/conf/tomcat-users.xml
+            sed -i '/<\/tomcat-users>/ i\<user username="arquillian" password="arquillian" roles="manager-script"/>' apache-tomcat-9.0.62/conf/tomcat-users.xml
       - name: Cache Maven packages
         uses: actions/cache@v1
         with:
