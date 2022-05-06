@@ -10,6 +10,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      CATALINA_HOME: /home/runner/work/webcastellum/webcastellum/apache-tomcat-9.0.62
     steps:
       - uses: actions/checkout@v2
         with:
@@ -18,14 +20,26 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 11
-      - name: Install Tomcat
-        run: sudo apt-get install -y tomcat9
+      - name: install tomcat
+        run: |
+            wget https://archive.apache.org/dist/tomcat/tomcat-9/v9.0.62/bin/apache-tomcat-9.0.62.tar.gz
+            mkdir tomcat
+            tar zxf apache-tomcat-9.0.62.tar.gz
+            sed -i '/<\/tomcat-users>/ i\<user username="arquillian" password="arquillian" roles="manager-script"/>' apache-tomcat-9.0.62/conf/tomcat-users.xml
+      - name: additional dependencies
+        run: |
+            wget https://repository.jboss.org/nexus/content/groups/public/javax/jms/jms/1.1/jms-1.1.jar
+            wget https://repo1.maven.org/maven2/javax/mail/mail/1.5.0-b01/mail-1.5.0-b01.jar
+            mvn install:install-file -Dfile=jms-1.1.jar -DgroupId=javax.jms -DartifactId=jms -Dversion=1.1 -Dpackaging=jar
+            mvn install:install-file -Dfile=mail-1.5.0-b01.jar -DgroupId=javax.mail -DartifactId=mail -Dversion=1.5.0-b01 -Dpackaging=jar
       - name: Cache Maven packages
         uses: actions/cache@v1
         with:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
-      - name: Build and test
-        run: mvn clean package -P tomcat -Dmaven.test.skip=true
+      - name: Build
+        run: mvn package -P tomcat -Dmaven.test.skip=true
+      - name: Test
+        run: mvn test -P tomcat
 

@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -31,6 +32,8 @@ import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 
+import org.jboss.arquillian.graphene.Graphene;
+
 import org.junit.Test;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -41,10 +44,7 @@ import static org.junit.Assert.*;
 
 @RunWith(value = Arquillian.class)
 @RunAsClient
-public class WebFilterArquillianTest {
-
-
-    public static final int HTTP_I_AM_A_TEAPOT = 418;
+public class WebFilterDroneTest {
     
     @ArquillianResource
     private URL contextPath;
@@ -55,12 +55,12 @@ public class WebFilterArquillianTest {
     public static WebArchive createDeployment(){
 	WebArchive war =
 	    ShrinkWrap.create(WebArchive.class, "test.war")
-	    .addAsLibrary(new File("/home/user/.m2/repository/javax/jms/jms/1.1/jms-1.1.jar"))
-	    .addAsLibrary(new File("/home/user/.m2/repository/javax/mail/mail/1.5.0-b01/mail-1.5.0-b01.jar"))
+	    .addAsLibrary(new File(System.getProperty("user.home") + "/.m2/repository/javax/jms/jms/1.1/jms-1.1.jar"))
+	    .addAsLibrary(new File(System.getProperty("user.home") + "/.m2/repository/javax/mail/mail/1.5.0-b01/mail-1.5.0-b01.jar"))
 	    .addAsLibrary(new File("target/webcastellum-1.8.4.jar"))
 	    .addAsWebResource(new File("src/test/resources/index.html"), "index.html")
 	    .addAsWebResource(new File("src/test/resources/test.jsp"), "test.jsp")
-	    .setWebXML(new File("src/test/resources/test-web.xml"));
+	    .setWebXML(new File("src/test/resources/test-web-drone.xml"));
 
 	return war;
     }
@@ -102,38 +102,10 @@ public class WebFilterArquillianTest {
 	//	assertTrue("msg: " + webdriver.getCurrentUrl(), webdriver.getCurrentUrl().equals("http://localhost:8080/test/.."));	
     }
 
-    //@Ignore
-    @Test
-    public void testRoot5(){
-	HttpClient client = HttpClient.newHttpClient();
-	HttpRequest request = HttpRequest.newBuilder()
-	    .uri(URI.create("http://localhost:8080/test/%2e%2e%2f,"))
-	    .build();
-
-	try{
-	    HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
-	    
-	    assertEquals(response.statusCode(), HttpURLConnection.HTTP_BAD_REQUEST);
-	    assertEquals(response.uri().toString(), "http://localhost:8080/test/%2e%2e%2f,");
-	}catch(IOException | InterruptedException e){
-	    fail();
-	}
-    }
-
-    @Test
-    public void testRoot6(){
-	HttpClient client = HttpClient.newHttpClient();
-	HttpRequest request = HttpRequest.newBuilder()
-	    .uri(URI.create("http://localhost:8080/test/test.jsp"))
-	    .build();
-	client.sendAsync(request, BodyHandlers.ofString())
-	    .thenApply(HttpResponse::body)
-	    .thenAccept(System.out::println)
-	    .join();
-    }
-
     @Test
     public void testSQLInjectionViaGetParam7(){
+	webdriver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
+	
 	webdriver.get(contextPath.toExternalForm() + "test.jsp");
 
 
@@ -141,41 +113,17 @@ public class WebFilterArquillianTest {
 	System.out.println("C" + contextPath.toExternalForm() + "E");
 	System.out.println("EC" + webdriver.getCurrentUrl() + "E");
 	System.out.println("ET" + webdriver.getTitle() + "E");
+
+	//	Graphene.waitGui();
 	
-	webdriver.get(contextPath.toExternalForm() + "test.jsp?test=1'%20or%20'1'%20=%20'1&amp;password=1'%20or%20'1'%20=%20'1");	
-	assertTrue("AS: " + webdriver.getTitle(), webdriver.getTitle().contains("HTTP Status 418"));
+	webdriver.get(contextPath.toExternalForm() + "test.jsp?test=1'%20or%20'1'%20=%20'1&amp;password=1'%20or%20'1'%20=%20'1");
+
+
+	System.out.println("XX: " + webdriver.getTitle());
+	
+	assertTrue("AS: " + webdriver.getTitle(), webdriver.getTitle().contains("Security Alert"));
 	//	assertTrue("msg: " + webdriver.getCurrentUrl(), webdriver.getCurrentUrl().equals("http://localhost:8080/test/.."));	
     }
-
-    @Test
-    public void testSQLInjectionViaGetParam(){
-	String requestUri = "http://localhost:8080/test/test.jsp?test=1'%20or%20'1'%20=%20'1&amp;password=1'%20or%20'1'%20=%20'1";
-	assertBlockedWithoutRedirect(requestUri);
-    }
-
-    @Test
-    public void testSQLInjectionViaGetParam2(){
-	String requestUri = "http://localhost:8080/test/test.jsp?test=1'%20or%20'1'%20=%20'1'))/*&amp;password=foo";
-	assertBlockedWithoutRedirect(requestUri);
-    }
-
-    private void assertBlockedWithoutRedirect(String requestUri){
-	HttpClient client = HttpClient.newHttpClient();
-	HttpRequest request = HttpRequest.newBuilder()
-	    .uri(URI.create(requestUri))
-	    .build();
-
-	try{
-	    HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
-	    	   
-    	    assertEquals(response.statusCode(), HTTP_I_AM_A_TEAPOT);
-	    assertEquals(response.uri().toString(), requestUri);
-	}catch(IOException | InterruptedException e){
-	    fail();
-	}
-
-    }
-
 
     public void testSecretTokenLinkInjection(){}
     public void testQueryStringEncryption(){}
