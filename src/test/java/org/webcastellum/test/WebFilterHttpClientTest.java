@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -19,13 +20,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.openqa.selenium.WebDriver;
-
-import org.jboss.shrinkwrap.resolver.api.maven.archive.importer.MavenImporter;
-
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
-import org.jboss.arquillian.drone.api.annotation.Drone;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -41,15 +37,13 @@ import static org.junit.Assert.*;
 
 @RunWith(value = Arquillian.class)
 @RunAsClient
-public class WebFilterArquillianTest {
+public class WebFilterHttpClientTest {
 
 
     public static final int HTTP_I_AM_A_TEAPOT = 418;
     
     @ArquillianResource
     private URL contextPath;
-    @Drone
-    private WebDriver webdriver;
 
     @Deployment
     public static WebArchive createDeployment(){
@@ -63,43 +57,6 @@ public class WebFilterArquillianTest {
 	    .setWebXML(new File("src/test/resources/test-web.xml"));
 
 	return war;
-    }
-
-    @Test
-    public void testRoot(){
-	webdriver.get(contextPath.toExternalForm());
-	
-	assertTrue("TITLE: " + webdriver.getTitle(), webdriver.getTitle().contains("WebCastellum Test Index Page"));
-	assertTrue(webdriver.getCurrentUrl().equals("http://localhost:8080/test/"));	
-    }
-
-    @Test
-    public void testRoot2(){
-	webdriver.get(contextPath.toExternalForm() + "%2e%2e%2f,");
-	
-	assertTrue("AS: " + webdriver.getTitle(), webdriver.getTitle().contains("HTTP Status 400"));
-	//	assertTrue("msg: " + webdriver.getCurrentUrl(), webdriver.getCurrentUrl().equals("http://localhost:8080/test/.."));	
-    }
-
-    @Test
-    public void testRoot3(){
-	webdriver.get(contextPath.toExternalForm() + "test.jsp");
-	
-	assertTrue("AS: " + webdriver.getTitle(), webdriver.getTitle().contains("Web Castellum Test JSP"));
-	//	assertTrue("msg: " + webdriver.getCurrentUrl(), webdriver.getCurrentUrl().equals("http://localhost:8080/test/.."));	
-    }
-
-    //@Ignore
-    @Test
-    public void testRoot4(){
-	webdriver.get(contextPath.toExternalForm() + "?test=%T1");
-
-	//same as getCurrentUrl
-	System.out.println("C" + contextPath.toExternalForm() + "E");
-	//System.out.println("W3: " + webdriver.getTitle());
-	
-	assertTrue("AS: " + webdriver.getTitle(), webdriver.getTitle().contains("WebCastellum Test Index Page"));
-	//	assertTrue("msg: " + webdriver.getCurrentUrl(), webdriver.getCurrentUrl().equals("http://localhost:8080/test/.."));	
     }
 
     //@Ignore
@@ -133,29 +90,14 @@ public class WebFilterArquillianTest {
     }
 
     @Test
-    public void testSQLInjectionViaGetParam7(){
-	webdriver.get(contextPath.toExternalForm() + "test.jsp");
-
-
-	//same as getCurrentUrl
-	System.out.println("C" + contextPath.toExternalForm() + "E");
-	System.out.println("EC" + webdriver.getCurrentUrl() + "E");
-	System.out.println("ET" + webdriver.getTitle() + "E");
-	
-	webdriver.get(contextPath.toExternalForm() + "test.jsp?test=1'%20or%20'1'%20=%20'1&amp;password=1'%20or%20'1'%20=%20'1");	
-	assertTrue("AS: " + webdriver.getTitle(), webdriver.getTitle().contains("HTTP Status 418"));
-	//	assertTrue("msg: " + webdriver.getCurrentUrl(), webdriver.getCurrentUrl().equals("http://localhost:8080/test/.."));	
-    }
-
-    @Test
     public void testSQLInjectionViaGetParam(){
-	String requestUri = "http://localhost:8080/test/test.jsp?test=1'%20or%20'1'%20=%20'1&amp;password=1'%20or%20'1'%20=%20'1";
+	String requestUri = contextPath.toExternalForm() + "test.jsp?test=1'%20or%20'1'%20=%20'1&amp;password=1'%20or%20'1'%20=%20'1";
 	assertBlockedWithoutRedirect(requestUri);
     }
 
     @Test
     public void testSQLInjectionViaGetParam2(){
-	String requestUri = "http://localhost:8080/test/test.jsp?test=1'%20or%20'1'%20=%20'1'))/*&amp;password=foo";
+	String requestUri = contextPath.toExternalForm() + "test.jsp?test=1'%20or%20'1'%20=%20'1'))/*&amp;password=foo";
 	assertBlockedWithoutRedirect(requestUri);
     }
 

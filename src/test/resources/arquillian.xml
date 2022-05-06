@@ -3,7 +3,7 @@
   
     <container qualifier="tomcat" default="true">
         <configuration>
-          <property name="catalinaHome">/var/lib/tomcat9</property>
+	  <property name="catalinaHome">/opt/tomcat</property>
 	  <property name="user">arquillian</property>
 	   <property name="pass">arquillian</property>
         </configuration>

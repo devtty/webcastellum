@@ -42,7 +42,7 @@
     
     <init-param>
       <param-name>DevelopmentAttackReplyStatusCodeOrMessageResource</param-name>
-      <param-value>418</param-value>
+      <param-value>org/webcastellum/attack.html</param-value>
     </init-param>
     <init-param>
       <param-name>ProductionAttackReplyStatusCodeOrMessageResource</param-name>

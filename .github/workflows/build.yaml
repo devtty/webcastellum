@@ -18,10 +18,10 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 11
-      - name: Install Tomcat
-        run: sudo apt-get install -y tomcat9
-      - name: echo env
-        run: echo $CATALINA_HOME
+      - name: download Tomcat
+        run: wget https://archive.apache.org/dist/tomcat/tomcat-9/v9.0.62/bin/apache-tomcat-9.0.62.tar.gz /tmp
+      - name: decompress tomcat
+        run: sudo tar xf /tmp/apache-tomcat-9.0.62.tar.gz -C /opt/tomcat
       - name: Cache Maven packages
         uses: actions/cache@v1
         with:
