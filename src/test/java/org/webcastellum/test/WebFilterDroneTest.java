@@ -33,6 +33,8 @@ import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 
 import org.jboss.arquillian.graphene.Graphene;
+import org.jboss.arquillian.graphene.GrapheneElement;
+import org.jboss.arquillian.graphene.page.Page;
 
 import org.junit.Test;
 import org.junit.Before;
@@ -51,6 +53,10 @@ public class WebFilterDroneTest {
     @Drone
     private WebDriver webdriver;
 
+    @Page
+    private TestPage testPage;
+
+    
     @Deployment
     public static WebArchive createDeployment(){
 	WebArchive war =
@@ -123,6 +129,30 @@ public class WebFilterDroneTest {
 	
 	assertTrue("AS: " + webdriver.getTitle(), webdriver.getTitle().contains("Security Alert"));
 	//	assertTrue("msg: " + webdriver.getCurrentUrl(), webdriver.getCurrentUrl().equals("http://localhost:8080/test/.."));	
+    }
+
+    @Test
+    public void testSimpleFormPost(){
+	webdriver.get(contextPath.toExternalForm() + "test.jsp");
+
+       	assertEquals(testPage.getFirstNameDiv().getText(), "Parameter: null");
+	
+	testPage.submit("ADF");
+
+	assertEquals(testPage.getFirstNameDiv().getText(), "Parameter: ADF");
+    }
+
+    @Test
+    public void testSQLInjectionViaPostParam(){
+	webdriver.get(contextPath.toExternalForm() + "test.jsp");
+
+       	assertEquals(testPage.getFirstNameDiv().getText(), "Parameter: null");
+	
+	testPage.submit("1'%20or%20'1'%20=%20'1&amp;password=1'%20or%20'1'%20=%20'1");
+
+	assertTrue("AS: " + webdriver.getTitle(), webdriver.getTitle().contains("Security Alert"));	
+	
+
     }
 
     public void testSecretTokenLinkInjection(){}
