@@ -11,7 +11,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      CATALINA_HOME: /home/runner/webcastellum/webcastellum/tomcat
+      CATALINA_HOME: /home/runner/work/webcastellum/webcastellum/tomcat
     steps:
       - uses: actions/checkout@v2
         with:
