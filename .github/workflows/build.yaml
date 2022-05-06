@@ -11,7 +11,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      CATALINA_HOME: /home/runner/work/webcastellum/webcastellum/tomcat-9.0.62
+      CATALINA_HOME: /home/runner/work/webcastellum/webcastellum/apache-tomcat-9.0.62
     steps:
       - uses: actions/checkout@v2
         with:
@@ -27,7 +27,8 @@ jobs:
             tar zxf apache-tomcat-9.0.62.tar.gz
             ls -al
             cd apache-tomcat-9.0.62
-            ls -al	    
+            ls -al
+            sed -i '/<\/tomcat-users>/ i\<user username="arquillian" password="arquillian" roles="manager-script"/>' apache-tomcat-9.0.92/conf/tomcat-users.xml
       - name: Cache Maven packages
         uses: actions/cache@v1
         with:
