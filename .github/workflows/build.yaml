@@ -25,9 +25,6 @@ jobs:
             wget https://archive.apache.org/dist/tomcat/tomcat-9/v9.0.62/bin/apache-tomcat-9.0.62.tar.gz
             mkdir tomcat
             tar zxf apache-tomcat-9.0.62.tar.gz
-            ls -al
-            cd apache-tomcat-9.0.62
-            ls -al
             sed -i '/<\/tomcat-users>/ i\<user username="arquillian" password="arquillian" roles="manager-script"/>' apache-tomcat-9.0.62/conf/tomcat-users.xml
       - name: Cache Maven packages
         uses: actions/cache@v1
