@@ -26,6 +26,9 @@ jobs:
             mkdir tomcat
             tar zxf apache-tomcat-9.0.62.tar.gz --directory tomcat
             pwd
+            ls -al
+            cd tomcat
+            ls -al	    
       - name: Cache Maven packages
         uses: actions/cache@v1
         with:
