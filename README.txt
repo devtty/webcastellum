@@ -1,3 +1,5 @@
+[![Java CI](https://github.com/devtty/webcastellum/actions/workflows/build.yaml/badge.svg)](https://github.com/devtty/webcastellum/actions/workflows/build.yaml)
+
 Dieses Quickstart-Readme enthaelt die minimal notwendigen Schritte zur Einbindung der WebCastellum Web Application Firewall 
 in das WAR-Archiv einer Web-Anwendung. Weitergehende Informationen zur Installation sowie detaillierte Anleitungen 
 zur Aktivierung und zum Customizing der zahlreichen angebotenen Schutzfunktionen finden Sie im WebCastellum 
