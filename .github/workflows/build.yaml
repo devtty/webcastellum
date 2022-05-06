@@ -21,7 +21,8 @@ jobs:
       - name: install tomcat
         run: |
             wget https://archive.apache.org/dist/tomcat/tomcat-9/v9.0.62/bin/apache-tomcat-9.0.62.tar.gz
-            tar zxf apache-tomcat-9.0.62.tar.gz --directory target/tomcat
+	    mkdir tomcat
+            tar zxf apache-tomcat-9.0.62.tar.gz --directory tomcat
       - name: Cache Maven packages
         uses: actions/cache@v1
         with:
@@ -29,5 +30,5 @@ jobs:
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
       - name: Build and test
-        run: mvn clean package -P tomcat
+        run: mvn package -P tomcat
 
