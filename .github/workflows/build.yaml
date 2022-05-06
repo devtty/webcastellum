@@ -11,7 +11,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      CATALINA_HOME: /home/runner/work/webcastellum/webcastellum/tomcat
+      CATALINA_HOME: /home/runner/work/webcastellum/webcastellum/tomcat-9.0.62
     steps:
       - uses: actions/checkout@v2
         with:
@@ -24,11 +24,7 @@ jobs:
         run: |
             wget https://archive.apache.org/dist/tomcat/tomcat-9/v9.0.62/bin/apache-tomcat-9.0.62.tar.gz
             mkdir tomcat
-            tar zxf apache-tomcat-9.0.62.tar.gz --directory tomcat
-            pwd
-            ls -al
-            cd tomcat
-            ls -al	    
+            tar zxf apache-tomcat-9.0.62.tar.gz
       - name: Cache Maven packages
         uses: actions/cache@v1
         with:
