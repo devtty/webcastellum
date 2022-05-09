@@ -49,7 +49,8 @@ public class TestPage {
     
     public void submit(String firstName){
 	this.firstName.sendKeys(firstName);
-	guardHttp(submitButton).click();
+	//guardHttp(submitButton).click();
+	submitButton.click();
     }
     
     
