@@ -6,11 +6,11 @@
     <filter-class>org.webcastellum.WebCastellumFilter</filter-class>
     <init-param>
       <param-name>ApplicationName</param-name>
-      <param-value>Testpplication</param-value>
+      <param-value>TestApplication</param-value>
     </init-param>
     <init-param>
       <param-name>LogVerboseForDevelopmentMode</param-name>
-      <param-value>true</param-value>
+      <param-value>false</param-value>
     </init-param>
     <init-param>
       <param-name>DefaultProductionModeCheckerValue</param-name>
@@ -22,15 +22,11 @@
     </init-param>
     <init-param>
       <param-name>Debug</param-name>
-      <param-value>true</param-value>
-    </init-param>
-    <init-param>
-      <param-name>AttackLogDirectory</param-name>
-      <param-value>logs</param-value>
+      <param-value>false</param-value>
     </init-param>
     <init-param>
       <param-name>DefaultAttackLoggerDirectory</param-name>
-      <param-value>/home/user/</param-value>
+      <param-value>/home/runner/work/webcastellum/webcastellum/apache-tomcat-8.5.78/logs</param-value>
     </init-param>
 
     

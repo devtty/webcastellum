@@ -13,5 +13,9 @@
         </protocol> -->
     </container>
 
+    <extension qualifier="webdriver">
+      <property name="javascriptEnabled">false</property>
+    </extension>
+
  
 </arquillian>
