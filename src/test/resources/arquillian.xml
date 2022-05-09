@@ -14,7 +14,8 @@
     </container>
 
     <extension qualifier="webdriver">
-      <property name="javascriptEnabled">false</property>
+      <property name="browser">PhantomJs</property>
+<!--      <property name="javascriptEnabled">false</property> -->
     </extension>
 
  
