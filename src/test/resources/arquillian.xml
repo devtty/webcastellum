@@ -12,6 +12,5 @@
             <property name="port">8181</property>
         </protocol> -->
     </container>
-
  
 </arquillian>
