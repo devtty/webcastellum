@@ -41,6 +41,9 @@ jobs:
           restore-keys: ${{ runner.os }}-m2
       - name: Build
         run: mvn package -P tomcat -Dmaven.test.skip=true
-      - name: Test
-        run: mvn test -P tomcat
+      - name: Analyze
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: mvn -B verify -P tomcat org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=devtty_webcastellum
 
