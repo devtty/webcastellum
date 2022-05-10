@@ -74,7 +74,7 @@ public class WebFilterDroneTest {
 	webdriver.get(contextPath.toExternalForm());
 	
 	assertTrue("TITLE: " + webdriver.getTitle(), webdriver.getTitle().contains("Web Castellum Test JSP"));
-	assertTrue(webdriver.getCurrentUrl().equals("http://localhost:8080/test/test.jsp"));	
+	assertEquals("http://localhost:8080/test/test.jsp", webdriver.getCurrentUrl());
     }
 
     @Test
@@ -131,14 +131,12 @@ public class WebFilterDroneTest {
 
     @Test
     public void testSimpleFormPost(@InitialPage TestPage testPage){
-	System.out.println("SFP T: " + webdriver.getTitle());
 	
-       	assertEquals(testPage.getFirstNameDiv().getText(), "Parameter: null");  //here
+       	assertEquals("Parameter: null", testPage.getFirstNameDiv().getText());  //here
 	
-	testPage.submit("ADF");
-	System.out.println("SFP A: " + webdriver.getTitle());
+	testPage.submit("Horst");
 
-	assertEquals(testPage.getFirstNameDiv().getText(), "Parameter: ADF");
+	assertEquals( "Parameter: Horst", testPage.getFirstNameDiv().getText());
     }
 
     @Test
