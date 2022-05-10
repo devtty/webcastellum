@@ -1,12 +1,15 @@
 package org.webcastellum.test;
 
 import org.jboss.arquillian.graphene.GrapheneElement;
+import org.jboss.arquillian.graphene.page.Location;
 
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import static org.jboss.arquillian.graphene.Graphene.guardHttp;
 
+
+@Location("test.jsp")
 public class TestPage {
 
     @FindBy(id = "fname")
@@ -21,9 +24,8 @@ public class TestPage {
     @FindBy(id = "submit")
     private GrapheneElement submitButton;
 
-    //    @FindBy(xpath = "[@id='firstnameParameter']")
     @FindBy(id = "firstnameParameter")
-    private WebElement firstNameDiv;
+    private GrapheneElement firstNameDiv;
 	
     
     public GrapheneElement getFirstName(){
@@ -42,7 +44,7 @@ public class TestPage {
 	return submitButton;
     }
 
-    public WebElement getFirstNameDiv(){
+    public GrapheneElement getFirstNameDiv(){
 	return firstNameDiv;
     }
     

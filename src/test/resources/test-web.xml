@@ -30,7 +30,7 @@
     </init-param>
     <init-param>
       <param-name>DefaultAttackLoggerDirectory</param-name>
-      <param-value>/home/user/</param-value>
+      <param-value>/home/runner/work/webcastellum/webcastellum/apache-tomcat-8.5.78/logs</param-value>
     </init-param>
 
     
