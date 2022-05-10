@@ -35,6 +35,11 @@
       <param-name>BlockInvalidEncodedQueryString</param-name>
       <param-value>true</param-value>
     </init-param>
+
+    <init-param>
+      <param-name>RedirectWelcomePage</param-name>
+      <param-value>/test/</param-value>
+    </init-param>
     
     <init-param>
       <param-name>DevelopmentAttackReplyStatusCodeOrMessageResource</param-name>
@@ -46,22 +51,20 @@
     </init-param>
     <init-param>
       <param-name>ParameterAndFormProtection</param-name>
-      <param-value>true</param-value>
+      <param-value>false</param-value>
     </init-param>
     <init-param>
       <param-name>SecretTokenLinkInjection</param-name>
-      <param-value>true</param-value>
+      <param-value>false</param-value>
     </init-param>
     <init-param>
       <param-name>QueryStringEncryption</param-name>
-      <param-value>true</param-value>
+      <param-value>false</param-value>
     </init-param>
      <init-param>
       <param-name>ExtraCheckboxProtection</param-name>
-      <param-value>true</param-value>
+      <param-value>false</param-value>
     </init-param>
-
-   
   </filter>
   <filter-mapping>
     <filter-name>WebCastellum</filter-name>

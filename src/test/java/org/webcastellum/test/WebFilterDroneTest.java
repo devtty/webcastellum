@@ -35,6 +35,7 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.arquillian.graphene.Graphene;
 import org.jboss.arquillian.graphene.GrapheneElement;
 import org.jboss.arquillian.graphene.page.Page;
+import org.jboss.arquillian.graphene.page.InitialPage;
 
 import org.junit.Test;
 import org.junit.Before;
@@ -50,13 +51,10 @@ public class WebFilterDroneTest {
     
     @ArquillianResource
     private URL contextPath;
+
     @Drone
     private WebDriver webdriver;
 
-    @Page
-    private TestPage testPage;
-
-    
     @Deployment
     public static WebArchive createDeployment(){
 	WebArchive war =
@@ -75,8 +73,8 @@ public class WebFilterDroneTest {
     public void testRoot(){
 	webdriver.get(contextPath.toExternalForm());
 	
-	assertTrue("TITLE: " + webdriver.getTitle(), webdriver.getTitle().contains("WebCastellum Test Index Page"));
-	assertTrue(webdriver.getCurrentUrl().equals("http://localhost:8080/test/"));	
+	assertTrue("TITLE: " + webdriver.getTitle(), webdriver.getTitle().contains("Web Castellum Test JSP"));
+	assertTrue(webdriver.getCurrentUrl().equals("http://localhost:8080/test/test.jsp"));	
     }
 
     @Test
@@ -104,7 +102,7 @@ public class WebFilterDroneTest {
 	System.out.println("C" + contextPath.toExternalForm() + "E");
 	//System.out.println("W3: " + webdriver.getTitle());
 	
-	assertTrue("AS: " + webdriver.getTitle(), webdriver.getTitle().contains("WebCastellum Test Index Page"));
+	assertTrue("AS: " + webdriver.getTitle(), webdriver.getTitle().contains("Web Castellum Test JSP"));
 	//	assertTrue("msg: " + webdriver.getCurrentUrl(), webdriver.getCurrentUrl().equals("http://localhost:8080/test/.."));	
     }
 
@@ -132,27 +130,24 @@ public class WebFilterDroneTest {
     }
 
     @Test
-    public void testSimpleFormPost(){
-	webdriver.get(contextPath.toExternalForm() + "test.jsp");
-
-       	assertEquals(testPage.getFirstNameDiv().getText(), "Parameter: null");
+    public void testSimpleFormPost(@InitialPage TestPage testPage){
+	System.out.println("SFP T: " + webdriver.getTitle());
+	
+       	assertEquals(testPage.getFirstNameDiv().getText(), "Parameter: null");  //here
 	
 	testPage.submit("ADF");
+	System.out.println("SFP A: " + webdriver.getTitle());
 
 	assertEquals(testPage.getFirstNameDiv().getText(), "Parameter: ADF");
     }
 
     @Test
-    public void testSQLInjectionViaPostParam(){
-	webdriver.get(contextPath.toExternalForm() + "test.jsp");
-
-       	assertEquals(testPage.getFirstNameDiv().getText(), "Parameter: null");
+    public void testSQLInjectionViaPostParam(@InitialPage TestPage testPage){
+       	assertEquals(testPage.getFirstNameDiv().getText(), "Parameter: null"); //here
 	
 	testPage.submit("1'%20or%20'1'%20=%20'1&amp;password=1'%20or%20'1'%20=%20'1");
 
 	assertTrue("AS: " + webdriver.getTitle(), webdriver.getTitle().contains("Security Alert"));	
-	
-
     }
 
     public void testSecretTokenLinkInjection(){}

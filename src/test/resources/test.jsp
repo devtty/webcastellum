@@ -7,7 +7,7 @@
 <body>
    <%= request.getRemoteHost() %>
 
-   <span id="firstnameParameter">Parameter: <%= request.getParameter("fname") %></span>
+   <div id="firstnameParameter">Parameter: <%= request.getParameter("fname") %></div>
 
 <form action="test.jsp" method="POST">
     <label for="fname">First name:</label><br>

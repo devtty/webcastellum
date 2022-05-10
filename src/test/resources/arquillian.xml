@@ -12,11 +12,5 @@
             <property name="port">8181</property>
         </protocol> -->
     </container>
-
-    <extension qualifier="webdriver">
-      <property name="browser">PhantomJs</property>
-<!--      <property name="javascriptEnabled">false</property> -->
-    </extension>
-
  
 </arquillian>
