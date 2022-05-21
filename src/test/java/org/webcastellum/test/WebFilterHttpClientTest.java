@@ -51,7 +51,7 @@ public class WebFilterHttpClientTest {
 	    ShrinkWrap.create(WebArchive.class, "test.war")
 	    .addAsLibrary(new File(System.getProperty("user.home") + "/.m2/repository/javax/jms/jms/1.1/jms-1.1.jar"))
 	    .addAsLibrary(new File(System.getProperty("user.home") + "/.m2/repository/javax/mail/mail/1.5.0-b01/mail-1.5.0-b01.jar"))
-	    .addAsLibrary(new File("target/webcastellum-1.8.4.jar"))
+	    .addAsLibrary(new File("target/webcastellum-1.8.5-SNAPSHOT.jar"))
 	    .addAsWebResource(new File("src/test/resources/index.html"), "index.html")
 	    .addAsWebResource(new File("src/test/resources/test.jsp"), "test.jsp")
 	    .setWebXML(new File("src/test/resources/test-web.xml"));
