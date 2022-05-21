@@ -38,8 +38,7 @@ public abstract class SimpleDefinitionContainer extends AbstractDefinitionContai
         final String message = "WebCastellum loaded "+(ruleFiles.length<10?" ":"")+ruleFiles.length+" security rule"+(ruleFiles.length==1?":  ":"s: ")+this.ruleFileLoader.getPath()+" (via "+this.ruleFileLoader.getClass().getName()+")"; // TODO: Java5 use StringBuilder
         final SortedSet newDefinitions = new TreeSet();
         boolean newHasEnabledDefinitions = false;
-        for (int i=0; i<ruleFiles.length; i++) {
-            final RuleFile ruleFile = ruleFiles[i];
+        for (RuleFile ruleFile : ruleFiles) {
             final Properties properties = ruleFile.getProperties();
             
             // extract request rules from rule file
@@ -73,7 +72,6 @@ public abstract class SimpleDefinitionContainer extends AbstractDefinitionContai
             } catch (PatternSyntaxException e) {
                 throw new IllegalRuleDefinitionFormatException("Invalid regular expression syntax in rule file: "+ruleFile, e);
             }
-            
         }
         // now overwrite the previous values/rules: in order to make it as quick and atomic as possible
         this.definitions = newDefinitions;

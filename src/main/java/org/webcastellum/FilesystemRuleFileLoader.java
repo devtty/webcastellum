@@ -36,8 +36,7 @@ public final class FilesystemRuleFileLoader extends AbstractFilebasedRuleFileLoa
             if (!directory.isDirectory()) throw new IllegalArgumentException("Directory exists but is not a directory (maybe just a file?): "+directory.getAbsolutePath());
             final List/*<RuleFile>*/ rules = new ArrayList/*<RuleFile>*/();
             final File[] files = directory.listFiles();
-            for (int i=0; i<files.length; i++) {
-                final File file = files[i];
+            for (File file : files) {
                 if (file.isFile() && isMatchingSuffix(file.getName())) {
                     if (!file.canRead()) throw new FileNotFoundException("Unable to read rule definition file: "+file.getAbsolutePath());
                     final Properties properties = new Properties();

@@ -155,11 +155,15 @@ public final class ResponseWrapper extends HttpServletResponseWrapper {
         this.matchersToCaptureLinksWithinScripts = matchersToCaptureLinksWithinScripts;
         this.prefiltersToCaptureLinksWithinTags = prefiltersToCaptureLinksWithinTags;
         this.matchersToCaptureLinksWithinTags = matchersToCaptureLinksWithinTags;
-        for (int i=0; i<matchersToCaptureLinksWithinScripts.length; i++) {
-            if (matchersToCaptureLinksWithinScripts[i].groupCount() < 1) throw new IllegalArgumentException("Pattern must have an explicitly defined capturing group to identify the URL: "+matchersToCaptureLinksWithinScripts[i].pattern());
+        for (Matcher matchersToCaptureLinksWithinScript : matchersToCaptureLinksWithinScripts) {
+            if (matchersToCaptureLinksWithinScript.groupCount() < 1) {
+                throw new IllegalArgumentException("Pattern must have an explicitly defined capturing group to identify the URL: " + matchersToCaptureLinksWithinScript.pattern());
+            }
         }
-        for (int i=0; i<matchersToCaptureLinksWithinTags.length; i++) {
-            if (matchersToCaptureLinksWithinTags[i].groupCount() < 1) throw new IllegalArgumentException("Pattern must have an explicitly defined capturing group to identify the URL: "+matchersToCaptureLinksWithinTags[i].pattern());
+        for (Matcher matchersToCaptureLinksWithinTag : matchersToCaptureLinksWithinTags) {
+            if (matchersToCaptureLinksWithinTag.groupCount() < 1) {
+                throw new IllegalArgumentException("Pattern must have an explicitly defined capturing group to identify the URL: " + matchersToCaptureLinksWithinTag.pattern());
+            }
         }
 
         this.groupNumbersToCaptureLinksWithinScripts = groupNumbersToCaptureLinksWithinScripts;
@@ -677,10 +681,10 @@ public final class ResponseWrapper extends HttpServletResponseWrapper {
     private Date parseHttpDate(final String value) {
         if (value == null || value.length() == 0) return null;
         Date result = null;
-        for (int i=0; i<HTTP_DATE_FORMATS.length; i++) {
+        for (SimpleDateFormat HTTP_DATE_FORMATS1 : HTTP_DATE_FORMATS) {
             try {
-                result = HTTP_DATE_FORMATS[i].parse(value);
-            } catch (ParseException ignored) {} catch (RuntimeException ignored) {}
+                result = HTTP_DATE_FORMATS1.parse(value);
+            }catch (ParseException ignored) {}catch (RuntimeException ignored) {}
         }
         return result;
     }

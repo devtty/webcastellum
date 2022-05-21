@@ -143,8 +143,8 @@ public final class ResponseModificationDefinitionContainer extends RequestDefini
             try {
                 final String[] tokens = WordMatchingUtils.split(value);
                 final List/*<Integer>*/ groupNumbers = new ArrayList(tokens.length);
-                for (int i=0; i<tokens.length; i++) {
-                    final int groupNumber = Integer.parseInt(tokens[i].trim());
+                for (String token : tokens) {
+                    final int groupNumber = Integer.parseInt(token.trim());
                     if (groupNumber > responseModificationDefinition.getUrlCapturingPattern().matcher("TEST").groupCount()) throw new IllegalRuleDefinitionFormatException("Configured pattern has no corresponding capturing group for response-modification specific value: "+KEY_CAPTURING_GROUP_NUMBERS+" for rule: "+responseModificationDefinition.getIdentification()+": "+value);
                     groupNumbers.add(new Integer(groupNumber));
                 }

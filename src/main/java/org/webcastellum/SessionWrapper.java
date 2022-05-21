@@ -173,8 +173,7 @@ public final class SessionWrapper implements HttpSession, Serializable {
     private String[] hideInternal(final String[] names) {
         if (names == null) return null;
         final Vector namesFiltered = new Vector();
-        for (int i=0; i<names.length; i++) {
-            final String name = names[i];
+        for (String name : names) {
             if ( !isInternal(name) ) namesFiltered.add(name);
         }
         return (String[]) namesFiltered.toArray(new String[0]);

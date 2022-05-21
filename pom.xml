@@ -10,7 +10,7 @@
     <groupId>org.webcastellum</groupId>
     <artifactId>webcastellum</artifactId>
     <packaging>jar</packaging>
-    <version>1.8.4</version>
+    <version>1.8.5-SNAPSHOT</version>
     <name>WebCastellum</name>
     <url>http://www.WebCastellum.org</url>
     <description>Java-based Open Source WAF (Web Application Firewall) to include inside a web application in order to protect it against attacks like SQL Injection, Cross-Site Scripting (XSS), Cross-Site Request Forgery (CSRF), Parameter Manipulation and many more.</description>
@@ -100,6 +100,12 @@
             <groupId>javax.mail</groupId>
             <artifactId>mail</artifactId>
             <version>[1.3,)</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.activation</groupId>
+            <artifactId>javax.activation</artifactId>
+            <version>1.2.0</version>
             <scope>provided</scope>
         </dependency>
 	<dependency>

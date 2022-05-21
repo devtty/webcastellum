@@ -39,10 +39,12 @@ public final class WordMatchingUtils {
 				}
 			}
 		} else {
-			// simple brute force check
-			for (int i=0; i<words.length; i++) {
-				if (text.contains(words[i])) return true;
-			}
+                    // simple brute force check
+                    for (String word : words) {
+                        if (text.contains(word)) {
+                            return true;
+                        }
+                    }
 		}
 		return false;
 	}
@@ -56,27 +58,27 @@ public final class WordMatchingUtils {
 	public static int determineMinimumLength(final String[] words) {
 		if (words == null || words.length == 0) return 0;
 		int minLength = Integer.MAX_VALUE;
-		for (int i=0; i<words.length; i++) {
-            minLength = Math.min(minLength, words[i].length());
-        }
+            for (String word : words) {
+                minLength = Math.min(minLength, word.length());
+            }
 		return minLength;
 	}
 	
 	public static String[] deduplicate(final String[] patterns) {
 		if (patterns == null || patterns.length == 0) return patterns;
 		final Set/*<String>*/ searchWords = new HashSet(patterns.length);
-		for (int i=0; i<patterns.length; i++) {
-            searchWords.add(patterns[i]);
-        }
+            for (String pattern : patterns) {
+                searchWords.add(pattern);
+            }
 		return (String[]) searchWords.toArray(new String[]{});
 	}
 
 	public static String[] trimLowercaseAndDeduplicate(final String[] patterns) {
 		if (patterns == null || patterns.length == 0) return patterns;
 		final Set/*<String>*/ searchWords = new HashSet(patterns.length);
-		for (int i=0; i<patterns.length; i++) {
-            searchWords.add(patterns[i].trim().toLowerCase());
-        }
+            for (String pattern : patterns) {
+                searchWords.add(pattern.trim().toLowerCase());
+            }
 		return (String[]) searchWords.toArray(new String[]{});
 	}
 	

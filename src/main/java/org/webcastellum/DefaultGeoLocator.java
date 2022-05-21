@@ -30,18 +30,22 @@ public final class DefaultGeoLocator implements GeoLocator {
     public static final String PARAM_XML_ELEMENT_COUNTRY_CODE = "DefaultGeoLocatorXmlCountryCodeElement";
     
 
-    private boolean enabled=false, cachingOfNegativeRepliesAllowed=false;
-    private int connectTimeout, readTimeout;
-    private String servicePattern, xmlElementName;
+    private boolean enabled=false;
+    private boolean cachingOfNegativeRepliesAllowed=false;
+    
+    private int connectTimeout;
+    private int readTimeout;
+    private String servicePattern;
+    private String xmlElementName;
     private Proxy proxy;
     
   
     public void setFilterConfig(FilterConfig filterConfig) throws FilterConfigurationException {
         final ConfigurationManager configManager = ConfigurationUtils.createConfigurationManager(filterConfig);
         // enabled
-        this.enabled = (""+true).equals( ConfigurationUtils.extractOptionalConfigValue(configManager, PARAM_ENABLED, ""+false).trim().toLowerCase() );
+        this.enabled = (""+true).equalsIgnoreCase( ConfigurationUtils.extractOptionalConfigValue(configManager, PARAM_ENABLED, ""+false).trim());
         // cachingOfNegativeRepliesAllowed 
-        this.cachingOfNegativeRepliesAllowed = (""+true).equals( ConfigurationUtils.extractOptionalConfigValue(configManager, PARAM_CACHING_NEGATIVES_ALLOWED, ""+true).trim().toLowerCase() );
+        this.cachingOfNegativeRepliesAllowed = (""+true).equalsIgnoreCase( ConfigurationUtils.extractOptionalConfigValue(configManager, PARAM_CACHING_NEGATIVES_ALLOWED, ""+true).trim() );
         { // connect timeout
             final String value = ConfigurationUtils.extractOptionalConfigValue(configManager, PARAM_TIMEOUT_CONNECT, "750");
             try {
@@ -105,7 +109,10 @@ public final class DefaultGeoLocator implements GeoLocator {
             if (status != HttpURLConnection.HTTP_OK) throw new GeoLocatingException("Non-OK status code returned from geo-locating site: "+status);
             input = connection.getInputStream();
             // unfortunately DocumentBuilderFactory is not guaranteed to be thread-safe, so either synchronize it here (when caching) or simply don't cache it as a member variable
-            final Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(input);
+            DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+            documentBuilderFactory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+            final Document document = documentBuilderFactory.newDocumentBuilder().parse(input);
+            
             final NodeList countryAbbrevs = document.getElementsByTagName(this.xmlElementName);
             if (countryAbbrevs.getLength() == 0) throw new GeoLocatingException("No country containing XML received from geo-locating site");
             final String result = countryAbbrevs.item(0).getTextContent();
@@ -129,32 +136,5 @@ public final class DefaultGeoLocator implements GeoLocator {
             if (connection != null) try { connection.disconnect(); } catch (RuntimeException ignored) {}
         }
     }
-
-    
-    
-    /** /
-    // just for local testing
-    public static final void main(String[] args) throws Exception {
-        final GeoLocator locator = new DefaultGeoLocator();
-        locator.setFilterConfig(new FilterConfig(){
-            public String getFilterName() {
-                throw new UnsupportedOperationException("Not supported yet.");
-            }
-            public javax.servlet.ServletContext getServletContext() {
-                throw new UnsupportedOperationException("Not supported yet.");
-            }
-            public java.util.Enumeration getInitParameterNames() {
-                throw new UnsupportedOperationException("Not supported yet.");
-            }
-            public String getInitParameter(String key) {
-                //if (PARAM_INTERNET_PROXY_HOST.equals(key)) return "127.0.0.1";
-                //if (PARAM_INTERNET_PROXY_PORT.equals(key)) return "8008";
-                return null;
-            }
-        });
-        final long timer = System.currentTimeMillis();
-        final String result = locator.getCountryCode("212.85.96.95");
-        System.out.println("Result: "+result+" in "+(System.currentTimeMillis()-timer)+" ms");
-    }/**/
     
 }

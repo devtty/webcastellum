@@ -740,8 +740,7 @@ public final class ResponseFilterStream extends AbstractRelaxingHtmlParserStream
     private void prefilterMatchingFormMaskingExclusions(String extractedFormNameDecoded) {
         if (extractedFormNameDecoded == null) extractedFormNameDecoded = ""; // = to enable matching of forms without a name attribute
         // take only those that are matching the current form's name from the array of form-field-masking-exclusions that match the request
-        for (int i=0; i<this.matchingFormFieldMaskingExclusions.length; i++) {
-            final FormFieldMaskingExcludeDefinition formFieldExclusion = this.matchingFormFieldMaskingExclusions[i];
+        for (FormFieldMaskingExcludeDefinition formFieldExclusion : this.matchingFormFieldMaskingExclusions) {
             if ((formFieldExclusion.getFormNamePrefilter()==null || WordMatchingUtils.matchesWord(formFieldExclusion.getFormNamePrefilter(),extractedFormNameDecoded,WebCastellumFilter.TRIE_MATCHING_THRSHOLD)) 
                     && formFieldExclusion.getFormNamePattern().matcher(extractedFormNameDecoded).find()) this.formFieldExclusionsOfCurrentForm.add(formFieldExclusion);
         }

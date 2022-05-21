@@ -217,12 +217,12 @@ public final class MultipartServletRequest extends HttpServletRequestWrapper {
             }
             final String[] values = getRequest().getParameterValues(urlParamName);
             if (values != null) {
-                for (int i = 0; i < values.length; i++) {
-                    addToMapOfCollections(this.urlParametersOfRequest, urlParamName, values[i]);
-                    addToMapOfCollections(this.urlAndFormParametersOfRequestMerged, urlParamName, values[i]);
+                for (String value : values) {
+                    addToMapOfCollections(this.urlParametersOfRequest, urlParamName, value);
+                    addToMapOfCollections(this.urlAndFormParametersOfRequestMerged, urlParamName, value);
                     hasUrlParamsOnFirstAttempt = true;
                     if (DEBUG) {
-                        System.out.println("           ---> with value: " + values[i]);
+                        System.out.println("           ---> with value: " + value);
                     }
                 }
             }

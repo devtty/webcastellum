@@ -464,18 +464,17 @@ public final class ResponseUtils {
             if (queryString == null) return ServerUtils.findReusableSessionContentKeyOrCreateNewOne(session, parameterAndFormProtection, reuseSessionContent, applySetAfterWrite);
             queryString = ServerUtils.unmaskAmpersandsInLink(queryString);
             final String[] parameters = queryString.split("&");
-            for (int i=0; i<parameters.length; i++) {
-                final String parameter = parameters[i];
+            for (String parameter : parameters) {
                 final int equalsSignPos = parameter.indexOf('=');
                 final String name = equalsSignPos > -1 ? parameter.substring(0,equalsSignPos) : parameter;
                 final String nameDecoded = ServerUtils.decodeBrokenValue(name);
                 parameterAndFormProtection.addParameterName(nameDecoded, false); // false since the URL params are encrypted and therefore always submitted unchanged
                 // also track the request parameter value count of the link's params
-                                    // TODO: only required to track when "ExtraRequestParamValueCountProtection" is configured to true:
+                // TODO: only required to track when "ExtraRequestParamValueCountProtection" is configured to true:
                 parameterAndFormProtection.incrementMinimumValueCountForParameterName(nameDecoded, 1);
                 parameterAndFormProtection.incrementMaximumValueCountForParameterName(nameDecoded, 1);
                 // in case also a readonly form field exists with the same name as the current URL query-string param, take that readonly form field out of the check...
-                                    // TODO: only required to track when "ExtraReadonlyFormFieldProtection" is configured to true:
+                // TODO: only required to track when "ExtraReadonlyFormFieldProtection" is configured to true:
                 parameterAndFormProtection.addReadwriteFieldName(nameDecoded); // TODO: anstelle hier das ganze readonly-form-feld aus dem readonlyness-schutz rauszunehmen, koennte man auch besser noch einfach den Wert des hier gerade aktiven URL-parameters mit in die Liste der expected values zu dem field-name nehmen... aber so wie es jetzt ist, ist es auch erstmal ok...
             }
             return ServerUtils.findReusableSessionContentKeyOrCreateNewOne(session, parameterAndFormProtection, reuseSessionContent, applySetAfterWrite);
