@@ -199,10 +199,8 @@ public abstract class RequestDefinitionContainer/*<T extends RequestDefinition>*
         final SortedSet newDefinitions = new TreeSet();
         boolean newHasEnabledDefinitions=false, newHavingEnabledRequestParamCheckingRules=false, newHavingEnabledQueryStringCheckingRules=false, newHavingEnabledHeaderCheckingRules=false, newHavingEnabledCookieCheckingRules=false;
 
-        for (int i=0; i<ruleFiles.length; i++) {
-            final RuleFile ruleFile = ruleFiles[i];
+        for (RuleFile ruleFile : ruleFiles) {
             final Properties properties = ruleFile.getProperties();
-            
             // extract request rules from rule file
             // "enabled" and "description" are the standard base properties that even exist for CustomRequestMatcher based rule files
             final boolean enabled = (""+true).equals( properties.getProperty(KEY_ENABLED, "true").trim().toLowerCase() );
@@ -213,10 +211,9 @@ public abstract class RequestDefinitionContainer/*<T extends RequestDefinition>*
             final String servletPath = properties.getProperty(KEY_SERVLET_PATH);
             final String customRequestMatcherClassName = properties.getProperty(KEY_CUSTOM_REQUEST_MATCHER);
             if (servletPath == null && customRequestMatcherClassName == null) throw new IllegalRuleDefinitionFormatException("Servlet path property ("+KEY_SERVLET_PATH+") OR custom request matcher property ("+KEY_CUSTOM_REQUEST_MATCHER+") not found in rule file: "+ruleFile);
-
-            
             // now decide if a standard rule file or a custom-request-matcher based rule file should be created
-            if ( properties.containsKey(KEY_CUSTOM_REQUEST_MATCHER) ) { //= custom-request-matcher based rule file @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+            if (properties.containsKey(KEY_CUSTOM_REQUEST_MATCHER)) {
+                //= custom-request-matcher based rule file @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
                 try {
                     final Class customRequestMatcherClass = Class.forName(customRequestMatcherClassName.trim());
                     final CustomRequestMatcher customRequestMatcher = (CustomRequestMatcher) customRequestMatcherClass.newInstance();
@@ -245,14 +242,15 @@ public abstract class RequestDefinitionContainer/*<T extends RequestDefinition>*
                 } catch (CustomRequestMatchingException e) {
                     throw new IllegalRuleDefinitionFormatException("Unable to set custom request matching properties for customRequestMatcher in rule file: "+ruleFile, e);
                 }
-            } else { //= standard rule file @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+            } else {
+                //= standard rule file @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
                 // fetch the list of negations
                 final List/*<String>*/ negations = new ArrayList();
                 if (properties.getProperty(KEY_NEGATION) != null) {
                     // split, since they're comma-separated'
                     final String[] negationNamesSplitted = properties.getProperty(KEY_NEGATION).split(",");
-                    for (int j=0; j<negationNamesSplitted.length; j++) {
-                        final String negationName = negationNamesSplitted[j].trim();
+                    for (String negationNamesSplitted1 : negationNamesSplitted) {
+                        final String negationName = negationNamesSplitted1.trim();
                         if (negationName.length() > 0) negations.add(negationName);
                     }
                 }
@@ -260,7 +258,6 @@ public abstract class RequestDefinitionContainer/*<T extends RequestDefinition>*
                 if (negations.contains(KEY_DESCRIPTION)) throw new IllegalRuleDefinitionFormatException("Description property is not allowed in negation names found in rule file: "+ruleFile);
                 if (negations.contains(KEY_ENABLED)) throw new IllegalRuleDefinitionFormatException("Enabled flag is not allowed in negation names found in rule file: "+ruleFile);
                 if (negations.contains(KEY_NEGATION)) throw new IllegalRuleDefinitionFormatException("Not allowed to negate the negations found in rule file: "+ruleFile);
-
                 // fetch the expressions
                 try {
                     final Pattern servletPathPattern = Pattern.compile(servletPath);
@@ -437,79 +434,79 @@ public abstract class RequestDefinitionContainer/*<T extends RequestDefinition>*
                         
                         
                         // optional PREFILTER values
-                          else if (KEY_CONTEXT_PATH_PREFILTER.equals(key)) {
-                              requestDefinition.setContextPathPrefilter( WordDictionary.createInstance(properties.getProperty(key)) );
+                        else if (KEY_CONTEXT_PATH_PREFILTER.equals(key)) {
+                            requestDefinition.setContextPathPrefilter( WordDictionary.createInstance(properties.getProperty(key)) );
                         } else if (KEY_PATH_INFO_PREFILTER.equals(key)) {
-                              requestDefinition.setPathInfoPrefilter( WordDictionary.createInstance(properties.getProperty(key)) );
+                            requestDefinition.setPathInfoPrefilter( WordDictionary.createInstance(properties.getProperty(key)) );
                         } else if (KEY_PATH_TRANSLATED_PREFILTER.equals(key)) {
-                              requestDefinition.setPathTranslatedPrefilter( WordDictionary.createInstance(properties.getProperty(key)) );
+                            requestDefinition.setPathTranslatedPrefilter( WordDictionary.createInstance(properties.getProperty(key)) );
                         } else if (KEY_COUNTRY_PREFILTER.equals(key)) {
-                              requestDefinition.setCountryPrefilter( WordDictionary.createInstance(properties.getProperty(key)) );
+                            requestDefinition.setCountryPrefilter( WordDictionary.createInstance(properties.getProperty(key)) );
                         } else if (KEY_REMOTE_ADDR_PREFILTER.equals(key)) {
-                              requestDefinition.setRemoteAddrPrefilter( WordDictionary.createInstance(properties.getProperty(key)) );
+                            requestDefinition.setRemoteAddrPrefilter( WordDictionary.createInstance(properties.getProperty(key)) );
                         } else if (KEY_REMOTE_HOST_PREFILTER.equals(key)) {
-                              requestDefinition.setRemoteHostPrefilter( WordDictionary.createInstance(properties.getProperty(key)) );
+                            requestDefinition.setRemoteHostPrefilter( WordDictionary.createInstance(properties.getProperty(key)) );
                         } else if (KEY_REMOTE_PORT_PREFILTER.equals(key)) {
-                              requestDefinition.setRemotePortPrefilter( WordDictionary.createInstance(properties.getProperty(key)) );
+                            requestDefinition.setRemotePortPrefilter( WordDictionary.createInstance(properties.getProperty(key)) );
                         } else if (KEY_REMOTE_USER_PREFILTER.equals(key)) {
-                              requestDefinition.setRemoteUserPrefilter( WordDictionary.createInstance(properties.getProperty(key)) );
+                            requestDefinition.setRemoteUserPrefilter( WordDictionary.createInstance(properties.getProperty(key)) );
                         } else if (KEY_TIME_PREFILTER.equals(key)) {
-                              requestDefinition.setTimePrefilter( WordDictionary.createInstance(properties.getProperty(key)) );
+                            requestDefinition.setTimePrefilter( WordDictionary.createInstance(properties.getProperty(key)) );
                         } else if (KEY_TIME_YEAR_PREFILTER.equals(key)) {
-                              requestDefinition.setTimeYearPrefilter( WordDictionary.createInstance(properties.getProperty(key)) );
+                            requestDefinition.setTimeYearPrefilter( WordDictionary.createInstance(properties.getProperty(key)) );
                         } else if (KEY_TIME_MONTH_PREFILTER.equals(key)) {
-                              requestDefinition.setTimeMonthPrefilter( WordDictionary.createInstance(properties.getProperty(key)) );
+                            requestDefinition.setTimeMonthPrefilter( WordDictionary.createInstance(properties.getProperty(key)) );
                         } else if (KEY_TIME_DAY_PREFILTER.equals(key)) {
-                              requestDefinition.setTimeDayPrefilter( WordDictionary.createInstance(properties.getProperty(key)) );
+                            requestDefinition.setTimeDayPrefilter( WordDictionary.createInstance(properties.getProperty(key)) );
                         } else if (KEY_TIME_HOUR_PREFILTER.equals(key)) {
-                              requestDefinition.setTimeHourPrefilter( WordDictionary.createInstance(properties.getProperty(key)) );
+                            requestDefinition.setTimeHourPrefilter( WordDictionary.createInstance(properties.getProperty(key)) );
                         } else if (KEY_TIME_MINUTE_PREFILTER.equals(key)) {
-                              requestDefinition.setTimeMinutePrefilter( WordDictionary.createInstance(properties.getProperty(key)) );
+                            requestDefinition.setTimeMinutePrefilter( WordDictionary.createInstance(properties.getProperty(key)) );
                         } else if (KEY_TIME_SECOND_PREFILTER.equals(key)) {
-                              requestDefinition.setTimeSecondPrefilter( WordDictionary.createInstance(properties.getProperty(key)) );
+                            requestDefinition.setTimeSecondPrefilter( WordDictionary.createInstance(properties.getProperty(key)) );
                         } else if (KEY_TIME_WEEKDAY_PREFILTER.equals(key)) {
-                              requestDefinition.setTimeWeekdayPrefilter( WordDictionary.createInstance(properties.getProperty(key)) );
+                            requestDefinition.setTimeWeekdayPrefilter( WordDictionary.createInstance(properties.getProperty(key)) );
                         } else if (KEY_AUTH_TYPE_PREFILTER.equals(key)) {
-                              requestDefinition.setAuthTypePrefilter( WordDictionary.createInstance(properties.getProperty(key)) );
+                            requestDefinition.setAuthTypePrefilter( WordDictionary.createInstance(properties.getProperty(key)) );
                         } else if (KEY_SCHEME_PREFILTER.equals(key)) {
-                              requestDefinition.setSchemePrefilter( WordDictionary.createInstance(properties.getProperty(key)) );
+                            requestDefinition.setSchemePrefilter( WordDictionary.createInstance(properties.getProperty(key)) );
                         } else if (KEY_METHOD_PREFILTER.equals(key)) {
-                              requestDefinition.setMethodPrefilter( WordDictionary.createInstance(properties.getProperty(key)) );
+                            requestDefinition.setMethodPrefilter( WordDictionary.createInstance(properties.getProperty(key)) );
                         } else if (KEY_PROTOCOL_PREFILTER.equals(key)) {
-                              requestDefinition.setProtocolPrefilter( WordDictionary.createInstance(properties.getProperty(key)) );
+                            requestDefinition.setProtocolPrefilter( WordDictionary.createInstance(properties.getProperty(key)) );
                         } else if (KEY_MIME_TYPE_PREFILTER.equals(key)) {
-                              requestDefinition.setMimeTypePrefilter( WordDictionary.createInstance(properties.getProperty(key)) );
+                            requestDefinition.setMimeTypePrefilter( WordDictionary.createInstance(properties.getProperty(key)) );
                         } else if (KEY_ENCODING_PREFILTER.equals(key)) {
-                              requestDefinition.setEncodingPrefilter( WordDictionary.createInstance(properties.getProperty(key)) );
+                            requestDefinition.setEncodingPrefilter( WordDictionary.createInstance(properties.getProperty(key)) );
                         } else if (KEY_CONTENT_LENGTH_PREFILTER.equals(key)) {
-                              requestDefinition.setContentLengthPrefilter( WordDictionary.createInstance(properties.getProperty(key)) );
+                            requestDefinition.setContentLengthPrefilter( WordDictionary.createInstance(properties.getProperty(key)) );
                         } else if (KEY_HEADER_NAME_LIST_PREFILTER.equals(key)) {
-                              requestDefinition.setHeaderNameListPrefilter( WordDictionary.createInstance(properties.getProperty(key)) );
+                            requestDefinition.setHeaderNameListPrefilter( WordDictionary.createInstance(properties.getProperty(key)) );
                         } else if (KEY_REQUEST_URL_PREFILTER.equals(key)) {
-                              requestDefinition.setRequestURLPrefilter( WordDictionary.createInstance(properties.getProperty(key)) );
+                            requestDefinition.setRequestURLPrefilter( WordDictionary.createInstance(properties.getProperty(key)) );
                         } else if (KEY_REQUEST_URI_PREFILTER.equals(key)) {
-                              requestDefinition.setRequestURIPrefilter( WordDictionary.createInstance(properties.getProperty(key)) );
+                            requestDefinition.setRequestURIPrefilter( WordDictionary.createInstance(properties.getProperty(key)) );
                         } else if (KEY_COOKIE_NAME_LIST_PREFILTER.equals(key)) {
-                              requestDefinition.setCookieNameListPrefilter( WordDictionary.createInstance(properties.getProperty(key)) );
+                            requestDefinition.setCookieNameListPrefilter( WordDictionary.createInstance(properties.getProperty(key)) );
                         } else if (KEY_REQUESTED_SESSION_ID_PREFILTER.equals(key)) {
-                              requestDefinition.setRequestedSessionIdPrefilter( WordDictionary.createInstance(properties.getProperty(key)) );
+                            requestDefinition.setRequestedSessionIdPrefilter( WordDictionary.createInstance(properties.getProperty(key)) );
                         } else if (KEY_QUERY_STRING_PREFILTER.equals(key)) {
-                              requestDefinition.setQueryStringPrefilter( WordDictionary.createInstance(properties.getProperty(key)) );
+                            requestDefinition.setQueryStringPrefilter( WordDictionary.createInstance(properties.getProperty(key)) );
                         } else if (KEY_PARAM_NAME_LIST_PREFILTER.equals(key)) {
-                              requestDefinition.setRequestParamNameListPrefilter( WordDictionary.createInstance(properties.getProperty(key)) );
+                            requestDefinition.setRequestParamNameListPrefilter( WordDictionary.createInstance(properties.getProperty(key)) );
                         } else if (KEY_SERVER_NAME_PREFILTER.equals(key)) {
-                              requestDefinition.setServerNamePrefilter( WordDictionary.createInstance(properties.getProperty(key)) );
+                            requestDefinition.setServerNamePrefilter( WordDictionary.createInstance(properties.getProperty(key)) );
                         } else if (KEY_SERVER_PORT_PREFILTER.equals(key)) {
-                              requestDefinition.setServerPortPrefilter( WordDictionary.createInstance(properties.getProperty(key)) );
+                            requestDefinition.setServerPortPrefilter( WordDictionary.createInstance(properties.getProperty(key)) );
                         } else if (KEY_LOCAL_ADDR_PREFILTER.equals(key)) {
-                              requestDefinition.setLocalAddrPrefilter( WordDictionary.createInstance(properties.getProperty(key)) );
+                            requestDefinition.setLocalAddrPrefilter( WordDictionary.createInstance(properties.getProperty(key)) );
                         } else if (KEY_LOCAL_NAME_PREFILTER.equals(key)) {
-                              requestDefinition.setLocalNamePrefilter( WordDictionary.createInstance(properties.getProperty(key)) );
+                            requestDefinition.setLocalNamePrefilter( WordDictionary.createInstance(properties.getProperty(key)) );
                         } else if (KEY_LOCAL_PORT_PREFILTER.equals(key)) {
-                              requestDefinition.setLocalPortPrefilter( WordDictionary.createInstance(properties.getProperty(key)) );
-                              
-                              
-                              
+                            requestDefinition.setLocalPortPrefilter( WordDictionary.createInstance(properties.getProperty(key)) );
+                            
+                            
+                            
                         } else if (key.length() > KEY_HEADER_NAME_PREFIX_PREFILTER.length() && key.startsWith(KEY_HEADER_NAME_PREFIX_PREFILTER)) {
                             final String headerName = key.substring(KEY_HEADER_NAME_PREFIX_PREFILTER.length()).toUpperCase();
                             if (requestDefinition.getHeaderValuePrefilter(headerName) != null) throw new IllegalRuleDefinitionFormatException("Multiple headers with the same name are not allowed in rule file (note that header names are case-insensitive): "+ruleFile);
@@ -524,9 +521,9 @@ public abstract class RequestDefinitionContainer/*<T extends RequestDefinition>*
                         } else if (KEY_HEADER_COUNT_ANY_PREFILTER.equals(key)) {
                             // null as special key that stands for "any header name"
                             requestDefinition.addHeaderCountPrefilter(null, WordDictionary.createInstance(properties.getProperty(key)));
-                              
-                              
-                              
+                            
+                            
+                            
                         } else if (key.length() > KEY_COOKIE_NAME_PREFIX_PREFILTER.length() && key.startsWith(KEY_COOKIE_NAME_PREFIX_PREFILTER)) {
                             final String cookieName = key.substring(KEY_COOKIE_NAME_PREFIX_PREFILTER.length()).toUpperCase();
                             if (requestDefinition.getCookieValuePrefilter(cookieName) != null) throw new IllegalRuleDefinitionFormatException("Multiple cookies with the same name are not allowed in rule file (note that cookie names are case-insensitive): "+ruleFile);
@@ -541,9 +538,9 @@ public abstract class RequestDefinitionContainer/*<T extends RequestDefinition>*
                         } else if (KEY_COOKIE_COUNT_ANY_PREFILTER.equals(key)) {
                             // null as special key that stands for "any cookie name"
                             requestDefinition.addCookieCountPrefilter(null, WordDictionary.createInstance(properties.getProperty(key)));
-                        
-    
-
+                            
+                            
+                            
                         } else if (key.length() > KEY_PARAM_NAME_PREFIX_PREFILTER.length() && key.startsWith(KEY_PARAM_NAME_PREFIX_PREFILTER)) {
                             final String paramName = key.substring(KEY_PARAM_NAME_PREFIX_PREFILTER.length());
                             if (requestDefinition.getRequestParamValuePrefilter(paramName) != null) throw new IllegalRuleDefinitionFormatException("Multiple request parameters with the same name are not allowed in rule file: "+ruleFile);
@@ -558,9 +555,9 @@ public abstract class RequestDefinitionContainer/*<T extends RequestDefinition>*
                         } else if (KEY_PARAM_COUNT_ANY_PREFILTER.equals(key)) {
                             // null as special key that stands for "any parameter name"
                             requestDefinition.addRequestParamCountPrefilter(null, WordDictionary.createInstance(properties.getProperty(key)));
-
-                        
-                        
+                            
+                            
+                            
                         } else {
                             // yet unknown key, so don't remove it from the list: continue directly without removal (see below)
                             continue;
@@ -575,8 +572,7 @@ public abstract class RequestDefinitionContainer/*<T extends RequestDefinition>*
                 } catch (PatternSyntaxException e) {
                     throw new IllegalRuleDefinitionFormatException("Invalid regular expression syntax in rule file: "+ruleFile, e);
                 }
-            }            
-            
+            }
         }
         // now overwrite the previous values/rules: in order to make it as quick and atomic as possible
         this.definitions = newDefinitions;
@@ -1026,8 +1022,8 @@ public abstract class RequestDefinitionContainer/*<T extends RequestDefinition>*
                             boolean foundMatch = !matchingSingleValueIsEnough;
                             for (final Iterator it = headerMapVariants.values().iterator(); it.hasNext();) {
                                 final Permutation[] values = (Permutation[]) it.next();
-                                for (int i=0; i<values.length; i++) {
-                                    if (ServerUtils.isVariantMatching(values[i],prefilter,matcher,this.nonStandardPermutationsAllowed) == expectation) {
+                                for (Permutation value : values) {
+                                    if (ServerUtils.isVariantMatching(value, prefilter, matcher, this.nonStandardPermutationsAllowed) == expectation) {
                                         if (matchingSingleValueIsEnough) {
                                             foundMatch = true;
                                             break;
@@ -1054,8 +1050,7 @@ public abstract class RequestDefinitionContainer/*<T extends RequestDefinition>*
                                 final Matcher matcher = requestDefinition.getHeaderValuePattern(headerName).matcher("");
                                 final boolean expectation = !requestDefinition.isHeaderValuePatternNegated(headerName);
                                 boolean match = !matchingSingleValueIsEnough;
-                                for (int i=0; i<headerValues.length; i++) {
-                                    final Permutation headerValue = headerValues[i];
+                                for (Permutation headerValue : headerValues) {
                                     if (ServerUtils.isVariantMatching(headerValue,prefilter,matcher,this.nonStandardPermutationsAllowed) == expectation) {
                                         if (matchingSingleValueIsEnough) {
                                             match = true;
@@ -1143,8 +1138,8 @@ public abstract class RequestDefinitionContainer/*<T extends RequestDefinition>*
                             boolean foundMatch = !matchingSingleValueIsEnough;
                             for (final Iterator it = cookieMapVariants.values().iterator(); it.hasNext();) {
                                 final Permutation[] values = (Permutation[]) it.next();
-                                for (int i=0; i<values.length; i++) {
-                                    if (ServerUtils.isVariantMatching(values[i],prefilter,matcher,this.nonStandardPermutationsAllowed) == expectation) {
+                                for (Permutation value : values) {
+                                    if (ServerUtils.isVariantMatching(value, prefilter, matcher, this.nonStandardPermutationsAllowed) == expectation) {
                                         if (matchingSingleValueIsEnough) {
                                             foundMatch = true;
                                             break;
@@ -1171,8 +1166,7 @@ public abstract class RequestDefinitionContainer/*<T extends RequestDefinition>*
                                 final Matcher matcher = requestDefinition.getCookieValuePattern(cookieName).matcher("");
                                 final boolean expectation = !requestDefinition.isCookieValuePatternNegated(cookieName);
                                 boolean match = !matchingSingleValueIsEnough;
-                                for (int i=0; i<cookieValues.length; i++) {
-                                    final Permutation cookieValue = cookieValues[i];
+                                for (Permutation cookieValue : cookieValues) {
                                     if (ServerUtils.isVariantMatching(cookieValue,prefilter,matcher,this.nonStandardPermutationsAllowed) == expectation) {
                                         if (matchingSingleValueIsEnough) {
                                             match = true;
@@ -1220,8 +1214,8 @@ public abstract class RequestDefinitionContainer/*<T extends RequestDefinition>*
                             boolean foundMatch = !matchingSingleValueIsEnough;
                             for (final Iterator it = requestParameterMapVariants.values().iterator(); it.hasNext();) {
                                 final Permutation[] values = (Permutation[]) it.next();
-                                for (int i=0; i<values.length; i++) {
-                                    if (ServerUtils.isVariantMatching(values[i],prefilter,matcher,this.nonStandardPermutationsAllowed) == expectation) {
+                                for (Permutation value : values) {
+                                    if (ServerUtils.isVariantMatching(value, prefilter, matcher, this.nonStandardPermutationsAllowed) == expectation) {
                                         if (matchingSingleValueIsEnough) {
                                             foundMatch = true;
                                             break;
@@ -1248,8 +1242,7 @@ public abstract class RequestDefinitionContainer/*<T extends RequestDefinition>*
                                 final Matcher matcher = requestDefinition.getRequestParamValuePattern(parameterName).matcher("");
                                 final boolean expectation = !requestDefinition.isRequestParamValuePatternNegated(parameterName);
                                 boolean match = !matchingSingleValueIsEnough;
-                                for (int i=0; i<requestParameterValues.length; i++) {
-                                    final Permutation requestParameterValue = requestParameterValues[i];
+                                for (Permutation requestParameterValue : requestParameterValues) {
                                     if (ServerUtils.isVariantMatching(requestParameterValue,prefilter,matcher,this.nonStandardPermutationsAllowed) == expectation) {
                                         if (matchingSingleValueIsEnough) {
                                             match = true;
@@ -1321,7 +1314,9 @@ public abstract class RequestDefinitionContainer/*<T extends RequestDefinition>*
         for (final Iterator/*<String[]>*/ iter = values.iterator(); iter.hasNext();) {
             final String[] value = (String[]) iter.next();
             if (value != null && value.length > 0) {
-                for (int i=0; i<value.length; i++) elements.add(value[i]);
+                for (String value1 : value) {
+                    elements.add(value1);
+                }
             }
         }
         return commaDelimitedList(elements);

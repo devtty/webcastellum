@@ -174,20 +174,18 @@ public final class RequestUtils {
                         final String name = (String) names.nextElement();
                         final String[] values = request.getParameterValues(name);
                         if (values != null) {
-                            for (int i=0 ; i<values.length; i++) {
-                                final String requestParam = removeSensitiveData(name,values[i],sensitiveRequestParamNameMatcherToReuse,sensitiveRequestParamNameAndValueUrlMatcherToReuse,sensitiveValueMatcherToReuse);
-                                
+                            for (String value : values) {
+                                final String requestParam = removeSensitiveData(name, value, sensitiveRequestParamNameMatcherToReuse, sensitiveRequestParamNameAndValueUrlMatcherToReuse, sensitiveValueMatcherToReuse);
                                 appendValueToMessage(logMessage, "requestParam (sensitive data removed): "+name, requestParam);
                                 /* too slow
                                 if (logDecodedAndTransformedVariants) {
-                                    final Permutation variants = ServerUtils.permutateVariants(requestParam,true);
-                                    for (final Iterator iter = variants.iterator(); iter.hasNext();) {
-                                        final String variant = (String) iter.next();
-                                        if (!variant.equals(requestParam)) appendValueToMessage(logMessage, "requestParam (sensitive data removed + decoded and transformed variant): "+name, variant);
-                                    }
+                                final Permutation variants = ServerUtils.permutateVariants(requestParam,true);
+                                for (final Iterator iter = variants.iterator(); iter.hasNext();) {
+                                final String variant = (String) iter.next();
+                                if (!variant.equals(requestParam)) appendValueToMessage(logMessage, "requestParam (sensitive data removed + decoded and transformed variant): "+name, variant);
                                 }
-                                 */
-                                
+                                }
+                                */
                             }
                         }
                     }
@@ -237,8 +235,7 @@ public final class RequestUtils {
 //                timer = System.currentTimeMillis();
                 final Cookie[] cookies = request.getCookies();
                 if (cookies != null) {
-                    for (int i=0; i<cookies.length; i++) {
-                        final Cookie cookie = cookies[i];
+                    for (Cookie cookie : cookies) {
                         if (cookie != null) {
                             final String name = cookie.getName();
                             final String value = cookie.getValue();
@@ -246,14 +243,14 @@ public final class RequestUtils {
                             appendValueToMessage(logMessage, "cookie: "+name, value);
                             /* too slow
                             if (logDecodedAndTransformedVariants) {
-                                final Permutation variants = ServerUtils.permutateVariants(value,true);
-                                for (final Iterator iter = variants.iterator(); iter.hasNext();) {
-                                    final String variant = (String) iter.next();
-                                    if (!variant.equals(value)) appendValueToMessage(logMessage, "cookie: "+name+" (decoded and transformed variant)", variant);
-                                }
+                            final Permutation variants = ServerUtils.permutateVariants(value,true);
+                            for (final Iterator iter = variants.iterator(); iter.hasNext();) {
+                            final String variant = (String) iter.next();
+                            if (!variant.equals(value)) appendValueToMessage(logMessage, "cookie: "+name+" (decoded and transformed variant)", variant);
                             }
-                             */
-
+                            }
+                            */
+                            
                         }
                     }
                 }
@@ -377,8 +374,7 @@ public final class RequestUtils {
         final Map/*<String,List<String>>*/ cookieMap = new HashMap();
         final Cookie[] cookies = request.getCookies();
         if (cookies != null) {
-            for (int i=0; i<cookies.length; i++) {
-                final Cookie cookie = cookies[i];
+            for (Cookie cookie : cookies) {
                 if (cookie != null) {
                     final String name = cookie.getName();
                     List/*<String>*/ valueList = (List) cookieMap.get(name);
@@ -703,8 +699,7 @@ public final class RequestUtils {
         if (expectedValues == null) throw new NullPointerException("expectedValues must not be null");
         if (actualSubmittedValues == null || actualSubmittedValues.length == 0) return true; //= yes, empty is counted as a mismatch
         if (expectedValues.size() != actualSubmittedValues.length) return true;
-        for (int i=0; i<actualSubmittedValues.length; i++) {
-            final String actualSubmittedValue = actualSubmittedValues[i];
+        for (String actualSubmittedValue : actualSubmittedValues) {
             final boolean wasThere = expectedValues.remove(actualSubmittedValue);
             if (!wasThere) return true;
         }

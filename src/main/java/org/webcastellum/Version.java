@@ -4,7 +4,7 @@ public final class Version {
         
     public static final byte VERSION_MAJOR = 1;
     public static final byte VERSION_MINOR = 8;
-    public static final byte VERSION_PATCH = 4;
+    public static final byte VERSION_PATCH = 5;
     
 
     private Version() {}

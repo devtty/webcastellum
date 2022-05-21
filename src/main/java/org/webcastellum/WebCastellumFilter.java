@@ -470,8 +470,7 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
                     for (final Iterator entries = requestDetails.headerMap.entrySet().iterator(); entries.hasNext();) {
                         final Map.Entry entry = (Map.Entry) entries.next();
                         final String name = (String) entry.getKey();
-                        for (int i=0; i<this.tieSessionToHeaderList.length; i++) {
-                            final String tieName = this.tieSessionToHeaderList[i];
+                        for (String tieName : this.tieSessionToHeaderList) {
                             if (tieName.equalsIgnoreCase(name)) {
                                 final String[] values = (String[]) entry.getValue();
                                 relevantHeaders.put( name, Arrays.asList(values) );
@@ -1121,8 +1120,8 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
             for (final Enumeration parameters = request.getParameterNames(); parameters.hasMoreElements();) {
                 final String parameterName = (String) parameters.nextElement();
                 final String[] parameterValues = request.getParameterValues(parameterName);
-                for (int i=0; i<parameterValues.length; i++) {
-                    logLocal(parameterName+" = "+parameterValues[i]);
+                for (String parameterValue : parameterValues) {
+                    logLocal(parameterName+" = " + parameterValue);
                 }
             }
             
@@ -1622,8 +1621,8 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
                             requestDetails.somethingHasBeenUncovered = true;
                         } else { // no uncovering, so at least check against mismatches
                             if (!isIncomingFieldProtectionExclude) {
-                                for (int i=0; i<submittedValues.length; i++) {
-                                    if (!allowedValues.contains(submittedValues[i])) {
+                                for (String submittedValue : submittedValues) {
+                                    if (!allowedValues.contains(submittedValue)) {
                                         // potential select/check/radiobox field tampering (spoofing) detected
                                         if (this.redirectWelcomePage.length() == 0) {
                                             // as no redirect welcome page is defined we have to treat it as a potential attack nevertheless
@@ -1964,8 +1963,7 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
             int greatestCookieValueLength = 0;
             final Cookie[] cookies = httpRequest.getCookies();
             if (cookies != null) {
-                for (int i=0; i<cookies.length; i++) {
-                    final Cookie cookie = cookies[i];
+                for (Cookie cookie : cookies) {
                     cookieCount++;
                     final String comment = cookie.getComment();
                     final String domain = cookie.getDomain();
@@ -2001,8 +1999,7 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
                 totalRequestParamSize += nameLength;
                 final String[] values = httpRequest.getParameterValues(name);
                 if (values == null) continue;
-                for (int i=0; i<values.length; i++) {
-                    final String value = values[i];
+                for (String value : values) {
                     final int valueLength = value.length();
                     greatestRequestParamValueLength = Math.max(greatestRequestParamValueLength, valueLength);
                     totalRequestParamSize += valueLength;
@@ -2496,8 +2493,7 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
             final List/*<Integer[]>*/ tmpGroupNumbersToCaptureLinksWithinScripts = new ArrayList(responseModificationDefinitionsArr.length);
             final List/*<Integer[]>*/ tmpGroupNumbersToCaptureLinksWithinTags = new ArrayList(responseModificationDefinitionsArr.length);
             //final List<List<String>> tmpTagNames = new ArrayList(responseModificationDefinitions.length);
-            for (int i=0; i<responseModificationDefinitionsArr.length; i++) {
-                final ResponseModificationDefinition responseModificationDefinition = responseModificationDefinitionsArr[i];
+            for (ResponseModificationDefinition responseModificationDefinition : responseModificationDefinitionsArr) {
                 if ( responseModificationDefinition.isMatchesScripts() ) {
                     tmpPatternsToExcludeCompleteScript.add( responseModificationDefinition.getScriptExclusionPattern() );
                     tmpPrefiltersToExcludeCompleteScript.add( responseModificationDefinition.getScriptExclusionPrefilter() );

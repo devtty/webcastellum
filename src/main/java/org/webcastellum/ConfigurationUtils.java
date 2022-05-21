@@ -81,15 +81,7 @@ public final class ConfigurationUtils {
         final ConfigurationManager configManager;
         try {
             configManager = new ConfigurationManager(filterConfig);
-        } catch (ClassNotFoundException e) {
-            throw new FilterConfigurationException(e);
-        } catch (InstantiationException e) {
-            throw new FilterConfigurationException(e);
-        } catch (IllegalAccessException e) {
-            throw new FilterConfigurationException(e);
-        } catch (FilterConfigurationException e) {
-            throw new FilterConfigurationException(e);
-        } catch (RuntimeException e) {
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | FilterConfigurationException | RuntimeException e) {
             throw new FilterConfigurationException(e);
         }
         assert configManager != null;

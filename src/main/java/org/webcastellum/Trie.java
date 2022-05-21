@@ -10,9 +10,9 @@ public final class Trie implements Serializable {
 	public static final Trie createTrie(String[] words) {
 		final IdentifierSequence countingID = new IdentifierSequence();
 		final Trie trie = new Trie(countingID);
-		for (int i=0; i<words.length; i++) {
-            trie.addString(words[i], countingID);
-        }
+            for (String word : words) {
+                trie.addString(word, countingID);
+            }
 		return trie;
 	}
 

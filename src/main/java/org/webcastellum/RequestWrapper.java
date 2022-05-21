@@ -342,8 +342,8 @@ public final class RequestWrapper extends HttpServletRequestWrapper {
     private String[] checkForUnsecureValues(final String[] values) {
         if (!this.applyUnsecureParameterValueChecks) return values;
         if (values == null) return null;
-        for (int i=0; i<values.length; i++) {
-            checkForUnsecureValue(values[i]);
+        for (String value : values) {
+            checkForUnsecureValue(value);
         }
         return values;
     }

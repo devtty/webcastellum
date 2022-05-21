@@ -53,8 +53,7 @@ public final class DatabaseRuleFileInserter {
                 connection = DriverManager.getConnection(this.jdbcUrl, this.jdbcUser, this.jdbcPassword);
                 connection.setAutoCommit(false);
                 preparedStatement = connection.prepareStatement("INSERT INTO "+this.table+" ("+this.columnPath+", "+this.columnFilename+", "+this.columnPropertyKey+", "+this.columnPropertyValue+") VALUES (?,?,?,?)");
-                for (int i=0; i<files.length; i++) {
-                    final File file = files[i];
+                for (File file : files) {
                     if (file.isFile()) {
                         if (!file.canRead()) throw new IllegalArgumentException("Unable to read rule definition file: "+file.getAbsolutePath());
                         final Properties properties = new Properties();
@@ -126,7 +125,7 @@ public final class DatabaseRuleFileInserter {
         try {
             final DatabaseRuleFileInserter converter = new DatabaseRuleFileInserter(jdbcDriver, jdbcUrl, jdbcUser, jdbcPassword, table, columnPath, columnFilename, columnPropertyKey, columnPropertyValue, fileStorageBase, fileStoragePath);
             converter.convertFromFileToDatabase();
-        } catch (Exception e) {
+        } catch (IOException | ClassNotFoundException | SQLException e) {
             String message = e.getMessage();
             if (message == null || "null".equalsIgnoreCase(message)) {
                 e.printStackTrace();

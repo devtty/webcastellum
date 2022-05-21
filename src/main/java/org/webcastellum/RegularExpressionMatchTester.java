@@ -97,9 +97,9 @@ public final class RegularExpressionMatchTester extends JFrame {
     private void removeHighlighters() {
         Highlighter hilite = textArea.getHighlighter();
         Highlighter.Highlight[] hilites = hilite.getHighlights();
-        for (int i = 0; i < hilites.length; i++) {
-            if (hilites[i].getPainter() instanceof MyHighlightPainter) {
-                hilite.removeHighlight(hilites[i]);
+        for (Highlighter.Highlight hilite1 : hilites) {
+            if (hilite1.getPainter() instanceof MyHighlightPainter) {
+                hilite.removeHighlight(hilite1);
             }
         }
     }

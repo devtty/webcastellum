@@ -326,8 +326,8 @@ public final class AttackHandler {
                             final String name = (String) names.nextElement();
                             final String[] values = requestAsSeenByTheApplication.getParameterValues(name);
                             if (values != null) {
-                                for (int i=0 ; i<values.length; i++) {
-                                    RequestUtils.appendValueToMessage(logMessage, "requestParam: "+ServerUtils.urlEncode(name), ServerUtils.urlEncode(values[i]));
+                                for (String value : values) {
+                                    RequestUtils.appendValueToMessage(logMessage, "requestParam: "+ServerUtils.urlEncode(name), ServerUtils.urlEncode(value));
                                 }
                             }
                         }

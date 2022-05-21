@@ -36,17 +36,20 @@ public final class LearningModeFileParser {
     // TODO: spaeter hier noch hinzufuegen, dass wenn keine files per argumentlist uebergeben wurden einfach der inhalt aus stdin als input genommen wird... im sinne von        cat xyz.* | java -cp .......
     public static final void main(final String[] args) {
         final List/*<File>*/ files = new ArrayList();
-        for (int i=0; i<args.length; i++) {
-            final File file = new File(args[i]);
+        for (String arg : args) {
+            final File file = new File(arg);
             if (!file.exists() || !file.canRead()) {
                 System.err.println("Ignoring non-existing or non-readable file: "+file.getAbsolutePath());
                 continue;
             }
-            if (file.isFile()) files.add(file);
-            else if (file.isDirectory()) {
+            if (file.isFile()) {
+                files.add(file);
+            } else if (file.isDirectory()) {
                 final File[] filesInDir = file.listFiles();
-                for (int j=0; j<filesInDir.length; j++) {
-                    if (filesInDir[j].isFile()) files.add(filesInDir[j]);
+                for (File filesInDir1 : filesInDir) {
+                    if (filesInDir1.isFile()) {
+                        files.add(filesInDir1);
+                    }
                 }
             }
         }

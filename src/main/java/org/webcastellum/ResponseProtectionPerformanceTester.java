@@ -113,8 +113,7 @@ public final class ResponseProtectionPerformanceTester {
         final List/*<Integer[]>*/ tmpGroupNumbersToCaptureLinksWithinScripts = new ArrayList(responseModificationDefinitions.length);
         final List/*<Integer[]>*/ tmpGroupNumbersToCaptureLinksWithinTags = new ArrayList(responseModificationDefinitions.length);
         //final List<List<String>> tmpTagNames = new ArrayList(responseModificationDefinitions.length);
-        for (int i = 0; i < responseModificationDefinitions.length; i++) {
-            final ResponseModificationDefinition responseModificationDefinition = responseModificationDefinitions[i];
+        for (ResponseModificationDefinition responseModificationDefinition : responseModificationDefinitions) {
             if (responseModificationDefinition.isMatchesScripts()) {
                 tmpPatternsToExcludeCompleteScript.add( responseModificationDefinition.getScriptExclusionPattern() );
                 tmpPrefiltersToExcludeCompleteScript.add( responseModificationDefinition.getScriptExclusionPrefilter() );
