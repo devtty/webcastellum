@@ -3456,7 +3456,7 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
             try {
                 final GeoLocator geoLocator = (GeoLocator) Class.forName(value).newInstance();
                 geoLocator.setFilterConfig(filterConfig);
-                this.geoLocatingCache = new GeoLocatingCache(geoLocator, housekeepingIntervalMinutes*60*1000);
+                this.geoLocatingCache = new GeoLocatingCache(geoLocator, housekeepingIntervalMinutes*60*1000L);
             } catch (ClassNotFoundException e) {
                 throw new UnavailableException("Unable to find geo-locator class ("+value+"): "+e.getMessage());
             } catch (InstantiationException e) {
@@ -4634,7 +4634,7 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
                 if (exceptionReplyMessage != null && exceptionReplyMessage.length() > 0) {
                     String message = exceptionReplyMessage;
                     message = message.replaceAll("\\$\\{id\\}", ServerUtils.quoteReplacement(ServerUtils.escapeSpecialCharactersHTML(logReferenceId)));
-                    message = message.replaceAll("\\$\\{message\\}", ServerUtils.quoteReplacement(ServerUtils.escapeSpecialCharactersHTML(exceptionMessage.toString())));
+                    message = message.replaceAll("\\$\\{message\\}", ServerUtils.quoteReplacement(ServerUtils.escapeSpecialCharactersHTML( exceptionMessage!=null ? exceptionMessage.toString() : "null")));
                     message = message.replaceAll("\\$\\{details\\}", ServerUtils.quoteReplacement(ServerUtils.escapeSpecialCharactersHTML(exceptionDetails.toString())));
                     response.setContentType("text/html");
                     response.getWriter().write(message);

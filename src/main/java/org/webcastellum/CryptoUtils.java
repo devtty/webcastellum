@@ -93,6 +93,7 @@ public final class CryptoUtils {
         // here even the length is random
         return generateRandomToken(secure, (secure?SECURE_RANDOM:RANDOM).nextInt(3)+7); // TODO: per web.xml konfigurierbar machen !! wie lang das range sein soll (von, bis)
     }
+
     public static String generateRandomToken(final boolean secure, final int length) {
         StringBuilder result = null;
         //Matcher matcher = null;
