@@ -53,7 +53,12 @@ public class CryptoUtilsTest {
     
     @Test(expected = IllegalArgumentException.class)
     public void testToIntValueWithToLongArgument(){
-        CryptoUtils.toIntValue("001");
+        CryptoUtils.toIntValue("ABCDEF121");
+    }
+    
+    @Test(expected = IllegalArgumentException.class)
+    public void testToIntValueWithToShortArgument(){
+        CryptoUtils.toIntValue("");
     }
     
     @Test(expected = NullPointerException.class)
