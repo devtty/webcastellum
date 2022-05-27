@@ -9,6 +9,7 @@ import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import java.util.logging.MemoryHandler;
 import java.util.logging.SimpleFormatter;
+import java.util.concurrent.atomic.AtomicInteger;
 import javax.servlet.FilterConfig;
 
 public final class DefaultAttackLogger implements AttackLogger {
@@ -25,7 +26,7 @@ public final class DefaultAttackLogger implements AttackLogger {
     private MemoryHandler memoryHandlerPointerForSecurityLogging; // pointer to concrete memory-handler (also set as more abstract this.handler when a memory-handler is used)
     private FileHandler fileHandlerPointerForSecurityLogging; // pointer to concrete file-handler (also set as more abstract this.handler when no memory-handler is used)
     // number of requests to log *after* an attack has happended
-    private volatile int currentPostAttackLogCounter;
+    private AtomicInteger currentPostAttackLogCounter;
 
     
     public void setFilterConfig(final FilterConfig filterConfig) throws FilterConfigurationException { // TODO: use  ConfigurationUtils.extractOptionalConfigValue
@@ -118,9 +119,9 @@ public final class DefaultAttackLogger implements AttackLogger {
 
   private void decreasePostAttackLogCounter() {
         if (this.memoryHandlerPointerForSecurityLogging != null) {
-            if (this.currentPostAttackLogCounter > 0) this.currentPostAttackLogCounter--;
+            if (this.currentPostAttackLogCounter.get() > 0) this.currentPostAttackLogCounter.incrementAndGet();
             // to stop the post-attack logging feature, set the memory handler's push-level back to WARNING
-            if (this.currentPostAttackLogCounter <= 0 && this.memoryHandlerPointerForSecurityLogging.getPushLevel() != Level.WARNING) this.memoryHandlerPointerForSecurityLogging.setPushLevel(Level.WARNING);
+            if (this.currentPostAttackLogCounter.get() <= 0 && this.memoryHandlerPointerForSecurityLogging.getPushLevel() != Level.WARNING) this.memoryHandlerPointerForSecurityLogging.setPushLevel(Level.WARNING);
         }
     }
 
@@ -135,7 +136,7 @@ public final class DefaultAttackLogger implements AttackLogger {
             // post-attack logging stuff
             if (this.prePostCount > 0 && this.memoryHandlerPointerForSecurityLogging != null) {
                 // set post-attack-counter to number of regular requests to log *after* this attack
-                this.currentPostAttackLogCounter = this.prePostCount;
+                this.currentPostAttackLogCounter.set(this.prePostCount);
                 // to have the post-attack logging feature, set the memory handler's push-level to FINE
                 this.memoryHandlerPointerForSecurityLogging.setPushLevel(Level.FINE);
             }

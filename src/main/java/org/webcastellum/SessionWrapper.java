@@ -194,7 +194,8 @@ public final class SessionWrapper implements HttpSession, Serializable {
     protected void setArchiveProtectiveSessionContentOnInvalidate(final RequestWrapper currentRequest) {
         synchronized (mutex) {
             this.isArchiveProtectiveSessionContentOnInvalidate = currentRequest != null;
-            if (currentRequest == null) SessionWrapper.currentPendingRequest.set(null); // TODO: Java5-specific   1.4 .set(null)   1.5 .remove()
+            if (currentRequest == null)
+		SessionWrapper.currentPendingRequest.remove(); // TODO: Java5-specific   1.4 .set(null)   1.5 .remove()
             else SessionWrapper.currentPendingRequest.set(currentRequest);
         }
     }
