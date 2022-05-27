@@ -169,7 +169,7 @@ public final class DefaultCaptchaGenerator implements CaptchaGenerator {
         final Color backgroudColor = new Color(200+RANDOM.nextInt(45),200+RANDOM.nextInt(45),200+RANDOM.nextInt(45));
         final Color darker = backgroudColor.darker();
         final Color brighter = backgroudColor.brighter();
-        final Paint backgroudPaint = new GradientPaint(5+RANDOM.nextInt(80),5+RANDOM.nextInt(80),darker, this.width-5-RANDOM.nextInt(80),this.height-5-RANDOM.nextInt(80),brighter, true);
+        final Paint backgroudPaint = new GradientPaint(5f+RANDOM.nextInt(80),5f+RANDOM.nextInt(80),darker, this.width-5f-RANDOM.nextInt(80),this.height-5f-RANDOM.nextInt(80),brighter, true);
         graphics.setColor(backgroudColor);
         graphics.setPaint(backgroudPaint);
         graphics.fillRect(0, 0, this.width, this.height);

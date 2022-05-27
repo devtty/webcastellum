@@ -173,7 +173,7 @@ public final class ResponseFilterStream extends AbstractRelaxingHtmlParserStream
         this.honeylinkSuffix = honeylinkSuffix;
         this.honeylinkMaxPerPage = honeylinkMaxPerPage;
         if (honeylinkMaxPerPage > 0) {
-            this.honeylinkRandom = randomizeHoneylinksOnEveryRequest ? null : new Random( this.servletPath.hashCode()+WebCastellumFilter.customerIdentifier );
+            this.honeylinkRandom = randomizeHoneylinksOnEveryRequest ? null : new Random( ((long) this.servletPath.hashCode())+WebCastellumFilter.customerIdentifier );
             this.tagPartCounterTarget = HoneylinkUtils.nextTagPartCounterTarget(this.honeylinkRandom);
         } else this.honeylinkRandom = null;
     }

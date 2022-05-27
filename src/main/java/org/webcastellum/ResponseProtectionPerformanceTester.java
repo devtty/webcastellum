@@ -157,7 +157,7 @@ public final class ResponseProtectionPerformanceTester {
         // warm up
         final Cipher cipher = CryptoUtils.getCipher();
         final CryptoKeyAndSalt key = CryptoUtils.generateRandomCryptoKeyAndSalt(false);
-        Cipher.getInstance("AES");
+        Cipher.getInstance("AES/GCM/NoPadding");
         MessageDigest.getInstance("SHA-1");
 
         final ResponseWrapper response = new ResponseWrapper(new ResponseMock(), request, attackHandler, helper, false, "___ENCRYPTED___", cipher, key, "___SEC-KEY___", "___SEC-VALUE___", "___PROT-KEY___",

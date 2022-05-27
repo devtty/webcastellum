@@ -23,7 +23,7 @@ public final class TrackingCounter extends AbstractCounter {
     
     public TrackingCounter(final long resetPeriodMillis) {
         super(resetPeriodMillis);
-        this.aggregationPeriodMillis = Math.min(resetPeriodMillis, DEFAULT_AGGREGATION_PERIOD_SECONDS*1000); 
+        this.aggregationPeriodMillis = Math.min(resetPeriodMillis, DEFAULT_AGGREGATION_PERIOD_SECONDS*1000L); 
         // initial increment
         increment();
     }

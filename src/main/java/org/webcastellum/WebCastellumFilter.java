@@ -2042,7 +2042,7 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
         // check forced-session-invalidation
         // =========================================================
         if (session != null && this.forcedSessionInvalidationPeriodMinutes > 0) {
-            final long forcedCutoff = session.getCreationTime() + (this.forcedSessionInvalidationPeriodMinutes * 60 * 1000);
+            final long forcedCutoff = session.getCreationTime() + (this.forcedSessionInvalidationPeriodMinutes * 60 * 1000L);
             if ( System.currentTimeMillis() > forcedCutoff ) {
                 this.attackHandler.logWarningRequestMessage("Forced session invalidation: "+session.getId());
                 try {
@@ -3257,7 +3257,7 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
             if (value == null) value = configManager.getConfigurationValue(LEGACY_PARAM_RULE_FILE_RELOADING_INTERVAL); // only for backwards-compatibility to old param name
             if (value == null) value = "0"; // defaults to 0 to disable rule reloading (for security reasons)
             try {
-                this.ruleFileReloadingIntervalMillis = Integer.parseInt(value.trim()) * 60 * 1000;
+                this.ruleFileReloadingIntervalMillis = Integer.parseInt(value.trim()) * 60 * 1000L;
                 if (this.ruleFileReloadingIntervalMillis > 0) {
                     this.nextRuleReloadingTime = System.currentTimeMillis() + this.ruleFileReloadingIntervalMillis;
                 }
@@ -3272,7 +3272,7 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
             String value = configManager.getConfigurationValue(PARAM_CONFIG_RELOADING_INTERVAL);
             if (value == null) value = "0"; // defaults to 0 to disable config reloading (for security reasons)
             try {
-                this.configReloadingIntervalMillis = Integer.parseInt(value.trim()) * 60 * 1000;
+                this.configReloadingIntervalMillis = Integer.parseInt(value.trim()) * 60 * 1000L;
                 if (this.configReloadingIntervalMillis > 0) {
                     this.nextConfigReloadingTime = System.currentTimeMillis() + this.configReloadingIntervalMillis;
                 }
@@ -3437,7 +3437,7 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
             String blockAttackingClientsThresholdValue = configManager.getConfigurationValue(PARAM_BLOCK_ATTACKING_CLIENTS_THRESHOLD);
             if (blockAttackingClientsThresholdValue == null) blockAttackingClientsThresholdValue = "0";
             try {
-                this.attackHandler = new AttackHandler( attackLogger, Integer.parseInt(blockAttackingClientsThresholdValue.trim()), housekeepingIntervalMinutes*60*1000, blockPeriodMinutes*60*1000, resetPeriodMinutesAttack*60*1000, resetPeriodMinutesRedirectThreshold*60*1000,
+                this.attackHandler = new AttackHandler( attackLogger, Integer.parseInt(blockAttackingClientsThresholdValue.trim()), housekeepingIntervalMinutes*60*1000L, blockPeriodMinutes*60*1000L, resetPeriodMinutesAttack*60*1000L, resetPeriodMinutesRedirectThreshold*60*1000L,
                         this.learningModeAggregationDirectory, this.applicationName, this.logSessionValuesOnAttack, this.invalidateSessionOnAttack, 
                         this.blockRepeatedRedirectsThreshold, this.isProductionMode , this.logVerboseForDevelopmentMode, this.removeSensitiveDataRequestParamNamePattern, this.removeSensitiveDataValuePattern, logClientUserData );
             } catch(NumberFormatException e) {
@@ -3664,7 +3664,7 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
                 if (this.denialOfServiceLimitDefinitions.isHavingEnabledHeaderCheckingRules()) isHavingEnabledHeaderCheckingRules = true;
                 if (this.denialOfServiceLimitDefinitions.isHavingEnabledCookieCheckingRules()) isHavingEnabledCookieCheckingRules = true;
                 logLocal(message);
-                this.denialOfServiceLimitCounter = new DenialOfServiceLimitTracker(this.attackHandler/*, this.denialOfServiceLimitDefinitions*/, housekeepingIntervalMinutes*60*1000);
+                this.denialOfServiceLimitCounter = new DenialOfServiceLimitTracker(this.attackHandler/*, this.denialOfServiceLimitDefinitions*/, housekeepingIntervalMinutes*60*1000L);
             } catch (Exception ex) {
                 throw new UnavailableException("Unable to load DoS limit definitions: "+ex.getMessage());
             }
@@ -4495,7 +4495,7 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
             try {
                 final int httpInvalidRequestOrNotFoundAttackThreshold = Integer.parseInt(httpInvalidRequestOrNotFoundAttackThresholdValue.trim());
                 if (httpInvalidRequestOrNotFoundAttackThreshold < 0) throw new UnavailableException("Configured HTTP 400/404 attack threshold must not be negative: "+httpInvalidRequestOrNotFoundAttackThresholdValue);
-                this.httpStatusCodeCounter = new HttpStatusCodeTracker(this.attackHandler, httpInvalidRequestOrNotFoundAttackThreshold, this.housekeepingIntervalMinutes*60*1000, this.resetPeriodMinutesBadResponseCode*60*1000, 
+                this.httpStatusCodeCounter = new HttpStatusCodeTracker(this.attackHandler, httpInvalidRequestOrNotFoundAttackThreshold, this.housekeepingIntervalMinutes*60*1000L, this.resetPeriodMinutesBadResponseCode*60*1000L, 
                         clusterAware?this.clusterBroadcastPeriod*1000:0, clusterInitialContextFactory, clusterJmsProviderUrl, clusterJmsConnectionFactory, clusterJmsTopic); // TODO: ueberall hier statt *60*1000 besser ein *60L*1000L nehmen !
             } catch(NumberFormatException e) {
                 throw new UnavailableException("Unable to number-parse configured HTTP 400/404 attack threshold: "+httpInvalidRequestOrNotFoundAttackThresholdValue);
@@ -4515,7 +4515,7 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
             try {
                 final int parsedValue = Integer.parseInt(valueThreshold.trim());
                 if (parsedValue < 0) throw new UnavailableException("Configured session creation attack threshold must not be negative: "+valueThreshold);
-                this.sessionCreationCounter = new SessionCreationTracker(this.attackHandler, parsedValue, this.housekeepingIntervalMinutes*60*1000, this.resetPeriodMinutesSessionCreation*60*1000, 
+                this.sessionCreationCounter = new SessionCreationTracker(this.attackHandler, parsedValue, this.housekeepingIntervalMinutes*60*1000L, this.resetPeriodMinutesSessionCreation*60*1000L, 
                         clusterAware?this.clusterBroadcastPeriod*1000:0, clusterInitialContextFactory, clusterJmsProviderUrl, clusterJmsConnectionFactory, clusterJmsTopic); // TODO: ueberall hier statt *60*1000 besser ein *60L*1000L nehmen !
             } catch(NumberFormatException e) {
                 throw new UnavailableException("Unable to number-parse configured session creation attack threshold: "+valueThreshold);
