@@ -8,6 +8,8 @@ import java.net.MalformedURLException;
 import java.net.Proxy;
 import java.net.SocketTimeoutException;
 import java.text.MessageFormat;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.FilterConfig;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -18,7 +20,6 @@ import org.xml.sax.SAXException;
 
 // NOTE: For heavy-traffic systems it makes sense to cache the complete IP database of hostip.info into a local data store (and rsync it async)
 public final class DefaultGeoLocator implements GeoLocator {
-    private static final boolean DEBUG = false;
 
     public static final String PARAM_ENABLED = "DefaultGeoLocatorEnabled";
     public static final String PARAM_CACHING_NEGATIVES_ALLOWED = "DefaultGeoLocatorCachingOfNegativeRepliesAllowed";
@@ -116,7 +117,7 @@ public final class DefaultGeoLocator implements GeoLocator {
             final NodeList countryAbbrevs = document.getElementsByTagName(this.xmlElementName);
             if (countryAbbrevs.getLength() == 0) throw new GeoLocatingException("No country containing XML received from geo-locating site");
             final String result = countryAbbrevs.item(0).getTextContent();
-            if (DEBUG) System.out.println("DefaultGeoLocator: "+result);
+            Logger.getLogger(DefaultGeoLocator.class.getName()).log(Level.FINE, "DefaultGeoLocator: {0}", result);
             if ( "XX".equalsIgnoreCase(result) ) return null;
             return result;
         } catch (MalformedURLException e) {

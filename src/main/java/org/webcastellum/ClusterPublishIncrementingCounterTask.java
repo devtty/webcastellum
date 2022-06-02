@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TimerTask;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.jms.JMSException;
 import javax.naming.NamingException;
 
@@ -32,15 +34,9 @@ public final class ClusterPublishIncrementingCounterTask extends TimerTask {
     public void run() {
         try {
             JmsUtils.init(this.clusterInitialContextFactory, this.clusterJmsProviderUrl, this.clusterJmsConnectionFactory, this.clusterJmsTopic); // in case connection was dropped due to some reason (unreliable network etc.)
-        } catch (NamingException e) {
+        } catch (NamingException | JMSException | RuntimeException e) {
             JmsUtils.closeQuietly(false); // to be re-initialized on the next call
-            System.err.println("Unable to init: "+e); // TODO: better logging
-        } catch (JMSException e) {
-            JmsUtils.closeQuietly(false); // to be re-initialized on the next call
-            System.err.println("Unable to init: "+e); // TODO: better logging
-        } catch (RuntimeException e) {
-            JmsUtils.closeQuietly(false); // to be re-initialized on the next call
-            System.err.println("Unable to init: "+e); // TODO: better logging
+            Logger.getLogger(ClusterPublishIncrementingCounterTask.class.getName()).log(Level.WARNING, "Unable to init: {0}", e);
         }
         // shortcut
         if (this.map.isEmpty()) return;
@@ -62,8 +58,7 @@ public final class ClusterPublishIncrementingCounterTask extends TimerTask {
             }
         }
         if (JmsUtils.DEBUG) {
-            System.out.println("map: "+this.map);
-            System.out.println("payload: "+payload);
+            Logger.getLogger(ClusterPublishIncrementingCounterTask.class.getName()).log(Level.FINE, "map: {0} payload: {1}", new Object[]{this.map, payload});
         }
         final Snapshot snapshot = new Snapshot(this.type, this.systemIdentifier, payload);
         // PUBLISH THE SNAPSHOT USING JMS

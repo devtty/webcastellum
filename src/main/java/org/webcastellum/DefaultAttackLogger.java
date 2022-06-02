@@ -1,6 +1,7 @@
 package org.webcastellum;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.logging.Formatter;
 import java.util.logging.FileHandler;
 import java.util.logging.Handler;
@@ -60,13 +61,14 @@ public final class DefaultAttackLogger implements AttackLogger {
         if (directory != null && directory.trim().length() != 0) {
             // create file logging
             final File file = new File(directory);
-            if (!file.exists()) System.err.println("WebCastellum log directory does not exist: "+file.getAbsolutePath());
+            if (!file.exists())
+                Logger.getGlobal().log(Level.WARNING, "WebCastellum log directory does not exist: {0}", file.getAbsolutePath());
             final String applicationAdjusted;
             if (application == null || application.trim().length() == 0) {
                 applicationAdjusted = "";
-                System.out.println("WebCastellum logs attacks for this application to "+file.getAbsolutePath());
+                Logger.getGlobal().log(Level.INFO, "WebCastellum logs attacks for this application to {0}", file.getAbsolutePath());
             } else {
-                System.out.println("WebCastellum logs attacks for application "+application.trim()+" to "+file.getAbsolutePath());
+                Logger.getGlobal().log(Level.INFO, "WebCastellum logs attacks for application {0} to {1}", new Object[]{application.trim(), file.getAbsolutePath()});
                 applicationAdjusted = "."+application.trim();
             }
             directory = AttackHandler.getAbsolutePathLoggingSafe(file);
@@ -92,8 +94,8 @@ public final class DefaultAttackLogger implements AttackLogger {
                     } else this.handlerForSecurityLogging = fileHandlerPointerForSecurityLogging; //= use without MemoryHandler wrapper
                 }
                 securityLogger.addHandler(this.handlerForSecurityLogging);
-            } catch (Exception e) {
-                System.err.println("Unable to initialize security logging: "+e.getMessage());
+            } catch (IOException | SecurityException e) {
+                Logger.getGlobal().log(Level.WARNING, "Unable to initialize security logging: {0}", e.getMessage());
             }
         }
     }
