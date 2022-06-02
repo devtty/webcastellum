@@ -5,6 +5,8 @@ import java.io.BufferedWriter;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.Writer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import javax.crypto.Cipher;
 import javax.servlet.ServletOutputStream;
@@ -13,12 +15,19 @@ import javax.servlet.ServletOutputStream;
 
 public final class ContentInjectionHelper {
     
-    private static final boolean DEBUG = false;
+    private boolean injectSecretTokenIntoLinks;
+    private boolean stripHtmlComments;
+    private boolean protectParametersAndForms;
+    private boolean extraProtectDisabledFormFields;
+    private boolean extraProtectReadonlyFormFields;
+    private boolean extraProtectRequestParamValueCount;
+    private boolean encryptQueryStringInLinks;
+    private boolean extraFullPathRemoval;
+    private boolean extraMediumPathRemoval;
+    private boolean extraStrictParameterCheckingForEncryptedLinks;
+    private boolean useTunedBlockParser;
+    private boolean useResponseBuffering;
     
-
-    
-    private boolean injectSecretTokenIntoLinks, stripHtmlComments, protectParametersAndForms, extraProtectDisabledFormFields, extraProtectReadonlyFormFields, extraProtectRequestParamValueCount, encryptQueryStringInLinks, extraFullPathRemoval, extraMediumPathRemoval, extraStrictParameterCheckingForEncryptedLinks,
-            useTunedBlockParser, useResponseBuffering;
     private ContentModificationExcludeDefinitionContainer contentModificationExcludeDefinitions;
     private FormFieldMaskingExcludeDefinitionContainer formFieldMaskingExcludeDefinitions;
 
@@ -271,20 +280,19 @@ public final class ContentInjectionHelper {
                 && ( 
                     this.extraFullPathRemoval ? this.contentModificationExcludeDefinitions.isMatchingIncomingLinkModificationExclusionEvenWhenFullPathRemovalEnabled(linkTargetUri) : this.contentModificationExcludeDefinitions.isMatchingIncomingLinkModificationExclusion(linkTargetUri)
                 );
-        if (DEBUG) System.out.println(linkTargetUri+": "+result);
+        
+        Logger.getLogger(ContentInjectionHelper.class.getName()).log(Level.FINE, "{0}: {1}", new Object[]{linkTargetUri, result});
+        
         return result;
     }
     
     public final boolean isMatchingOutgoingResponseModificationExclusion(final String servletPath, final String requestURI) {
         // expect servletPath to be empty, when WebLogic for example handles a static file access (like a .css or .js or .gif or .jpeg or .html file, etc.)
         final boolean result = this.contentModificationExcludeDefinitions != null && this.contentModificationExcludeDefinitions.isMatchingOutgoingResponseModificationExclusion(servletPath, requestURI);
-        if (DEBUG) System.out.println(requestURI+": "+result);
+        
+        Logger.getLogger(ContentInjectionHelper.class.getName()).log(Level.FINE, "{0}: {1}", new Object[]{requestURI, result});
+        
         return result;
     }
-    
-    
-
-    
-    
     
 }

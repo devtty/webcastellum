@@ -8,25 +8,34 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import javax.crypto.Cipher;
 import javax.servlet.http.HttpSession;
 
 
-
-
 public final class ResponseFilterStream extends AbstractRelaxingHtmlParserStream {
-
-    private static final boolean DEBUG = false;
     
     
     private final ByteArrayOutputStream scriptBody = new ByteArrayOutputStream();
     private final ByteArrayOutputStream collectedDisplayValue = new ByteArrayOutputStream();
     
     
-    private final boolean stripHtmlEnabled, injectSecretTokensEnabled, protectParamsAndFormsEnabled, encryptQueryStringsEnabled, useFullPathForResourceToBeAccessedProtection, additionalFullResourceRemoval, additionalMediumResourceRemoval, appendSessionIdToLinks, applySetAfterWrite;
-    private final String currentRequestUrlToCompareWith, servletPath, contextPath;
-    private final String tokenKey, tokenValue;
+    private final boolean stripHtmlEnabled;
+    private final boolean injectSecretTokensEnabled;
+    private final boolean protectParamsAndFormsEnabled;
+    private final boolean encryptQueryStringsEnabled;
+    private final boolean useFullPathForResourceToBeAccessedProtection;
+    private final boolean additionalFullResourceRemoval;
+    private final boolean additionalMediumResourceRemoval;
+    private final boolean appendSessionIdToLinks;
+    private final boolean applySetAfterWrite;
+    private final String currentRequestUrlToCompareWith;
+    private final String servletPath;
+    private final String contextPath;
+    private final String tokenKey;
+    private final String tokenValue;
     private final String protectionTokenKeyKey;
     private final ContentInjectionHelper contentInjectionHelper;
     private final String cryptoDetectionString; // to detect encrypted URLs which have (by definition) already the tokens injected if token injection is active
@@ -191,12 +200,7 @@ public final class ResponseFilterStream extends AbstractRelaxingHtmlParserStream
     
     //1.5@Override
     public void handleTag(String tag) throws IOException {
-        if (DEBUG) System.out.println("handleTag: "+tag);
-        
-        
-        
-        
-        
+        Logger.getLogger(ResponseFilterStream.class.getName()).log(Level.FINE, "handleTag: {0}", tag);
         
         boolean startsWithScriptOpening = false;
         boolean startsWithStyleOpening = false;
@@ -319,7 +323,7 @@ public final class ResponseFilterStream extends AbstractRelaxingHtmlParserStream
             this.isMultipartForm = ResponseUtils.isMultipartForm(tag);
             // only forms that explicitly have method=POST are of request method type POST
             if (this.matcherFormMethodPost.find()) isRequestMethodPOST= true;
-            if (DEBUG) System.out.println("POST ?: "+isRequestMethodPOST);
+            Logger.getLogger(ResponseFilterStream.class.getName()).log(Level.FINE, "POST ?: {0}", isRequestMethodPOST);
         }
         
         // TODO: hier auch File-Upload Felder beruecksichtigen ?!?
@@ -367,7 +371,7 @@ public final class ResponseFilterStream extends AbstractRelaxingHtmlParserStream
                         if (!this.isWithinSelectBox && startsWithSelectOpening && !isFormFieldMaskingExclusion(extractedFieldNameDecoded)) {
                             this.isWithinSelectBox = true;
                             this.nameOfCurrentSelectBox = extractedFieldNameDecoded;
-                            if (DEBUG) System.out.println("<select ... with name: "+extractedFieldNameDecoded);
+                            Logger.getLogger(ResponseFilterStream.class.getName()).log(Level.FINE, "<select ... with name: {0}", extractedFieldNameDecoded);
                         }
                     }
 
@@ -385,7 +389,7 @@ public final class ResponseFilterStream extends AbstractRelaxingHtmlParserStream
                                 value = ServerUtils.decodeBrokenValueExceptUrlEncoding(value);
                                 if (value == null) value = "";
                                 this.parameterAndFormProtectionOfCurrentForm.addCheckboxFieldAllowedValue(extractedFieldNameDecoded, value);
-                                if (DEBUG) System.out.println("input: checkbox ... with name: "+extractedFieldNameDecoded);
+                                Logger.getLogger(ResponseFilterStream.class.getName()).log(Level.FINE, "input: checkbox ... with name: {0}", extractedFieldNameDecoded);
                             }
                         }
 
@@ -402,7 +406,7 @@ public final class ResponseFilterStream extends AbstractRelaxingHtmlParserStream
                                 value = ServerUtils.decodeBrokenValueExceptUrlEncoding(value);
                                 if (value == null) value = "";
                                 this.parameterAndFormProtectionOfCurrentForm.addRadiobuttonFieldAllowedValue(extractedFieldNameDecoded, value);
-                                if (DEBUG) System.out.println("input: radiobutton ... with name: "+extractedFieldNameDecoded);
+                                Logger.getLogger(ResponseFilterStream.class.getName()).log(Level.FINE, "input: radiobutton ... with name: {0}", extractedFieldNameDecoded);
                             }
                         }
                     }
@@ -473,11 +477,11 @@ public final class ResponseFilterStream extends AbstractRelaxingHtmlParserStream
                 // continue        
                 if (value == null) {
                     this.isCollectingDisplayValueAsOptionValue = true;
-                    if (DEBUG) System.out.println("\t<option ... without value (collecting the display content as value)");
+                    Logger.getLogger(ResponseFilterStream.class.getName()).log(Level.FINE, "\t<option ... without value (collecting the display content as value)");
                 } else {
                     value = ServerUtils.decodeBrokenValueExceptUrlEncoding(value);
                     this.parameterAndFormProtectionOfCurrentForm.addSelectboxFieldAllowedValue(this.nameOfCurrentSelectBox, value);
-                    if (DEBUG) System.out.println("\t<option ... with value: "+value);
+                    Logger.getLogger(ResponseFilterStream.class.getName()).log(Level.FINE, "\t<option ... with value: "+value);
                 }
             }
         }
@@ -513,7 +517,7 @@ public final class ResponseFilterStream extends AbstractRelaxingHtmlParserStream
                     if ( (this.injectSecretTokensEnabled&&!isRequestMethodPOST) // since only GET forms get their Action-URL-Params ignored by browsers
                         || this.encryptQueryStringsEnabled || this.protectParamsAndFormsEnabled) { // = special form handling where the query-string of the form's action gets removed (and added below as a hidden field on closing of form)
                         this.actionUrlOfCurrentForm = actionUrlFetchedDirectlyFromForm;
-                        if (DEBUG) System.out.println("actionUrlOfCurrentForm fetched directly from form: "+actionUrlOfCurrentForm);
+                        Logger.getLogger(ResponseFilterStream.class.getName()).log(Level.FINE, "actionUrlOfCurrentForm fetched directly from form: {0}", actionUrlOfCurrentForm);
                         // in case the action URL is mising or empty, we have to take the original request's URI as form action when full-path-removal is enabled, since otherwise there might be path discrepancies since all paths are flattened during full-path-removal:
                         if ((this.additionalFullResourceRemoval || this.additionalMediumResourceRemoval) && (this.actionUrlOfCurrentForm == null || this.actionUrlOfCurrentForm.length()==0 )) {
                             // for medium path removal we're allowed to use a relative path, otherwise for full path removal we must use an absolute path
@@ -571,7 +575,7 @@ public final class ResponseFilterStream extends AbstractRelaxingHtmlParserStream
     
     //1.5@Override
     public void handleTagClose(final String tag) throws IOException {
-        if (DEBUG) System.out.println("close of tag: "+tag);
+        Logger.getLogger(ResponseFilterStream.class.getName()).log(Level.FINE, "close of tag: "+tag);
         boolean startsWithScript = false;
         boolean startsWithForm = false;
         boolean startsWithSelectAndProtectionIsActive = false;
@@ -611,9 +615,9 @@ public final class ResponseFilterStream extends AbstractRelaxingHtmlParserStream
             writeScriptBodyWithLinksAdjusted();
             this.scriptBody.reset();
         } else if (startsWithForm) {
-            if (DEBUG) System.out.println("startsWithForm");
+            Logger.getLogger(ResponseFilterStream.class.getName()).log(Level.FINE, "startsWithForm");
             if (this.actionUrlOfCurrentForm != null) {
-                if (DEBUG) System.out.println("actionUrlOfCurrentForm != null : "+actionUrlOfCurrentForm);
+                Logger.getLogger(ResponseFilterStream.class.getName()).log(Level.FINE, "actionUrlOfCurrentForm != null : {0}", actionUrlOfCurrentForm);
                 if (!this.encryptQueryStringsEnabled || !ResponseUtils.isAlreadyEncrypted(this.cryptoDetectionString,this.actionUrlOfCurrentForm)) { // = only inject tokens when either encryption is disabled or has not taken place, when for example response.encodeURL already caught that URL
                     if (this.injectSecretTokensEnabled) { // this.protectParamsAndFormsEnabled bedingt this.injectSecretTokensEnabled automatisch
                         final String urlDecoded = ServerUtils.decodeBrokenValueHtmlOnly(this.actionUrlOfCurrentForm, false);
@@ -629,7 +633,7 @@ public final class ResponseFilterStream extends AbstractRelaxingHtmlParserStream
                             //System.out.println("xxx1 this.actionUrlOfCurrentForm="+this.actionUrlOfCurrentForm);
                             //System.out.println("xxx2 this.encryptQueryStringsEnabled="+this.encryptQueryStringsEnabled);
                             if (this.encryptQueryStringsEnabled) { // ======================= NOTE: When this.protectParamsAndFormsEnabled is activated, this.encryptQueryStringsEnabled is also true automatically since when ParamsAndForms are protected, encryption is a must
-                                if (DEBUG) System.out.println("POST of form ? :"+isCurrentFormRequestMethodPOST);
+                                Logger.getLogger(ResponseFilterStream.class.getName()).log(Level.FINE, "POST of form ? :{0}", isCurrentFormRequestMethodPOST);
                                 this.actionUrlOfCurrentForm = ResponseUtils.encryptQueryStringInURL(this.currentRequestUrlToCompareWith, this.contextPath, this.servletPath, this.actionUrlOfCurrentForm, true, isMultipartForm, Boolean.valueOf(this.isCurrentFormRequestMethodPOST), this.contentInjectionHelper.isSupposedToBeStaticResource(ResponseUtils.extractURI(this.actionUrlOfCurrentForm)), this.cryptoDetectionString, this.cipher, this.cryptoKey, useFullPathForResourceToBeAccessedProtection, this.additionalFullResourceRemoval, this.additionalMediumResourceRemoval, this.response, this.appendQuestionmarkOrAmpersandToLinks);
                             }
                             //System.out.println("xxx3 this.actionUrlOfCurrentForm="+this.actionUrlOfCurrentForm);
@@ -662,7 +666,7 @@ public final class ResponseFilterStream extends AbstractRelaxingHtmlParserStream
             if (startsWithSelectAndProtectionIsActive) {
                 this.isWithinSelectBox = false;
                 this.nameOfCurrentSelectBox = null;
-                if (DEBUG) System.out.println("</select");
+                Logger.getLogger(ResponseFilterStream.class.getName()).log(Level.FINE, "</select");
             }
         }
 
@@ -678,7 +682,7 @@ public final class ResponseFilterStream extends AbstractRelaxingHtmlParserStream
 
     //1.5@Override
     public void handlePseudoTagRestart(final char[] stuff) throws IOException {
-        if (DEBUG) System.out.println("handlePseudoTagRestart: "+stuff);
+        Logger.getLogger(ResponseFilterStream.class.getName()).log(Level.FINE, "handlePseudoTagRestart: {0}", stuff);
         if (this.isWithinScript) {
             this.scriptBody.write( new String(stuff).getBytes(encoding) ); // TODO: geht das hier auch schneller ?
         } else {
@@ -690,7 +694,7 @@ public final class ResponseFilterStream extends AbstractRelaxingHtmlParserStream
     
     //1.5@Override
     public void handleText(final int b) throws IOException {
-        if (DEBUG) System.out.println("handleText: "+b);
+        Logger.getLogger(ResponseFilterStream.class.getName()).log(Level.FINE, "handleText: {0}", b);
         if (this.isWithinScript) {
             this.scriptBody.write(b);
         } else {
@@ -706,7 +710,7 @@ public final class ResponseFilterStream extends AbstractRelaxingHtmlParserStream
     
     //1.5@Override
     public void handleText(final String text) throws IOException {
-        if (DEBUG) System.out.println("handleText: "+text);
+        Logger.getLogger(ResponseFilterStream.class.getName()).log(Level.FINE, "handleText: {0}", text);
         if (this.isWithinScript) {
             this.scriptBody.write(text.getBytes(encoding));
         } else {
@@ -727,11 +731,11 @@ public final class ResponseFilterStream extends AbstractRelaxingHtmlParserStream
             String value = this.collectedDisplayValue.toString(encoding);
             value = ServerUtils.decodeBrokenValueExceptUrlEncoding(value);
             this.parameterAndFormProtectionOfCurrentForm.addSelectboxFieldAllowedValue(this.nameOfCurrentSelectBox, value);
-            if (DEBUG) System.out.println("\t\tcollected display value: "+value);
+            Logger.getLogger(ResponseFilterStream.class.getName()).log(Level.FINE, "\t\tcollected display value: {0}", value);
             this.isCollectingDisplayValueAsOptionValue = false;
             this.collectedDisplayValue.reset();
         }
-        if (DEBUG) System.out.println("\t</option");
+        Logger.getLogger(ResponseFilterStream.class.getName()).log(Level.FINE, "\t</option");
     }
 
     
@@ -828,10 +832,11 @@ public final class ResponseFilterStream extends AbstractRelaxingHtmlParserStream
                 }
             } while(capturingGroupNumber>0 && url==null);
             final int start = capturingMatcher.start(capturingGroupNumber);
-            if (DEBUG) {
-                System.out.println("capturingPattern: "+capturingMatcher.pattern());
-                System.out.println("url: "+url);
-            }
+            
+            
+            Logger.getLogger(ResponseFilterStream.class.getName()).log(Level.FINE, "capturingPattern: {0}", capturingMatcher.pattern());
+            Logger.getLogger(ResponseFilterStream.class.getName()).log(Level.FINE, "url: {0}", url);
+            
             if (!ServerUtils.isInternalHostURL(currentRequestUrlToCompareWith,ServerUtils.decodeBrokenValueHtmlOnly(url,false))) continue;
 // OLD            if (this.responseProtectionExclusion != null && this.responseProtectionExclusion.matcher(ResponseUtils.extractURI(url)).matches()) continue;
             final String extractedURI = ResponseUtils.extractURI(url);

@@ -1,5 +1,7 @@
 package org.webcastellum;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.FilterConfig;
 
 /**
@@ -7,22 +9,22 @@ import javax.servlet.FilterConfig;
  */
 public class DefaultConfigurationLoader implements ConfigurationLoader {
 
-    private static final boolean DEBUG = false;
-
     private FilterConfig filterConfig;
 
     public DefaultConfigurationLoader() {
-        if (DEBUG) System.out.println("Created new DefaultConfigurationLoader");
+        Logger.getLogger(DefaultConfigurationLoader.class.getName()).log(Level.FINE, "Created new DefaultConfigurationLoader");
     }
 
     public void setFilterConfig(final FilterConfig filterConfig) throws FilterConfigurationException {
-        if (DEBUG) System.out.println("Setting filterConfig");
+        Logger.getLogger(DefaultConfigurationLoader.class.getName()).log(Level.FINE, "Setting filterConfig");
         this.filterConfig = filterConfig;
     }
 
     public String getConfigurationValue(final String key) {
-        if (this.filterConfig == null) throw new IllegalStateException("filterConfig must be set before fetching configuration values");
-        if (DEBUG) System.out.println("Fetching config (via DefaultConfigurationLoader) for: "+key);
+        if (this.filterConfig == null) 
+            throw new IllegalStateException("filterConfig must be set before fetching configuration values");
+        
+        Logger.getLogger(DefaultConfigurationLoader.class.getName()).log(Level.FINE, "Fetching config (via DefaultConfigurationLoader) for: {0}", key);
         return this.filterConfig.getInitParameter(key);
     }
 

@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import javax.crypto.Cipher;
 import javax.servlet.http.HttpSession;
@@ -15,10 +17,7 @@ import javax.servlet.http.HttpSession;
 
 
 public final class ResponseFilterWriter extends AbstractRelaxingHtmlParserWriter {
-
-    private static final boolean DEBUG = false;
-    
-    
+       
     private final CharArrayWriter scriptBody = new CharArrayWriter();
     private final CharArrayWriter collectedDisplayValue = new CharArrayWriter();
     
@@ -192,8 +191,7 @@ public final class ResponseFilterWriter extends AbstractRelaxingHtmlParserWriter
     
     //1.5@Override
     public void handleTag(String tag) throws IOException {
-        if (DEBUG) System.out.println("handleTag: "+tag);
-        
+        Logger.getLogger(ResponseFilterWriter.class.getName()).log(Level.FINE, "handleTag: {0}", tag);
         
         
         boolean startsWithScriptOpening = false;
@@ -314,7 +312,7 @@ public final class ResponseFilterWriter extends AbstractRelaxingHtmlParserWriter
             this.isMultipartForm = ResponseUtils.isMultipartForm(tag);
             // only forms that explicitly have method=POST are of request method type POST
             if (this.matcherFormMethodPost.find()) isRequestMethodPOST= true;
-            if (DEBUG) System.out.println("POST ?: "+isRequestMethodPOST);
+            Logger.getLogger(ResponseFilterWriter.class.getName()).log(Level.FINE, "POST ?: {0}", isRequestMethodPOST);
         }
         
         // TODO: hier auch File-Upload Felder beruecksichtigen ?!?
@@ -362,7 +360,7 @@ public final class ResponseFilterWriter extends AbstractRelaxingHtmlParserWriter
                         if (!this.isWithinSelectBox && startsWithSelectOpening && !isFormFieldMaskingExclusion(extractedFieldNameDecoded)) {
                             this.isWithinSelectBox = true;
                             this.nameOfCurrentSelectBox = extractedFieldNameDecoded;
-                            if (DEBUG) System.out.println("<select ... with name: "+extractedFieldNameDecoded);
+                            Logger.getLogger(ResponseFilterWriter.class.getName()).log(Level.FINE, "<select ... with name: {0}", extractedFieldNameDecoded);
                         }
                     }
                     
@@ -380,7 +378,7 @@ public final class ResponseFilterWriter extends AbstractRelaxingHtmlParserWriter
                                 value = ServerUtils.decodeBrokenValueExceptUrlEncoding(value);
                                 if (value == null) value = "";
                                 this.parameterAndFormProtectionOfCurrentForm.addCheckboxFieldAllowedValue(extractedFieldNameDecoded, value);
-                                if (DEBUG) System.out.println("input: checkbox ... with name: "+extractedFieldNameDecoded);
+                                Logger.getLogger(ResponseFilterWriter.class.getName()).log(Level.FINE, "input: checkbox ... with name: {0}", extractedFieldNameDecoded);
                             }
                         }
 
@@ -397,7 +395,7 @@ public final class ResponseFilterWriter extends AbstractRelaxingHtmlParserWriter
                                 value = ServerUtils.decodeBrokenValueExceptUrlEncoding(value);
                                 if (value == null) value = "";
                                 this.parameterAndFormProtectionOfCurrentForm.addRadiobuttonFieldAllowedValue(extractedFieldNameDecoded, value);
-                                if (DEBUG) System.out.println("input: radiobutton ... with name: "+extractedFieldNameDecoded);
+                                Logger.getLogger(ResponseFilterWriter.class.getName()).log(Level.FINE, "input: radiobutton ... with name: {0}", extractedFieldNameDecoded);
                             }
                         }
                     }
@@ -425,7 +423,7 @@ public final class ResponseFilterWriter extends AbstractRelaxingHtmlParserWriter
                             } else {
                                 // TODO: hier bei type="checkbox" oder type="radio" oder ggf. auch button/submit/reset/hidden, etc. die Werte min und max value count entsprechend diversifiziert inkrementieren... 
                                 // fuer checkbox: also minimum nur auf 1 setzen und wenn der name bereits vorhanden ist, nicht weiter inkrementieren 
-                                System.err.println("not implemented"); // TODO: not fully implemented in this version (reserved for future featuresets)
+                                Logger.getLogger(ResponseFilterWriter.class.getName()).log(Level.WARNING, "not implemented"); // TODO: not fully implemented in this version (reserved for future featuresets)
                                 throw new UnsupportedOperationException("not implemented"); // TODO: not fully implemented in this version (reserved for future featuresets)
                             }
                         } else if (startsWithSelectOpening) {
@@ -433,7 +431,7 @@ public final class ResponseFilterWriter extends AbstractRelaxingHtmlParserWriter
                             final boolean isMultipleSelectbox = ResponseUtils.isFormFieldMultiple(tag);
                             if (isMultipleSelectbox) {
                                 // TODO: hier bei <select multiple> die anzahl der werte um die anzahl der options statt nur um 1 inkrementieren... (also die options dann per flag merken, dass isWithinSelectMultiple und je <option> opening dann den max-wert inkrementieren... mix-wert bleibt unvraendet
-                                System.err.println("not implemented"); // TODO: not fully implemented in this version (reserved for future featuresets)
+                                Logger.getLogger(ResponseFilterWriter.class.getName()).log(Level.WARNING, "not implemented"); // TODO: not fully implemented in this version (reserved for future featuresets)
                                 throw new UnsupportedOperationException("not implemented"); // TODO: not fully implemented in this version (reserved for future featuresets)
                             } else {
                                 this.parameterAndFormProtectionOfCurrentForm.incrementMaximumValueCountForParameterName(extractedFieldNameDecoded, 1);
@@ -468,11 +466,11 @@ public final class ResponseFilterWriter extends AbstractRelaxingHtmlParserWriter
                 // continue        
                 if (value == null) {
                     this.isCollectingDisplayValueAsOptionValue = true;
-                    if (DEBUG) System.out.println("\t<option ... without value (collecting the display content as value)");
+                    Logger.getLogger(ResponseFilterWriter.class.getName()).log(Level.FINE, "\t<option ... without value (collecting the display content as value)");
                 } else {
                     value = ServerUtils.decodeBrokenValueExceptUrlEncoding(value);
                     this.parameterAndFormProtectionOfCurrentForm.addSelectboxFieldAllowedValue(this.nameOfCurrentSelectBox, value);
-                    if (DEBUG) System.out.println("\t<option ... with value: "+value);
+                    Logger.getLogger(ResponseFilterWriter.class.getName()).log(Level.FINE, "\t<option ... with value: {0}", value);
                 }
             }
         }
@@ -508,7 +506,7 @@ public final class ResponseFilterWriter extends AbstractRelaxingHtmlParserWriter
                     if ( (this.injectSecretTokensEnabled&&!isRequestMethodPOST) // since only GET forms get their Action-URL-Params ignored by browsers
                         || this.encryptQueryStringsEnabled || this.protectParamsAndFormsEnabled) { // = special form handling where the query-string of the form's action gets removed (and added below as a hidden field on closing of form)
                         this.actionUrlOfCurrentForm = actionUrlFetchedDirectlyFromForm;
-                        if (DEBUG) System.out.println("actionUrlOfCurrentForm fetched directly from form: "+actionUrlOfCurrentForm);
+                        Logger.getLogger(ResponseFilterWriter.class.getName()).log(Level.FINE, "actionUrlOfCurrentForm fetched directly from form: {0}", actionUrlOfCurrentForm);
                         // in case the action URL is mising or empty, we have to take the original request's URI as form action when full-path-removal is enabled, since otherwise there might be path discrepancies since all paths are flattened during full-path-removal:
                         if ((this.additionalFullResourceRemoval || this.additionalMediumResourceRemoval) && (this.actionUrlOfCurrentForm == null || this.actionUrlOfCurrentForm.length()==0 )) {
                             // for medium path removal we're allowed to use a relative path, otherwise for full path removal we must use an absolute path
@@ -566,7 +564,7 @@ public final class ResponseFilterWriter extends AbstractRelaxingHtmlParserWriter
     
     //1.5@Override
     public void handleTagClose(final String tag) throws IOException {
-        if (DEBUG) System.out.println("handleTagClose: "+tag);
+        Logger.getLogger(ResponseFilterWriter.class.getName()).log(Level.FINE, "handleTagClose: {0}", tag);
         boolean startsWithScript = false;
         boolean startsWithForm = false;
         boolean startsWithSelectAndProtectionIsActive = false;
@@ -605,9 +603,9 @@ public final class ResponseFilterWriter extends AbstractRelaxingHtmlParserWriter
             writeScriptBodyWithLinksAdjusted();
             this.scriptBody.reset();
         } else if (startsWithForm) {
-            if (DEBUG) System.out.println("startsWithForm");
+            Logger.getLogger(ResponseFilterWriter.class.getName()).log(Level.FINE, "startsWithForm");
             if (this.actionUrlOfCurrentForm != null) {
-                if (DEBUG) System.out.println("actionUrlOfCurrentForm != null : "+actionUrlOfCurrentForm);
+                Logger.getLogger(ResponseFilterWriter.class.getName()).log(Level.FINE, "actionUrlOfCurrentForm != null : {0}", actionUrlOfCurrentForm);
                 if (!this.encryptQueryStringsEnabled || !ResponseUtils.isAlreadyEncrypted(this.cryptoDetectionString,this.actionUrlOfCurrentForm)) { // = only inject tokens when either encryption is disabled or has not taken place, when for example response.encodeURL already caught that URL
                     if (this.injectSecretTokensEnabled) { // this.protectParamsAndFormsEnabled bedingt this.injectSecretTokensEnabled automatisch
                         final String urlDecoded = ServerUtils.decodeBrokenValueHtmlOnly(this.actionUrlOfCurrentForm, false);
@@ -623,7 +621,7 @@ public final class ResponseFilterWriter extends AbstractRelaxingHtmlParserWriter
                             //System.out.println("xxx1 this.actionUrlOfCurrentForm="+this.actionUrlOfCurrentForm);
                             //System.out.println("xxx2 this.encryptQueryStringsEnabled="+this.encryptQueryStringsEnabled);
                             if (this.encryptQueryStringsEnabled) { // ======================= NOTE: When this.protectParamsAndFormsEnabled is activated, this.encryptQueryStringsEnabled is also true automatically since when ParamsAndForms are protected, encryption is a must
-                                if (DEBUG) System.out.println("POST of form ? :"+isCurrentFormRequestMethodPOST);
+                                Logger.getLogger(ResponseFilterWriter.class.getName()).log(Level.FINE, "POST of form ? :{0}", isCurrentFormRequestMethodPOST);
                                 this.actionUrlOfCurrentForm = ResponseUtils.encryptQueryStringInURL(this.currentRequestUrlToCompareWith, this.contextPath, this.servletPath, this.actionUrlOfCurrentForm, true, isMultipartForm, Boolean.valueOf(this.isCurrentFormRequestMethodPOST), this.contentInjectionHelper.isSupposedToBeStaticResource(ResponseUtils.extractURI(this.actionUrlOfCurrentForm)), this.cryptoDetectionString, this.cipher, this.cryptoKey, useFullPathForResourceToBeAccessedProtection, this.additionalFullResourceRemoval, this.additionalMediumResourceRemoval, this.response, this.appendQuestionmarkOrAmpersandToLinks);
                             }
                             //System.out.println("xxx3 this.actionUrlOfCurrentForm="+this.actionUrlOfCurrentForm);
@@ -656,7 +654,7 @@ public final class ResponseFilterWriter extends AbstractRelaxingHtmlParserWriter
             if (startsWithSelectAndProtectionIsActive) {
                 this.isWithinSelectBox = false;
                 this.nameOfCurrentSelectBox = null;
-                if (DEBUG) System.out.println("</select");
+                Logger.getLogger(ResponseFilterWriter.class.getName()).log(Level.FINE, "</select");
             }
         }
         
@@ -672,7 +670,7 @@ public final class ResponseFilterWriter extends AbstractRelaxingHtmlParserWriter
 
     //1.5@Override
     public void handlePseudoTagRestart(final char[] stuff) throws IOException {
-        if (DEBUG) System.out.println("handlePseudoTagRestart: "+stuff);
+        Logger.getLogger(ResponseFilterWriter.class.getName()).log(Level.FINE, "handlePseudoTagRestart: {0}", stuff);
         if (this.isWithinScript) {
             this.scriptBody.write(stuff);
         } else {
@@ -684,7 +682,7 @@ public final class ResponseFilterWriter extends AbstractRelaxingHtmlParserWriter
 
     //1.5@Override
     public void handleText(final int character) throws IOException {
-        if (DEBUG) System.out.println("handleText: "+character);
+        Logger.getLogger(ResponseFilterWriter.class.getName()).log(Level.FINE, "handleText: {0}", character);
         if (this.isWithinScript) {
             this.scriptBody.write(character);
         } else {
@@ -700,7 +698,7 @@ public final class ResponseFilterWriter extends AbstractRelaxingHtmlParserWriter
 
     //1.5@Override
     public void handleText(final String text) throws IOException {
-        if (DEBUG) System.out.println("handleText: "+text);
+        Logger.getLogger(ResponseFilterWriter.class.getName()).log(Level.FINE, "handleText: {0}", text);
         if (this.isWithinScript) {
             this.scriptBody.write(text);
         } else {
@@ -724,11 +722,11 @@ public final class ResponseFilterWriter extends AbstractRelaxingHtmlParserWriter
             String value = this.collectedDisplayValue.toString();
             value = ServerUtils.decodeBrokenValueExceptUrlEncoding(value);
             this.parameterAndFormProtectionOfCurrentForm.addSelectboxFieldAllowedValue(this.nameOfCurrentSelectBox, value);
-            if (DEBUG) System.out.println("\t\tcollected display value: "+value);
+            Logger.getLogger(ResponseFilterWriter.class.getName()).log(Level.FINE, "\t\tcollected display value: {0}", value);
             this.isCollectingDisplayValueAsOptionValue = false;
             this.collectedDisplayValue.reset();
         }
-        if (DEBUG) System.out.println("\t</option");
+        Logger.getLogger(ResponseFilterWriter.class.getName()).log(Level.FINE, "\t</option");
     }
 
     
@@ -822,10 +820,10 @@ public final class ResponseFilterWriter extends AbstractRelaxingHtmlParserWriter
                 }
             } while(capturingGroupNumber>0 && url==null);
             final int start = capturingMatcher.start(capturingGroupNumber);
-            if (DEBUG) {
-                System.out.println("capturingPattern: "+capturingMatcher.pattern());
-                System.out.println("url: "+url);
-            }
+            
+            Logger.getLogger(ResponseFilterWriter.class.getName()).log(Level.FINE, "capturingPattern: {0}", capturingMatcher.pattern());
+            Logger.getLogger(ResponseFilterWriter.class.getName()).log(Level.FINE, "url: {0}", url);
+            
             if (!ServerUtils.isInternalHostURL(currentRequestUrlToCompareWith,ServerUtils.decodeBrokenValueHtmlOnly(url,false))) continue;
 // OLD            if (this.responseProtectionExclusion != null && this.responseProtectionExclusion.matcher(ResponseUtils.extractURI(url)).matches()) continue;
             final String extractedURI = ResponseUtils.extractURI(url);
@@ -867,7 +865,8 @@ public final class ResponseFilterWriter extends AbstractRelaxingHtmlParserWriter
     private HttpSession getSession() {
         if (this.session == null) {
             this.session = this.request.getSession(false);
-            if (this.session == null) System.err.println("Strange situation: session is null where it should not be null");
+            if (this.session == null) 
+                Logger.getLogger(ResponseFilterWriter.class.getName()).log(Level.WARNING, "Strange situation: session is null where it should not be null");
         }
         return this.session;
     }
