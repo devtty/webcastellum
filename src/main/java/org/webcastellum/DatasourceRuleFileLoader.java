@@ -49,8 +49,7 @@ public final class DatasourceRuleFileLoader extends AbstractSqlRuleFileLoader {
                     throw new SQLException("Unable to load datasource from JNDI: "+this.jdbcDatasource);
                 }
             } catch (NamingException ex) {
-                ex.printStackTrace();
-                throw new SQLException("Unable to load datasource from JNDI: "+this.jdbcDatasource/*, ex*/); // TODO Java5: exception parameter in SQLException constructor with Java5 possible
+                throw new SQLException("Unable to load datasource from JNDI: " + this.jdbcDatasource + " : " + ex.getMessage()/*, ex*/); // TODO Java5: exception parameter in SQLException constructor with Java5 possible
             }
         }
         assert this.dataSource != null;

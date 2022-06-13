@@ -14,6 +14,8 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -21,13 +23,6 @@ import javax.servlet.http.HttpServletRequest;
 
 public abstract class RequestDefinitionContainer/*<T extends RequestDefinition>*/ extends AbstractDefinitionContainer {
 
-    
-    
-    private static final boolean DEBUG_SHOW_RULE_TIMINGS = false;
-    
-    
-    
-    
     
     public static final String FORMAT_TIME = "yyyyMMddHHmmss";
     public static final String FORMAT_TIME_YEAR = "yyyy";
@@ -753,9 +748,8 @@ public abstract class RequestDefinitionContainer/*<T extends RequestDefinition>*
                     continue; // short-circuit to ignore this disabled rule: continue with next request-definition to check
             }
             
-            if (DEBUG_SHOW_RULE_TIMINGS) {
-                System.out.println(System.currentTimeMillis()+" start of rule "+requestDefinition.getIdentification());
-            }
+            
+            Logger.getLogger(ResponseFilterWriter.class.getName()).log(Level.FINE, "{0} start of rule {1}", new Object[]{System.currentTimeMillis(), requestDefinition.getIdentification()});
             
             // now decide if a standard rule file or a custom-request-matcher based rule file should be worked on
             if ( requestDefinition.isHavingCustomRequestMatcher() ) { //= custom-request-matcher based rule file @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@

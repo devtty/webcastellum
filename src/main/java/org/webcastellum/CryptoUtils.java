@@ -30,7 +30,7 @@ public final class CryptoUtils {
     // TODO: die ciphers und deren modes per konfig in web.xml setzbar machen...
     private static final String CIPHER_DATA = "AES/GCM/NoPadding"; // AES, AES/ECB/PKCS5Padding, Blowfish, DES
     private static final String CIPHER_KEY = "AES"; // AES, Blowfish, DES
-    private static final String DIGEST = "SHA-1"; // MD5, SHA-1, SHA-256, SHA-512
+    private static final String DIGEST = "SHA-256"; // MD5, SHA-1, SHA-256, SHA-512
     private static final int KEY_SIZE = 128;
 
     private static final SecureRandom SECURE_RANDOM = new SecureRandom(); // TODO: use SecureRandom.getInstance()
