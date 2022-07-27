@@ -28,7 +28,8 @@ public final class CryptoUtils {
     
     
     // TODO: die ciphers und deren modes per konfig in web.xml setzbar machen...
-    private static final String CIPHER_DATA = "AES/GCM/NoPadding"; // AES, AES/ECB/PKCS5Padding, Blowfish, DES
+    //private static final String CIPHER_DATA = "AES/GCM/NoPadding"; // AES, AES/ECB/PKCS5Padding, Blowfish, DES
+    private static final String CIPHER_DATA = "AES"; // AES, AES/ECB/PKCS5Padding, Blowfish, DES
     private static final String CIPHER_KEY = "AES"; // AES, Blowfish, DES
     private static final String DIGEST = "SHA-256"; // MD5, SHA-1, SHA-256, SHA-512
     private static final int KEY_SIZE = 128;
@@ -128,9 +129,14 @@ public final class CryptoUtils {
     }
     
     public static int generateRandomNumber(final boolean secure, final int low, final int high) {
-        if (low >= high) throw new IllegalArgumentException("Low value must be lower than high value (low="+low+" and high="+high+")");
+        if(low<0 || high<0){
+            throw new IllegalArgumentException("Values cannot be negative");
+        }
+        if (low >= high) {
+            throw new IllegalArgumentException("Low value must be lower than high value (low=" + low + " and high=" + high + ")");
+        }
         final int difference = high - low;
-        return low + (secure?SECURE_RANDOM:RANDOM).nextInt(difference);
+        return low + (secure ? SECURE_RANDOM : RANDOM).nextInt(difference);
     }
     
     

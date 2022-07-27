@@ -3,11 +3,12 @@ package org.webcastellum;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import javax.crypto.Cipher;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class CryptoUtilsTest {
-    
+
     public CryptoUtilsTest() {
     }
 
@@ -26,22 +27,22 @@ public class CryptoUtilsTest {
         assertEquals((byte) 0xff, CryptoUtils.toByteValue("FF"));
         assertEquals((byte) 0x1, CryptoUtils.toByteValue("1"));
     }
-    
+
     @Test(expected = IllegalArgumentException.class)
-    public void testToByteValueWithToLongArgument(){
+    public void testToByteValueWithToLongArgument() {
         CryptoUtils.toByteValue("001");
     }
-    
+
     @Test(expected = IllegalArgumentException.class)
-    public void testToByteValueWithToShortArgument(){
+    public void testToByteValueWithToShortArgument() {
         CryptoUtils.toByteValue("");
     }
-    
+
     @Test(expected = NullPointerException.class)
-    public void testToByteValueWithNullArgument(){
+    public void testToByteValueWithNullArgument() {
         CryptoUtils.toByteValue(null);
     }
-    
+
     @Test
     public void testToIntValue() {
         assertEquals(1, CryptoUtils.toIntValue("01"));
@@ -50,34 +51,36 @@ public class CryptoUtilsTest {
         assertEquals(255, CryptoUtils.toIntValue("FF"));
         assertEquals(1, CryptoUtils.toIntValue("1"));
     }
-    
+
     @Test(expected = IllegalArgumentException.class)
-    public void testToIntValueWithToLongArgument(){
+    public void testToIntValueWithToLongArgument() {
         CryptoUtils.toIntValue("ABCDEF121");
     }
-    
+
     @Test(expected = IllegalArgumentException.class)
-    public void testToIntValueWithToShortArgument(){
+    public void testToIntValueWithToShortArgument() {
         CryptoUtils.toIntValue("");
     }
-    
+
     @Test(expected = NullPointerException.class)
-    public void testToIntValueWithNullArgument(){
+    public void testToIntValueWithNullArgument() {
         CryptoUtils.toIntValue(null);
     }
 
+    //TODO testing randomness through adding values to a list is not reliable bc. double values are possible
+    
     @Test
     public void testGenerateRandomToken_boolean() {
         List<String> strings = new ArrayList<>();
         String s = "";
-        for(int i = 0 ; i< 100; i++){
+        for (int i = 0; i < 100; i++) {
             String x = CryptoUtils.generateRandomToken(true);
             assertTrue(x.length() > 6);
             assertTrue(x.length() < 10);
             assertFalse(strings.contains(x));
             strings.add(x);
         }
-        for(int i = 0 ; i< 100; i++){
+        for (int i = 0; i < 100; i++) {
             String x = CryptoUtils.generateRandomToken(false);
             assertTrue(x.length() > 6);
             assertTrue(x.length() < 10);
@@ -89,13 +92,13 @@ public class CryptoUtilsTest {
     @Test
     public void testGenerateRandomToken_boolean_int() {
         List<String> strings = new ArrayList<>();
-        for(int i = 0 ; i< 100; i++){
+        for (int i = 0; i < 100; i++) {
             String x = CryptoUtils.generateRandomToken(true, 6);
             assertTrue(x.length() == 6);
             assertFalse(strings.contains(x));
             strings.add(x);
         }
-        for(int i = 0 ; i< 100; i++){
+        for (int i = 0; i < 100; i++) {
             String x = CryptoUtils.generateRandomToken(false, 12);
             assertTrue(x.length() == 12);
             assertFalse(strings.contains(x));
@@ -107,14 +110,14 @@ public class CryptoUtilsTest {
     public void testGenerateRandomBytes_boolean() {
         List<byte[]> a = new ArrayList<>();
 
-        for(int i = 0; i < 100; i++){
+        for (int i = 0; i < 100; i++) {
             byte[] bytes = CryptoUtils.generateRandomBytes(true);
             assertTrue("L:" + bytes.length, bytes.length > 9);
             assertTrue("L:" + bytes.length, bytes.length < 18);
             assertFalse(a.contains(bytes));
             a.add(bytes);
         }
-        for(int i = 0; i < 100; i++){
+        for (int i = 0; i < 100; i++) {
             byte[] bytes = CryptoUtils.generateRandomBytes(false);
             assertTrue("L:" + bytes.length, bytes.length > 9);
             assertTrue("L:" + bytes.length, bytes.length < 18);
@@ -127,13 +130,13 @@ public class CryptoUtilsTest {
     public void testGenerateRandomBytes_boolean_int() {
         List<byte[]> a = new ArrayList<>();
 
-        for(int i = 0; i < 100; i++){
+        for (int i = 0; i < 100; i++) {
             byte[] bytes = CryptoUtils.generateRandomBytes(true, 8);
             assertTrue("L:" + bytes.length, bytes.length == 8);
             assertFalse(a.contains(bytes));
             a.add(bytes);
         }
-        for(int i = 0; i < 100; i++){
+        for (int i = 0; i < 100; i++) {
             byte[] bytes = CryptoUtils.generateRandomBytes(false, 15);
             assertTrue("L:" + bytes.length, bytes.length == 15);
             assertFalse(a.contains(bytes));
@@ -141,20 +144,56 @@ public class CryptoUtilsTest {
         }
     }
 
-    /*
     @Test
     public void testGenerateRandomNumber_boolean() {
-        
+        List<Integer> a = new ArrayList<>();
+        for (int i = 0; i < 100; i++){
+            int r = CryptoUtils.generateRandomNumber(true);
+            assertFalse(a.contains(r));
+            a.add(r);
+        }
+        for (int i = 0; i < 100; i++){
+            int r = CryptoUtils.generateRandomNumber(false);
+            assertFalse(a.contains(r));
+            a.add(r);
+        }
     }
 
     @Test
     public void testGenerateRandomNumber_3args() {
+        List<Integer> a = new ArrayList<>();
+        for(int i = 0; i < 20; i++){
+            int r = CryptoUtils.generateRandomNumber(true, 500, 50000);
+            assertTrue(r > 500);
+            assertTrue(r < 50000);
+            assertFalse(a.contains(r));
+            a.add(r);
+        }
+        for(int i = 0; i < 20; i++){
+            int r = CryptoUtils.generateRandomNumber(false, 50000, 100000);
+            assertTrue(r > 50000);
+            assertTrue(r < 100000);
+            assertFalse(a.contains(r));
+            a.add(r);
+        }
+    }
+    
+    @Test(expected = IllegalArgumentException.class)
+    public void testGenerateRandomNumber_negativeMin(){
+        CryptoUtils.generateRandomNumber(true, -1, 10);
+    }
+    
+    @Test(expected = IllegalArgumentException.class)
+    public void testGenerateRandomNumber_negativeDifference(){
+        CryptoUtils.generateRandomNumber(true, 5, 4);
     }
 
     @Test
     public void testGetHashLength() throws Exception {
+        assertTrue(CryptoUtils.getHashLength() == 32);
     }
 
+    /*
     @Test
     public void testHash() throws Exception {
     }
@@ -163,18 +202,60 @@ public class CryptoUtilsTest {
     public void testGetCipher() throws Exception {
     }
 
+    */
+    
     @Test
     public void testGenerateRandomCryptoKeyAndSalt() throws Exception {
+        List<CryptoKeyAndSalt> a = new ArrayList<>();
+        for(int i = 0; i < 100; i++){
+            CryptoKeyAndSalt ckas = CryptoUtils.generateRandomCryptoKeyAndSalt(false);
+            assertFalse(ckas.isExtraHashingProtection());
+            assertNotNull(ckas.getKey());
+            assertNull(ckas.getSaltBefore());
+            assertNull(ckas.getSaltAfter());
+            assertTrue(ckas.getRepeatedHashingCount() == 0);
+            assertFalse(a.contains(ckas));
+            a.add(ckas);
+        }
+        for(int i = 0; i < 100; i++){
+            CryptoKeyAndSalt ckas = CryptoUtils.generateRandomCryptoKeyAndSalt(true);
+            assertTrue(ckas.isExtraHashingProtection());
+            assertNotNull(ckas.getKey());
+            assertNotNull(ckas.getSaltBefore());
+            assertTrue(ckas.getSaltBefore().length > 9);
+            assertTrue(ckas.getSaltBefore().length < 18);
+            assertNotNull(ckas.getSaltAfter());
+            assertTrue(ckas.getSaltAfter().length > 9);
+            assertTrue(ckas.getSaltAfter().length < 18);
+            assertTrue(ckas.getRepeatedHashingCount() >= 2);
+            assertTrue(ckas.getRepeatedHashingCount() <= 5);
+            assertFalse(a.contains(ckas));
+            a.add(ckas);
+        }
+        
     }
 
     @Test
-    public void testEncryptURLSafe() throws Exception {
+    public void testEncryptAndDecryptURLSafe() throws Exception {
+
+        String URL = "https://test.com/context/path?id=1&test=d";
+
+        CryptoKeyAndSalt ckas = CryptoUtils.generateRandomCryptoKeyAndSalt(true);
+        String s = CryptoUtils.encryptURLSafe(URL, ckas, null);
+
+        String decrypted = CryptoUtils.decryptURLSafe(s, ckas);
+
+        assertEquals(URL, decrypted);
+
+        ckas = CryptoUtils.generateRandomCryptoKeyAndSalt(false);
+        s = CryptoUtils.encryptURLSafe(URL, ckas, null);
+        decrypted = CryptoUtils.decryptURLSafe(s, ckas);
+        assertEquals(URL, decrypted);
+
     }
 
-    @Test
-    public void testDecryptURLSafe() throws Exception {
-    }
-
+    
+    /*
     @Test
     public void testBytesToHex() {
     }
@@ -190,5 +271,5 @@ public class CryptoUtilsTest {
     @Test
     public void testDecompress() throws Exception {
     }
-    */
+     */
 }
