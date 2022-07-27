@@ -28,8 +28,11 @@ public final class CryptoUtils {
     
     
     // TODO: die ciphers und deren modes per konfig in web.xml setzbar machen...
+    /* TODO: GCM needs additional parameters to work apart from this it should only encrypt an url query string -> strong encryption
+       really needed? url will be base64 encoded, what will happen w/ url-length?
+    */
     //private static final String CIPHER_DATA = "AES/GCM/NoPadding"; // AES, AES/ECB/PKCS5Padding, Blowfish, DES
-    private static final String CIPHER_DATA = "AES/ECB/PKCS5Padding"; // AES, AES/ECB/PKCS5Padding, Blowfish, DES
+    private static final String CIPHER_DATA = "AES"; // AES, AES/ECB/PKCS5Padding, Blowfish, DES
     private static final String CIPHER_KEY = "AES"; // AES, Blowfish, DES
     private static final String DIGEST = "SHA-256"; // MD5, SHA-1, SHA-256, SHA-512
     private static final int KEY_SIZE = 128;
