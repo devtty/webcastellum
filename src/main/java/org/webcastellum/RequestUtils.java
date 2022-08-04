@@ -259,7 +259,7 @@ public final class RequestUtils {
 
 
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
             appendValueToMessage(logMessage, "Unable to create security log message (unexpected exception during message creation)", e.getMessage());
         }
         return logMessage.toString();

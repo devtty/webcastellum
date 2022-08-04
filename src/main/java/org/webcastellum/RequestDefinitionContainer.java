@@ -21,7 +21,6 @@ import java.util.regex.PatternSyntaxException;
 import javax.servlet.http.HttpServletRequest;
 
 public abstract class RequestDefinitionContainer/*<T extends RequestDefinition>*/ extends AbstractDefinitionContainer {
-
     public static final String FORMAT_TIME = "yyyyMMddHHmmss";
     public static final String FORMAT_TIME_YEAR = "yyyy";
     public static final String FORMAT_TIME_MONTH = "MM";

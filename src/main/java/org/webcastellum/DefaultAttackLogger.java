@@ -73,6 +73,7 @@ public final class DefaultAttackLogger implements AttackLogger {
             if (!file.exists()) {
                 Logger.getGlobal().log(Level.WARNING, "WebCastellum log directory does not exist: {0}", file.getAbsolutePath());
             }
+
             final String applicationAdjusted;
             if (application == null || application.trim().length() == 0) {
                 applicationAdjusted = "";

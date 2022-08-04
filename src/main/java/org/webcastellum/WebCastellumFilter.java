@@ -5,6 +5,8 @@ import java.net.*;
 import java.security.NoSuchAlgorithmException;
 import java.text.MessageFormat;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -405,7 +407,7 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
             isIncomingSessionToHeaderBindingProtectionExclude = incomingProtectionExcludeDefinition != null && incomingProtectionExcludeDefinition.isExcludeSessionToHeaderBindingProtection();
             isIncomingExtraSessionTimeoutHandlingExclude = incomingProtectionExcludeDefinition != null && incomingProtectionExcludeDefinition.isExcludeExtraSessionTimeoutHandling();
         } catch (Exception e) {
-            e.printStackTrace();
+            Logger.getGlobal().log(Level.SEVERE, "Exception on entry point: {0}", e.getMessage());
             final Attack attack = this.attackHandler.handleAttack(request, requestDetails.clientAddress, "Unable to determine if it is a special point (exception during checking): "+e.getMessage());
             return new AllowedFlagWithMessage(false, attack);
         }
@@ -862,7 +864,7 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
                     return new AllowedFlagWithMessage(false, attack);
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                Logger.getGlobal().log(Level.SEVERE, "Exception white list match: {0}", e.getMessage());
                 final Attack attack = this.attackHandler.handleAttack(request, requestDetails.clientAddress, "Unable to determine if it is a whitelist match (exception during checking): "+e.getMessage());
                 return new AllowedFlagWithMessage(false, attack);
             }
@@ -893,7 +895,7 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
                         requestDetails.cookieMapVariants, requestDetails.requestedSessionId, requestDetails.queryStringVariants, 
                         requestDetails.requestParameterMapVariants, requestDetails.requestParameterMap);
         } catch (Exception e) {
-            e.printStackTrace();
+            Logger.getGlobal().log(Level.SEVERE, "Exception on special point: {0}", e.getMessage());
             final Attack attack = this.attackHandler.handleAttack(request, requestDetails.clientAddress, "Unable to determine if it is a special point (exception during checking): "+e.getMessage());
             return new AllowedFlagWithMessage(false, attack);
         }
@@ -1230,7 +1232,7 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
                 return new AllowedFlagWithMessage(false, attack);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            Logger.getGlobal().log(Level.SEVERE, "Exception bad-request: {0}", e.getMessage());
             // TODO: klar, dass wir hier den request ablehnen, da ein fehler im checking aufgetreten ist... aber sollten wir hier nicht vielleicht es vermeiden, dass der attack-counter hier auch inkrementiert wird und die session terminiert wird?
             // klar, dass es geblockt wird, aber es ist keine vollwertige attacke...
             final Attack attack = this.attackHandler.handleAttack(request, requestDetails.clientAddress, "Unable to determine if it is a bad-request (exception during bad-request checking): "+e.getMessage());
@@ -1372,7 +1374,7 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
                 // remove it from its ID-based storage
                 session.removeAttribute(SESSION_CAPTCHA_IMAGES+captchaIdReceivedForForm); // remove used captcha from session; BUT this might cause the effect, that the second submit of a twice-submitted captcha-form-submit does not find the captcha anymore... but that's why we keep the last captcha around for a while
             } catch (Exception e) { // TODO: Hier ggf. die IllegalStateException abfangen, wenn bereits die session invalidiert wurde... aber was dann? dann auch als Attacke werten? oder auf Startseite leiten ?
-                e.printStackTrace();
+                Logger.getGlobal().log(Level.SEVERE, "Exception captcha: {0}", e.getMessage());
                 // TODO: klar, dass wir hier den request ablehnen, da ein fehler im checking aufgetreten ist... aber sollten wir hier nicht vielleicht es vermeiden, dass der attack-counter hier auch inkrementiert wird und die session terminiert wird?
                 // klar, dass es geblockt wird, aber es ist keine vollwertige attacke...
                 final Attack attack = this.attackHandler.handleAttack(request, requestDetails.clientAddress, "Unable to work on request (exception during captcha form handling): "+e.getMessage());
@@ -1403,7 +1405,7 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
                 response.flushBuffer();
                 return new AllowedFlagWithMessage(false, captcha); // to stop further processing, since only the captcha should be sent back
             } catch (Exception e) {
-                e.printStackTrace();
+                Logger.getGlobal().log(Level.SEVERE, "Exception image handling: {0}", e.getMessage());
                 // TODO: klar, dass wir hier den request ablehnen, da ein fehler im checking aufgetreten ist... aber sollten wir hier nicht vielleicht es vermeiden, dass der attack-counter hier auch inkrementiert wird und die session terminiert wird?
                 // klar, dass es geblockt wird, aber es ist keine vollwertige attacke...
                 final Attack attack = this.attackHandler.handleAttack(request, requestDetails.clientAddress, "Unable to work on request (exception during captcha image handling): "+e.getMessage());
@@ -1473,7 +1475,7 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
                 response.flushBuffer();
                 return new AllowedFlagWithMessage(false, captcha); // to stop further processing, since only the captcha should be sent back
             } catch (Exception e) {
-                e.printStackTrace();
+                Logger.getGlobal().log(Level.SEVERE, "Exception on captcha handling: {0}", e.getMessage());
                 // TODO: klar, dass wir hier den request ablehnen, da ein fehler im checking aufgetreten ist... aber sollten wir hier nicht vielleicht es vermeiden, dass der attack-counter hier auch inkrementiert wird und die session terminiert wird?
                 // klar, dass es geblockt wird, aber es ist keine vollwertige attacke...
                 final Attack attack = this.attackHandler.handleAttack(request, requestDetails.clientAddress, "Unable to work on request (exception during captcha handling): "+e.getMessage());
@@ -2572,9 +2574,7 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
             final String message = "Exception ("+e.getMessage()+") while checking request (therefore disallowing it by default)";
             allowed = new AllowedFlagWithMessage(false, new Attack(message));
             if (!(e instanceof ServerAttackException)) {
-                // TODO: hier eigentlich auch auf stderr noetig oder ueberfluessig?
-                System.err.println(message);
-                e.printStackTrace();
+                Logger.getGlobal().log(Level.SEVERE, message);
             }
             this.attackHandler.logWarningRequestMessage(message);
         }
@@ -2620,7 +2620,8 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
                 // CHAIN CHAIN CHAIN CHAIN CHAIN CHAIN CHAIN CHAIN CHAIN CHAIN CHAIN CHAIN CHAIN CHAIN CHAIN CHAIN CHAIN CHAIN CHAIN CHAIN CHAIN
             } catch(ServerAttackException e) {
                 attackSoFar = true;
-                if (this.debug) e.printStackTrace();
+                Logger.getLogger(WebCastellumFilter.class.getName()).log(Level.SEVERE, "Exception (ServerAttack): {0}", e.getMessage());
+                
                 wrappedRequest.setTransferProtectiveSessionContentToNewSessionsDefinedByApplication(false); // also clears the eventually used TreadLocal
                 // already handled by attack-handler, but send disallowed response nevertheless without counting it in AttackHandler
                 sendDisallowedResponse((HttpServletResponse)response, new Attack(e.getMessage()));
@@ -2631,7 +2632,7 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
                  * rethrow the problem after that.
                  */
                 problem = t;
-                t.printStackTrace(); // TODO: put an "if (this.debug)" around this line ?
+                Logger.getGlobal().log(Level.SEVERE, "Throw: {0}", t.getMessage());
             } finally {
                 // Stop transferring WebCastellum session content from the old into new sessions, as the chain is over and if now the session gets invalidated it gets
                 // invalidated by WebCastellum, so that is then desired and should no longer get the WebCastellum session contents transferred...
@@ -2832,15 +2833,23 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
                         this.restartCompletelyOnNextRequest = true;
                         // when a full-restart failed, clean up any open stuff that might have been already initialized during our first init try 
                         // to have a clean beginning for the subsequent restart try
-                        try { destroy(); } catch (Exception e2) { e2.printStackTrace(); }
-                        e.printStackTrace();
+                        try { 
+                            destroy(); 
+                        } catch (Exception e2) { 
+                            Logger.getGlobal().log(Level.SEVERE, "Exception: {0}", e2.getMessage());
+                        }
+                        Logger.getGlobal().log(Level.SEVERE, "Exception: {0}", e.getMessage());
                         throw e;
                     } catch (UnavailableException e) {
                         this.restartCompletelyOnNextRequest = true;
                         // when a full-restart failed, clean up any open stuff that might have been already initialized during our first init try
                         // to have a clean beginning for the subsequent restart try
-                        try { destroy(); } catch (Exception e2) { e2.printStackTrace(); }
-                        e.printStackTrace();
+                        try { 
+                            destroy(); 
+                        } catch (Exception e2) { 
+                            Logger.getGlobal().log(Level.SEVERE, "Exception: {0}", e2.getMessage());
+                        }
+                        Logger.getGlobal().log(Level.SEVERE, "Exception: {0}", e.getMessage());
                         throw e;
                     }
                 }
@@ -4584,7 +4593,6 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
     
     private void sendProcessingError(final Throwable t, final HttpServletResponse response) {
         logLocal("Unable to process filter chain and unable to handle exception: "+t);
-        t.printStackTrace();
         response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
     }
     // TODO: sendUnavailableMessage und sendUncaughtExceptionResponse in eine parametrisierbare Methode mergen
