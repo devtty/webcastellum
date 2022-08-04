@@ -31,8 +31,8 @@ public final class DatabaseRuleFileLoader extends AbstractSqlRuleFileLoader {
         try {
             Class.forName(this.jdbcDriver);
         } catch (ClassNotFoundException ex) {
-            ex.printStackTrace();
-            throw new SQLException("Unable to load JDBC driver"/*, ex*/); // TODO Java5: exception parameter in SQLException constructor with Java5 possible
+            //ex.printStackTrace();
+            throw new SQLException("Unable to load JDBC driver: " + ex.getMessage());
         }
         return DriverManager.getConnection(this.jdbcURL, this.jdbcUser, this.jdbcPassword);
     }
