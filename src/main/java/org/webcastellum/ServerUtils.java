@@ -16,6 +16,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.servlet.http.HttpSession;
@@ -557,9 +559,6 @@ public final class ServerUtils {
         // Further details on URI encoding stuff: http://en.wikipedia.org/wiki/Percent-encoding
         try {
             return URLDecoder.decode(url, WebCastellumFilter.DEFAULT_CHARACTER_ENCODING);
-        } catch (UnsupportedEncodingException e) {
-            System.err.println("Unsupported character encoding configured for WebCastellum: "+WebCastellumFilter.DEFAULT_CHARACTER_ENCODING);
-            return url;
         } catch (IllegalArgumentException e) {
             return url;
         }
@@ -1101,7 +1100,10 @@ public final class ServerUtils {
 
     public static String extractResourceToBeAccessed(String url, final String currentContextPath, String currentRequestUriToUseAsBaseForRelativeLinks, final boolean useFullPathForResourceToBeAccessedProtection) {
         // TODO: hier evtl. noch HTML <base> tags im response beachten und parsen ?!?
-        if (DEBUG) System.out.println("extractResourceToBeAccessed ARGUMENTS url="+url+" currentContextPath="+currentContextPath+" currentRequestUriToUseAsBaseForRelativeLinks="+currentRequestUriToUseAsBaseForRelativeLinks+" useFullPathForResourceToBeAccessedProtection="+useFullPathForResourceToBeAccessedProtection);
+        Logger.getLogger(ClusterSubscribeIncrementingCounterClient.class.getName()).log(Level.FINE, "extractResourceToBeAccessed ARGUMENTS url={0}",url);
+        Logger.getLogger(ClusterSubscribeIncrementingCounterClient.class.getName()).log(Level.FINE, "currentContextPath={0}"+currentContextPath);
+        Logger.getLogger(ClusterSubscribeIncrementingCounterClient.class.getName()).log(Level.FINE, "currentRequestUriToUseAsBaseForRelativeLinks={0}", currentRequestUriToUseAsBaseForRelativeLinks);
+        Logger.getLogger(ClusterSubscribeIncrementingCounterClient.class.getName()).log(Level.FINE, "useFullPathForResourceToBeAccessedProtection={0}", useFullPathForResourceToBeAccessedProtection);
         // if url seems to be self-submitted form, simply use the currentRequestUri instead
         if (url.length()==0 || "?".equals(url)) url = currentRequestUriToUseAsBaseForRelativeLinks;
         // go on
@@ -1152,7 +1154,7 @@ public final class ServerUtils {
             else lastSlashOrStart++;
             resourceToBeAccessed = url.substring(lastSlashOrStart);
         }
-        if (DEBUG) System.out.println("extractResourceToBeAccessed RETURN "+resourceToBeAccessed);
+        Logger.getLogger(ClusterSubscribeIncrementingCounterClient.class.getName()).log(Level.FINE, "extractResourceToBeAccessed RETURN {0}", resourceToBeAccessed);
         return resourceToBeAccessed;
     }
     
@@ -1229,7 +1231,7 @@ public final class ServerUtils {
                             final String key = (String) keys.next();
                             final Object value = getAttributeIncludingInternal(session,WebCastellumFilter.INTERNAL_CONTENT_PREFIX+key);
                             if (value != null && value.equals(content)) {
-                                if (DEBUG) System.out.println("Session content can be reused ("+value+" equals "+content+"): "+key);
+                                Logger.getLogger(ClusterSubscribeIncrementingCounterClient.class.getName()).log(Level.FINE, "Session content can be reused ({0} equals {1}): {3}" , new Object[]{value,content,key});
                                 return key;
                             }
                         }

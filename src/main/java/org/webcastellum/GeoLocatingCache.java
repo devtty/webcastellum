@@ -10,47 +10,42 @@ import java.util.SortedSet;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.TreeSet;
-
-
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Caches the looked-up locations on class-c /24 subnets
  */
 public final class GeoLocatingCache {
+
     private static final boolean DEBUG = false;
     private static final boolean PRINT_COUNTRY = false;
 
-        
     // TODO: make this configurable
     private static final int MAXIMUM_CACHE_SIZE = 1000;
     private static final int MAXIMUM_CACHE_SIZE_CUTOFF_TOLERANCE = 200; // used to avoid frequent reductions of the cache... better a few bigger than many smaller reductions...
     private static final long MAXIMUM_CACHE_TTL_MILLIS = 14400000L; // = 4 hours
 
-
     private final GeoLocator locator;
     private final long cleanupIntervalMillis;
-    private final Map geoLocations = Collections.synchronizedMap(new /*<String,GeoLocation>*/ HashMap());
+    private final Map<String, GeoLocation> geoLocations = Collections.synchronizedMap(new HashMap<>());
 
     private Timer cleanupTimer;
-    private TimerTask task;    
-    
-    
-    
+    private TimerTask task;
+
     public GeoLocatingCache(final GeoLocator locator, final long cleanupIntervalMillis) {
         this.locator = locator;
         this.cleanupIntervalMillis = cleanupIntervalMillis;
     }
 
-    
-    
     private void initTimers() {
         if (this.cleanupTimer == null) {
             this.cleanupTimer = new Timer(/*"GeoLocatingCache-cleanup", */true); // TODO Java5: name parameter in Time constructor is only available in Java5
-            this.task = new CleanupGeoLocatingCacheTask("GeoLocatingCache",this.geoLocations);
-            this.cleanupTimer.scheduleAtFixedRate(task, DEBUG?10:CryptoUtils.generateRandomNumber(false,60000,300000), this.cleanupIntervalMillis);
+            this.task = new CleanupGeoLocatingCacheTask("GeoLocatingCache", this.geoLocations);
+            this.cleanupTimer.scheduleAtFixedRate(task, DEBUG ? 10 : CryptoUtils.generateRandomNumber(false, 60000, 300000), this.cleanupIntervalMillis);
         }
     }
-    
+
     public void destroy() {
         this.geoLocations.clear();
         if (this.task != null) {
@@ -62,16 +57,21 @@ public final class GeoLocatingCache {
             this.cleanupTimer = null;
             this.geoLocations.clear();
         }
-    }    
-    
-    
+    }
+
     public String getCountryCode(final String ip) {
-        if (ip == null) return null;
-        if (this.locator == null || !this.locator.isEnabled()) return null;
+        if (ip == null) {
+            return null;
+        }
+        if (this.locator == null || !this.locator.isEnabled()) {
+            return null;
+        }
         // lazily init cleanup timer
         if (this.cleanupTimer == null) {
             synchronized (this) {
-                if (this.cleanupTimer == null) initTimers();
+                if (this.cleanupTimer == null) {
+                    initTimers();
+                }
                 assert this.cleanupTimer != null;
             }
         }
@@ -81,48 +81,53 @@ public final class GeoLocatingCache {
         if (location == null) {
             try {
                 final String country = this.locator.getCountryCode(ip);
-                if (PRINT_COUNTRY) System.out.println("Looked up country: "+country);
-                if (country != null || this.locator.isCachingOfNegativeRepliesAllowed()) location = new GeoLocation(subnet, country);
-            } catch (GeoLocatingException e) {
-                // TODO: add proper logging
-                System.err.println(e.getMessage());
-                if (this.locator.isCachingOfNegativeRepliesAllowed()) location = new GeoLocation(subnet, null);
-            } catch (RuntimeException e) {
-                // TODO: add proper logging
-                System.err.println(e.getMessage());
-                if (this.locator.isCachingOfNegativeRepliesAllowed()) location = new GeoLocation(subnet, null);
+                if (PRINT_COUNTRY) {
+                    Logger.getLogger(GeoLocatingCache.class.getName()).log(Level.INFO, "Looked up country: {0}", country);
+                }
+                if (country != null || this.locator.isCachingOfNegativeRepliesAllowed()) {
+                    location = new GeoLocation(subnet, country);
+                }
+            } catch (GeoLocatingException | RuntimeException e) {
+                Logger.getLogger(GeoLocatingCache.class.getName()).log(Level.WARNING, e.getMessage());
+                if (this.locator.isCachingOfNegativeRepliesAllowed()) {
+                    location = new GeoLocation(subnet, null);
+                }
             }
             if (location != null) {
                 this.geoLocations.put(subnet, location);
-                if (this.geoLocations.size() > MAXIMUM_CACHE_SIZE) cutoffOldestElements();
+                if (this.geoLocations.size() > MAXIMUM_CACHE_SIZE) {
+                    cutoffOldestElements();
+                }
             }
         }
         return location == null ? null : location.getCountry();
     }
-    
-
-            
 
     private void cutoffOldestElements() {
-        if (this.geoLocations.size() <= MAXIMUM_CACHE_SIZE) return;
+        if (this.geoLocations.size() <= MAXIMUM_CACHE_SIZE) {
+            return;
+        }
         synchronized (this.geoLocations) {
-            if (this.geoLocations.size() <= MAXIMUM_CACHE_SIZE) return; // double checked since my threads could wait on the monitor to access this block and the first has already reduced the cache
-            // here we reduce the cache size (since it is too big) by removing the oldest ones
+            if (this.geoLocations.size() <= MAXIMUM_CACHE_SIZE) {
+                return; // double checked since my threads could wait on the monitor to access this block and the first has already reduced the cache
+            }            // here we reduce the cache size (since it is too big) by removing the oldest ones
             final int looserCount = this.geoLocations.size() - (MAXIMUM_CACHE_SIZE - MAXIMUM_CACHE_SIZE_CUTOFF_TOLERANCE);
-            if (looserCount <= 0) return; // = nothing to remove
-            final SortedSet/*<GeoLocation>*/ geoLocationsSortedByAge = new TreeSet(LAST_ACCESS_COMPARATOR);
+            if (looserCount <= 0) {
+                return; // = nothing to remove
+            }
+            final SortedSet<GeoLocation> geoLocationsSortedByAge = new TreeSet(LAST_ACCESS_COMPARATOR);
             geoLocationsSortedByAge.addAll(this.geoLocations.values());
-            int i=0;
+            int i = 0;
             for (final Iterator iter = geoLocationsSortedByAge.iterator(); iter.hasNext();) {
                 final GeoLocation looser = (GeoLocation) iter.next();
-                this.geoLocations.remove( looser.getSubnet() );
-                if (++i >= looserCount) break;
+                this.geoLocations.remove(looser.getSubnet());
+                if (++i >= looserCount) {
+                    break;
+                }
             }
-            if (DEBUG) System.out.println("*** CLEANUP: Geo-Location cache reduced to "+(this.geoLocations.size())+" (cache limit reached, removed "+i+" loosers) ***");
+            Logger.getLogger(GeoLocatingCache.class.getName()).log(Level.FINE, "*** CLEANUP: Geo-Location cache reduced to {0} (cache limit reached, removed {1} loosers) ***", new Object[]{this.geoLocations.size(), i});
         }
     }
-    
-    
 
     private String extractSubnet(String ip) {
         final int pos = ip.lastIndexOf(".");
@@ -131,29 +136,31 @@ public final class GeoLocatingCache {
         }
         return ip.substring(0, pos);
     }
-    
-    
-
 
     private static final Comparator LAST_ACCESS_COMPARATOR = new LastAccessComparator();
+
     public static final class LastAccessComparator implements Comparator {
+
         public int compare(final Object obj1, final Object obj2) {
             final GeoLocation left = (GeoLocation) obj1;
             final GeoLocation right = (GeoLocation) obj2;
-            if (left.getLastAccess() < right.getLastAccess()) return -1;
-            if (left.getLastAccess() > right.getLastAccess()) return 1;
+            if (left.getLastAccess() < right.getLastAccess()) {
+                return -1;
+            }
+            if (left.getLastAccess() > right.getLastAccess()) {
+                return 1;
+            }
             return 0;
         }
     }
 
-    
-
     public static final class GeoLocation implements Serializable {
+
         private static final long serialVersionUID = 1L;
         private final String subnet;
         private final String country;
         private final long creation = System.currentTimeMillis();
-                
+
         private volatile long lastAccess;
 
         public GeoLocation(final String subnet, final String country) {
@@ -178,39 +185,36 @@ public final class GeoLocatingCache {
             this.lastAccess = System.currentTimeMillis();
             return country;
         }
-        
+
         //1.5@Override
         public String toString() {
-            return this.subnet+": "+this.country;
+            return this.subnet + ": " + this.country;
         }
     }
-    
-    
-    
-    
-    
-    
-
-    
 
     public static final class CleanupGeoLocatingCacheTask extends TimerTask {
-        private final String name;
-        private final Map/*<String,GeoLocation>*/ map;
 
-        public CleanupGeoLocatingCacheTask(final String name, final Map/*<String,GeoLocation>*/ map) {
-            if (DEBUG) System.out.println("Created cleanup timer");
-            if (name == null) throw new NullPointerException("name must not be null");
-            if (map == null) throw new NullPointerException("map must not be null");
+        private final String name;
+        private final Map<String,GeoLocation> map;
+
+        public CleanupGeoLocatingCacheTask(final String name, final Map<String,GeoLocation> map) {
+            Logger.getLogger(GeoLocatingCache.class.getName()).log(Level.FINE, "Created cleanup timer");
+            if (name == null) {
+                throw new NullPointerException("name must not be null");
+            }
+            if (map == null) {
+                throw new NullPointerException("map must not be null");
+            }
             this.name = name;
             this.map = map;
         }
 
         public void run() {
             int loosers = 0;
-            if (DEBUG) System.out.println("*** CLEANUP: waiting to get monitor ***");
+            Logger.getLogger(GeoLocatingCache.class.getName()).log(Level.FINE, "*** CLEANUP: waiting to get monitor ***");
             synchronized (this.map) {
                 // here we remove all outdated cache entries
-                final long cutoff = System.currentTimeMillis() - (DEBUG?100:MAXIMUM_CACHE_TTL_MILLIS);
+                final long cutoff = System.currentTimeMillis() - (DEBUG ? 100 : MAXIMUM_CACHE_TTL_MILLIS);
                 for (final Iterator entries = this.map.entrySet().iterator(); entries.hasNext();) {
                     final Map.Entry entry = (Map.Entry) entries.next();
                     final GeoLocation location = (GeoLocation) entry.getValue();
@@ -220,13 +224,11 @@ public final class GeoLocatingCache {
                     }
                 }
             }
-            if (DEBUG) System.out.println("*** CLEANUP: "+loosers+" old geo-locations removed (from "+this.name+") ***");
+            Logger.getLogger(GeoLocatingCache.class.getName()).log(Level.FINE, "*** CLEANUP: {0} old geo-locations removed (from {1}) ***", new Object[]{loosers, this.name});
         }
 
     }
-    
-    
-    
+
     /* * /
     // just for local testing
     public static final void main(String[] args) throws InterruptedException {
@@ -296,8 +298,4 @@ public final class GeoLocatingCache {
         cache.destroy();
     }
     /* */
-            
-                
-        
-    
 }

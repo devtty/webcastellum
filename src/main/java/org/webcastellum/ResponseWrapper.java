@@ -9,6 +9,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.crypto.Cipher;
@@ -116,7 +118,7 @@ public final class ResponseWrapper extends HttpServletResponseWrapper {
             final String honeylinkPrefix, final String honeylinkSuffix, final short honeylinkMaxPerPage, final boolean randomizeHoneylinksOnEveryRequest, 
             final boolean pdfXssProtection, final boolean applySetAfterWrite) {
         super(response);
-        if (DEBUG) System.out.println(" =========> new RequestWrapper");
+        Logger.getLogger(ResponseWrapper.class.getName()).log(Level.FINE, " =========> new RequestWrapper");
         if (request == null) throw new NullPointerException("request must not be null");
         if (attackHandler == null) throw new NullPointerException("attackHandler must not be null");
         if (contentInjectionHelper == null) throw new NullPointerException("contentInjectionHelper must not be null");
@@ -262,20 +264,29 @@ public final class ResponseWrapper extends HttpServletResponseWrapper {
     
     
     private boolean isResponseModificationAllowed() {
+        //TODO lots of condit. logging removeit
         if (this.isCurrentRequestOfRelevantResourceType) {
             // determine content type
             String contentTypeUpperCased = extractContentTypeUpperCased();
-            if (contentTypeUpperCased == null) contentTypeUpperCased = "NULL"; // yes, the word "null" means "match with an unset content-type" here...
+            if (contentTypeUpperCased == null) {
+                contentTypeUpperCased = "NULL"; // yes, the word "null" means "match with an unset content-type" here...
+            }
             if (this.responseModificationContentTypes != null && this.responseModificationContentTypes.size() > 0) {
                 // check if it matches
-                if ( this.responseModificationContentTypes.contains(contentTypeUpperCased) ) {
-                    if (DEBUG) System.out.println("isResponseModificationAllowed() is true");
+                if (this.responseModificationContentTypes.contains(contentTypeUpperCased)) {
+                    Logger.getLogger(ResponseWrapper.class.getName()).log(Level.FINE, "isResponseModificationAllowed() is true");
                     //this.mayBeModified = true;
                     return true;
-                } else if (DEBUG) System.out.println("isResponseModificationAllowed() check 3 is false ("+contentTypeUpperCased+"): "+this.responseModificationContentTypes);
-            } else if (DEBUG) System.out.println("isResponseModificationAllowed() check 2 is false");
-        } else if (DEBUG) System.out.println("isResponseModificationAllowed() check 1 is false");
-        if (DEBUG) System.out.println("isResponseModificationAllowed() is false");
+                } else {
+                    Logger.getLogger(ResponseWrapper.class.getName()).log(Level.FINE, "isResponseModificationAllowed() check 3 is false ({0}): {1}", new Object[]{contentTypeUpperCased,this.responseModificationContentTypes});
+                }
+            } else {
+                Logger.getLogger(ResponseWrapper.class.getName()).log(Level.FINE, "isResponseModificationAllowed() check 2 is false");
+            }
+        } else{
+            Logger.getLogger(ResponseWrapper.class.getName()).log(Level.FINE, "isResponseModificationAllowed() check 1 is false");
+        }
+        Logger.getLogger(ResponseWrapper.class.getName()).log(Level.FINE, "isResponseModificationAllowed() is false");
         return false;
     }
     
@@ -283,7 +294,7 @@ public final class ResponseWrapper extends HttpServletResponseWrapper {
     private ServletOutputStream cachedServletOutputStream;
     //1.5@Override
     public /*synchronized*/ ServletOutputStream getOutputStream() throws IOException {
-        if (DEBUG) System.out.println("getOutputStream() called");
+        Logger.getLogger(ResponseWrapper.class.getName()).log(Level.FINE, "getOutputStream() called");
         if (this.cachedServletOutputStream == null) {
             this.secretTokensApplied = true;
             this.parameterAndFormTokensApplied = true;
@@ -312,7 +323,7 @@ public final class ResponseWrapper extends HttpServletResponseWrapper {
     private PrintWriter cachedPrintWriter;
     //1.5@Override
     public /*synchronized*/ PrintWriter getWriter() throws IOException {
-        if (DEBUG) System.out.println("getWriter() called");
+        Logger.getLogger(ResponseWrapper.class.getName()).log(Level.FINE, "getWriter() called");
         if (this.cachedPrintWriter == null) {
             this.secretTokensApplied = true;
             this.parameterAndFormTokensApplied = true;
@@ -345,7 +356,7 @@ public final class ResponseWrapper extends HttpServletResponseWrapper {
     
     //1.5@Override
     public void flushBuffer() throws IOException {
-        if (DEBUG) System.out.println("Flushing buffer");
+        Logger.getLogger(ResponseWrapper.class.getName()).log(Level.FINE, "Flushing buffer");
         super.flushBuffer();
         if (this.cachedPrintWriter != null) this.cachedPrintWriter.flush();
         if (this.cachedServletOutputStream != null) this.cachedServletOutputStream.flush();
@@ -385,16 +396,16 @@ public final class ResponseWrapper extends HttpServletResponseWrapper {
     //1.5@Override
     public void setContentLength(int length) {
         if (WebCastellumFilter.REMOVE_CONTENT_LENGTH_FOR_MODIFIABLE_RESPONSES && /*this.mayBeModified*/ isResponseModificationAllowed()) {
-            if (DEBUG) System.out.println("Original response content length removed");
+            Logger.getLogger(ResponseWrapper.class.getName()).log(Level.FINE, "Original response content length removed");
         } else {
-            if (DEBUG) System.out.println("Response content length: "+length);
+            Logger.getLogger(ResponseWrapper.class.getName()).log(Level.FINE, "Response content length: "+length);
             super.setContentLength(length);
         }
     }
     
     //1.5@Override
     public void setContentType(String type) {
-        if (DEBUG) System.out.println("Response content type: "+type);
+        Logger.getLogger(ResponseWrapper.class.getName()).log(Level.FINE, "Response content type: {0}", type);
         if (this.blockResponseHeadersWithCRLF) checkHeaderAgainstCRLF(type);
         if (this.pdfXssProtection && APPLICATION_PDF.equalsIgnoreCase(type)) {
             String filename = null;
@@ -441,8 +452,9 @@ public final class ResponseWrapper extends HttpServletResponseWrapper {
     
     //1.5@Override
     public void setCharacterEncoding(final String encoding) {
-        if (DEBUG) System.out.println("Response character encoding: "+encoding);
-        if (this.blockResponseHeadersWithCRLF) checkHeaderAgainstCRLF(encoding);
+        Logger.getLogger(ResponseWrapper.class.getName()).log(Level.FINE, "Response character encoding: {0}", encoding);
+        if (this.blockResponseHeadersWithCRLF) 
+            checkHeaderAgainstCRLF(encoding);
         super.setCharacterEncoding(encoding);
     }
     
@@ -484,7 +496,7 @@ public final class ResponseWrapper extends HttpServletResponseWrapper {
     
     //1.5@Override
     public void addHeader(final String name, final String value) {
-        if (DEBUG) System.out.println("addHeader: "+name+"="+value);
+        Logger.getLogger(ResponseWrapper.class.getName()).log(Level.FINE, "addHeader: {0} = {1}", new Object[]{name,value});
         if (this.blockResponseHeadersWithCRLF) {
             checkHeaderAgainstCRLF(name);
             checkHeaderAgainstCRLF(value);
@@ -495,7 +507,7 @@ public final class ResponseWrapper extends HttpServletResponseWrapper {
     }
     //1.5@Override
     public void setHeader(final String name, final String value) {
-        if (DEBUG) System.out.println("setHeader: "+name+"="+value);
+        Logger.getLogger(ResponseWrapper.class.getName()).log(Level.FINE, "setHeader: {0} = {1}", new Object[]{name,value});
         if (this.blockResponseHeadersWithCRLF) {
             checkHeaderAgainstCRLF(name);
             checkHeaderAgainstCRLF(value);
@@ -510,7 +522,7 @@ public final class ResponseWrapper extends HttpServletResponseWrapper {
 
     //1.5@Override
     public void sendRedirect(String location) throws IOException {
-        if (DEBUG) System.out.println(" ===> sendRedirect: "+location);
+        Logger.getLogger(ResponseWrapper.class.getName()).log(Level.FINE, " ===> sendRedirect: {0}", location);
         if (this.blockResponseHeadersWithCRLF) checkHeaderAgainstCRLF(location);
         // block redirects to foreign sites or applications
         if (this.blockNonLocalRedirects && !isLocalRedirect(location)) {
@@ -524,21 +536,23 @@ public final class ResponseWrapper extends HttpServletResponseWrapper {
         }
         // also inject the different types of tokens into the redirect-link, if it is a local redirect (and not a redirect to another site/app)
         // check if the current page is of relevant type and if the target page is also of relevant type
-        if (DEBUG) System.out.println(" .... this.isCurrentRequestOfRelevantResourceType="+isCurrentRequestOfRelevantResourceType+" this.contentInjectionHelper.isMatchingIncomingLinkModificationExclusion="+this.contentInjectionHelper.isMatchingIncomingLinkModificationExclusion(location)+" isLocalRdirect="+isLocalRedirect(location));
+        Logger.getLogger(ResponseWrapper.class.getName()).log(Level.FINE, " .... this.isCurrentRequestOfRelevantResourceType='{0}'", isCurrentRequestOfRelevantResourceType);
+        Logger.getLogger(ResponseWrapper.class.getName()).log(Level.FINE, " .... this.contentInjectionHelper.isMatchingIncomingLinkModificationExclusion='{0}'", this.contentInjectionHelper.isMatchingIncomingLinkModificationExclusion(location));
+        Logger.getLogger(ResponseWrapper.class.getName()).log(Level.FINE, " isLocalRdirect= {0}", isLocalRedirect(location));
         if (this.isCurrentRequestOfRelevantResourceType && !this.contentInjectionHelper.isMatchingIncomingLinkModificationExclusion(location) && isLocalRedirect(location)) {
             // if it is a redirect triggered by the anti spoofing mechanism of WebCastellum itself, don't append any protective content
             // ... so only append when it is *not* a WebCastellum internal redirect due to an recent attack
             if (!this.isRedirectingDueToRecentAttack) {
                 location = injectSecretTokenIntoLink(location, false, true);
                 location = injectParameterAndFormProtectionIntoLink(location, false, true);
-                if (DEBUG) System.out.println(" ......> pre-encryption: "+location);
+                Logger.getLogger(ResponseWrapper.class.getName()).log(Level.FINE, " ......> pre-encryption: {0}", location);
                 // encryption is always the last step
                 location = encryptQueryStringInLink(location, null); // null since we don't know here if GET or POST
-                if (DEBUG) System.out.println(" ......> post-encryption: "+location);
+                Logger.getLogger(ResponseWrapper.class.getName()).log(Level.FINE, " ......> post-encryption: {0}", location);
                 if (this.appendSessionIdToLinks) location = encodeURL(location);
             }
         }
-        if (DEBUG) System.out.println(" ----> results in: "+location);
+        Logger.getLogger(ResponseWrapper.class.getName()).log(Level.FINE, " ----> results in: {0}", location);
         super.sendRedirect(location);
     }
     
@@ -562,7 +576,7 @@ public final class ResponseWrapper extends HttpServletResponseWrapper {
     
     //1.5@Override
     public String encodeURL(String url) {
-        if (DEBUG) System.out.println(" =========> encodeURL: "+url);
+        Logger.getLogger(ResponseWrapper.class.getName()).log(Level.FINE, " =========> encodeURL: {0}", url);
         if (!this.isOptimizationHint) return super.encodeURL(url);
         url = super.encodeURL(url);
         // check if the current page is of relevant type and if the target page is also of relevant type
@@ -726,7 +740,9 @@ public final class ResponseWrapper extends HttpServletResponseWrapper {
                     if (parameterAndFormProtectionValue != null) {
                         result = ResponseUtils.injectParameterIntoURL(result, this.parameterAndFormProtectionKeyKey, parameterAndFormProtectionValue, this.maskAmpersandsInModifiedLinks&&!isRedirect, this.appendQuestionmarkOrAmpersandToLinks, urlAlreadyDecodedAndDoesNotNeedToBeEncodedAndStartsWithCheckAlreadyDone);
                     }
-                } else System.err.println("Strange situation: session does not exist where expected: injectParameterAndFormProtectionIntoLink()");
+                } else {
+                    Logger.getLogger(ResponseWrapper.class.getName()).log(Level.SEVERE, "Strange situation: session does not exist where expected: injectParameterAndFormProtectionIntoLink()");
+                }
             }
         }
         return result;
