@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
@@ -92,7 +94,7 @@ public final class RequestWrapper extends HttpServletRequestWrapper {
                 result = RequestUtils.removeParameter(result, pafTokenKey);
             }
         }
-        if (DEBUG) System.out.println("getQueryString(): "+result);
+        Logger.getLogger(RequestWrapper.class.getName()).log(Level.FINE, "getQueryString(): {0}", result);
         return result;
     }
 
@@ -124,7 +126,7 @@ public final class RequestWrapper extends HttpServletRequestWrapper {
                 javax.servlet.forward.servlet_path
                 javax.servlet.forward.path_info
          */
-        if (DEBUG) System.out.print("getAttribute("+name+") ==> ");
+        Logger.getLogger(RequestWrapper.class.getName()).log(Level.FINE, "getAttribute({0}) ==> ", name);
         if (this.transparentForwarding
                 && this.contentInjectionHelper.isEncryptQueryStringInLinks()
                 && name != null && name.startsWith("javax.")) {
@@ -132,12 +134,12 @@ public final class RequestWrapper extends HttpServletRequestWrapper {
             if ("javax.servlet.forward.context_path".equals(name) || "javax.servlet.forward.request_uri".equals(name)
                     || "javax.servlet.forward.query_string".equals(name) || "javax.servlet.forward.servlet_path".equals(name)
                     || "javax.servlet.forward.path_info".equals(name)) {
-                if (DEBUG) System.out.println("null (overwritten)");
+                Logger.getLogger(RequestWrapper.class.getName()).log(Level.FINE, "null (overwritten)");
                 return null;
             }
             
         }
-        if (DEBUG) System.out.println(super.getAttribute(name));
+        Logger.getLogger(RequestWrapper.class.getName()).log(Level.FINE, "{0}", super.getAttribute(name));
         return super.getAttribute(name);
     }
 
@@ -183,7 +185,7 @@ public final class RequestWrapper extends HttpServletRequestWrapper {
             if (values == null || values.length == 0) result = null;
             else result = checkForUnsecureValue(values[0]);
         }
-        if (DEBUG) System.out.println("getParameter("+name+")");
+        Logger.getLogger(RequestWrapper.class.getName()).log(Level.FINE, "getParameter({0})", name);
         return result;
     }
     
@@ -193,13 +195,13 @@ public final class RequestWrapper extends HttpServletRequestWrapper {
         if (this.removedRequestParameters.contains(name)) result = null;
         else if (!this.overwrittenParams.containsKey(name)) result = checkForUnsecureValues(getRequest().getParameterValues(name));
         else result = checkForUnsecureValues((String[])this.overwrittenParams.get(name));
-        if (DEBUG) System.out.println("getParameterValues("+name+")");
+        Logger.getLogger(RequestWrapper.class.getName()).log(Level.FINE, "getParameterValues({0})", name);
         return result;
     }
     
     //1.5@Override
     public Enumeration getParameterNames() { // TODO: ist laut Servlet-Spec es theoretisch moeglich, dass ein Caller auf die Enumeration ein .remove() aufruft und damit einen Wert entfernen moechte? Falls ja, Wrapper-Enumeration hier zurueckgeben
-        if (DEBUG) System.out.println("getParameterNames()");
+        Logger.getLogger(RequestWrapper.class.getName()).log(Level.FINE, "getParameterNames()");
         final Vector/*<String>*/ names = new Vector();
         final Enumeration/*<String>*/ rawNames = getRequest().getParameterNames();
         if (rawNames == null && this.overwrittenParams.isEmpty()) return null;
@@ -223,7 +225,7 @@ public final class RequestWrapper extends HttpServletRequestWrapper {
             parameterMap.putAll(this.overwrittenParams);
         }
         if (parameterMap == null) {
-            if (DEBUG) System.out.println("getParameterMap() ==> null");
+            Logger.getLogger(RequestWrapper.class.getName()).log(Level.FINE, "getParameterMap() ==> null");
             return null;
         }
         final Map copy = new HashMap/*<String,String[]>*/( parameterMap.size() ); // defensive copy, since it will be modified locally
@@ -234,7 +236,7 @@ public final class RequestWrapper extends HttpServletRequestWrapper {
                 copy.put(key, checkForUnsecureValues((String[]) entry.getValue()));
             }
         }
-        if (DEBUG) System.out.println("getParameterMap()");
+        Logger.getLogger(RequestWrapper.class.getName()).log(Level.FINE, "getParameterMap()");
         return copy;
     }
 
