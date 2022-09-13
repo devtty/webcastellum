@@ -29,7 +29,7 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
 
     
     
-    public static final Charset DEFAULT_CHARACTER_ENCODING = StandardCharsets.UTF_8;
+    public static final String DEFAULT_CHARACTER_ENCODING = "UTF-8";
     
     
     
@@ -255,7 +255,7 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
     // TODO: auch hier die anderen dependent objects (AttackHandler, etc.) wie den ContentInjectionHelper final machen und bereits hier in der Deklaration instantiieren und im Config-Laden lediglich parametrisieren per Settern + dann ueberall wo die instanzen reingereicht werden diese non-nullable machen per NPE
     private AttackHandler attackHandler;
     private String developmentAttackReplyMessage, productionAttackReplyMessage, developmentConfigurationMissingReplyMessage, productionConfigurationMissingReplyMessage, developmentExceptionReplyMessage, productionExceptionReplyMessage, redirectWelcomePage, sessionTimeoutRedirectPage;
-    private Charset requestCharacterEncoding;
+    private String requestCharacterEncoding;
     private int developmentAttackReplyStatusCode=200, productionAttackReplyStatusCode=200, developmentConfigurationMissingReplyStatusCode=503, productionConfigurationMissingReplyStatusCode=503, developmentExceptionReplyStatusCode=503, productionExceptionReplyStatusCode=503, forcedSessionInvalidationPeriodMinutes, housekeepingIntervalMinutes, blockPeriodMinutes;
     private long ruleFileReloadingIntervalMillis, nextRuleReloadingTime;
     private long configReloadingIntervalMillis, nextConfigReloadingTime;
@@ -1793,7 +1793,7 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
             try {
                 // IMPORTANT: set the encoding here as early as possible BEFORE ANY params are read,
                 // otherwise the request.setCharacterEncoding() won't work when already request parameters have been read !!!
-                request.setCharacterEncoding(this.requestCharacterEncoding.name());
+                request.setCharacterEncoding(this.requestCharacterEncoding);
                 if (this.debug) logLocal("Request character encoding set to: "+this.requestCharacterEncoding);
             } catch (UnsupportedEncodingException e) { // = wrong configuration
                 this.attackHandler.handleRegularRequest(httpRequest, RequestUtils.determineClientIp(httpRequest, this.clientIpDeterminator)); // = since we're about to stop this request, we log it here
@@ -2275,7 +2275,7 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
                             // set the response character encoding to the same custom request character encoding (when defined) as this is a very special situation here: we're including/forwarding stuff....
                             if (this.requestCharacterEncoding != null) {
                                 if (isOldJavaEE13) response.setContentType("text/html; charset="+this.requestCharacterEncoding); // TODO: was ist hier, wenn die App nun im Servlet des decrypteten Links ein Image streamed oder eine PDF-Datei erzeugt und den Content-Typ erneut setzt ... sollte ebenfalls hiermit gehen, oder?
-                                else response.setCharacterEncoding(this.requestCharacterEncoding.name());
+                                else response.setCharacterEncoding(this.requestCharacterEncoding);
                             }
 
                             // forward to the original unencrypted resource (not including since the include mechanism does not forward control to the resource, so that for example redirects and such originating from the included application logic will not work...
@@ -3064,10 +3064,10 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
         // Load config: request character encoding - OPTIONAL
         {
             //String value = configManager.getConfigurationValue(PARAM_CHARACTER_ENCODING);
-            Charset value = Charset.forName(configManager.getConfigurationValue(PARAM_CHARACTER_ENCODING).trim());
-            if (value == null) value = Charset.forName(configManager.getConfigurationValue(LEGACY_PARAM_CHARACTER_ENCODING)); // only for backwards-compatibility to old param name
+            String value = configManager.getConfigurationValue(PARAM_CHARACTER_ENCODING).trim();
+            if (value == null) value = configManager.getConfigurationValue(LEGACY_PARAM_CHARACTER_ENCODING); // only for backwards-compatibility to old param name
             if (value == null) value = DEFAULT_CHARACTER_ENCODING;
-            this.requestCharacterEncoding = value;
+            this.requestCharacterEncoding = value.trim();
             if (this.debug) logLocal("Request character encoding: "+this.requestCharacterEncoding);
         }
 
