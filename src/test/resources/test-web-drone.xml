@@ -10,7 +10,7 @@
     </init-param>
     <init-param>
       <param-name>LogVerboseForDevelopmentMode</param-name>
-      <param-value>false</param-value>
+      <param-value>true</param-value>
     </init-param>
     <init-param>
       <param-name>DefaultProductionModeCheckerValue</param-name>
@@ -22,13 +22,18 @@
     </init-param>
     <init-param>
       <param-name>Debug</param-name>
-      <param-value>false</param-value>
+      <param-value>true</param-value>
     </init-param>
+    
     <init-param>
       <param-name>DefaultAttackLoggerDirectory</param-name>
       <param-value>/home/runner/work/webcastellum/webcastellum/apache-tomcat-8.5.78/logs</param-value>
     </init-param>
-
+    
+    <init-param>
+      <param-name>CharacterEncoding</param-name>
+      <param-value>UTF-8</param-value>
+    </init-param>
     
     <!-- Basisschutz -->
     <init-param>

@@ -1,28 +1,12 @@
 package org.webcastellum.test;
 
-import java.io.IOException;
-import java.net.URI;
 import java.net.URL;
-import java.net.HttpURLConnection;
-import java.net.http.*;
-import java.net.http.HttpResponse.BodyHandlers;
 import java.io.File;
-import java.io.IOException;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.openqa.selenium.WebDriver;
 
-import org.jboss.shrinkwrap.resolver.api.maven.archive.importer.MavenImporter;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
@@ -32,16 +16,10 @@ import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 
-import org.jboss.arquillian.graphene.Graphene;
-import org.jboss.arquillian.graphene.GrapheneElement;
-import org.jboss.arquillian.graphene.page.Page;
 import org.jboss.arquillian.graphene.page.InitialPage;
 
 import org.junit.Test;
-import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.runner.RunWith;
-import org.webcastellum.WebCastellumFilter;
 
 import static org.junit.Assert.*;
 
