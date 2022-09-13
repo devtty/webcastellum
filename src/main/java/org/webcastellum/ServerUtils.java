@@ -24,17 +24,14 @@ import javax.servlet.http.HttpSession;
 
 public final class ServerUtils {
 
-
-    private static final boolean DEBUG = false;
     private static final boolean DEBUG_PRINT_TUNING_TIMINGS = false;
 
-
-    
-    
     private static final Character[] CACHE = new Character[127 + 1];
+    
     static {
         for(int i = 0; i < CACHE.length; i++) CACHE[i] = new Character((char)i);
     }
+    
     private static Character makeCharacter(final char c) {
         if(c < CACHE.length) return CACHE[(int)c];
         return new Character(c);
@@ -1104,7 +1101,7 @@ public final class ServerUtils {
     public static String extractResourceToBeAccessed(String url, final String currentContextPath, String currentRequestUriToUseAsBaseForRelativeLinks, final boolean useFullPathForResourceToBeAccessedProtection) {
         // TODO: hier evtl. noch HTML <base> tags im response beachten und parsen ?!?
         Logger.getLogger(ClusterSubscribeIncrementingCounterClient.class.getName()).log(Level.FINE, "extractResourceToBeAccessed ARGUMENTS url={0}",url);
-        Logger.getLogger(ClusterSubscribeIncrementingCounterClient.class.getName()).log(Level.FINE, "currentContextPath={0}"+currentContextPath);
+        Logger.getLogger(ClusterSubscribeIncrementingCounterClient.class.getName()).log(Level.FINE, "currentContextPath={0}", currentContextPath);
         Logger.getLogger(ClusterSubscribeIncrementingCounterClient.class.getName()).log(Level.FINE, "currentRequestUriToUseAsBaseForRelativeLinks={0}", currentRequestUriToUseAsBaseForRelativeLinks);
         Logger.getLogger(ClusterSubscribeIncrementingCounterClient.class.getName()).log(Level.FINE, "useFullPathForResourceToBeAccessedProtection={0}", useFullPathForResourceToBeAccessedProtection);
         // if url seems to be self-submitted form, simply use the currentRequestUri instead
@@ -1234,7 +1231,7 @@ public final class ServerUtils {
                             final String key = (String) keys.next();
                             final Object value = getAttributeIncludingInternal(session,WebCastellumFilter.INTERNAL_CONTENT_PREFIX+key);
                             if (value != null && value.equals(content)) {
-                                Logger.getLogger(ClusterSubscribeIncrementingCounterClient.class.getName()).log(Level.FINE, "Session content can be reused ({0} equals {1}): {3}" , new Object[]{value,content,key});
+                                Logger.getLogger(ClusterSubscribeIncrementingCounterClient.class.getName()).log(Level.FINE, "Session content can be reused ({0} equals {1}): {2}" , new Object[]{value,content,key});
                                 return key;
                             }
                         }

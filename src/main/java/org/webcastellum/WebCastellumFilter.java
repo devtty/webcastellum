@@ -2,8 +2,6 @@ package org.webcastellum;
 
 import java.io.*;
 import java.net.*;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.text.MessageFormat;
 import java.util.*;
@@ -1388,7 +1386,7 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
             try {
                 final Captcha captcha = (Captcha) ServerUtils.getAttributeIncludingInternal(session, SESSION_CAPTCHA_IMAGES+captchaIdReceivedForImage);
                 if (captcha == null) {
-                    final Attack attack = this.attackHandler.handleAttack(request, requestDetails.clientAddress, "No captcha (image) available for ID: "+captchaIdReceivedForImage);
+                    final Attack attack = this.attackHandler.handleAttack(request, requestDetails.clientAddress, "No captcha (image) available for ID: "+captchaIdReceivedForImage.replaceAll("[\n\r\t]", "_"));
                     return new AllowedFlagWithMessage(false, attack);
                 }
                 if (response.isCommitted()) {

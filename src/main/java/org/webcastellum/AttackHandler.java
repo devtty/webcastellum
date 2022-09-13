@@ -253,7 +253,7 @@ public final class AttackHandler {
         }
         boolean blocked = false;
         synchronized (this.attackCounter) {
-            Counter counter = (Counter) this.attackCounter.get(ip);
+            Counter counter = this.attackCounter.get(ip);
             if (counter == null) {
                 counter = new IncrementingCounter(this.resetPeriodMillisAttack);
                 this.attackCounter.put(ip, counter);
@@ -271,7 +271,7 @@ public final class AttackHandler {
     
     private boolean trackRedirecting(final String ip) {
         synchronized (this.redirectCounter) {
-            Counter counter = (Counter) this.redirectCounter.get(ip);
+            Counter counter = this.redirectCounter.get(ip);
             if (counter == null) {
                 counter = new IncrementingCounter(this.resetPeriodMillisRedirectThreshold);
                 this.redirectCounter.put(ip, counter);
