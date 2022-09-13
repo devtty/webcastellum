@@ -71,7 +71,7 @@ public final class AttackHandler {
         this.invalidateSessionOnAttack = invalidateSessionOnAttack;
         this.isProductionMode = isProductionMode;
         this.logVerboseForDevelopmentMode = logVerboseForDevelopmentMode;
-        this.blockMessage = String.format("%f seconds", Math.round(blockPeriodMillis / 1000d));
+        this.blockMessage = String.format("%d seconds", Math.round(blockPeriodMillis / 1000d));
         this.blockRepeatedRedirectsThreshold = blockRepeatedRedirectsThreshold;
         if (this.blockAttackingClientsThreshold > 0) {
             this.clientBlacklist = new ClientBlacklist(cleanupIntervalMillis, blockPeriodMillis);
@@ -344,7 +344,7 @@ public final class AttackHandler {
                 this.learningModeLogger.setUseParentHandlers(false);
                 // TODO: hier die rotations, counts, und sizes des hier erzeugten FileHandlers von aussen setzbar machen ?!? 
                 handlerForLearningModeLogging = new FileHandler(learningModeAggregationDirectory+"/WebCastellum-LearningMode"+applicationAdjusted+"-%g-%u.log", 1024*1024*10, 50, false);
-                this.handlerForLearningModeLogging.setEncoding(WebCastellumFilter.DEFAULT_CHARACTER_ENCODING.name());
+                this.handlerForLearningModeLogging.setEncoding(WebCastellumFilter.DEFAULT_CHARACTER_ENCODING);
                 final Formatter formatter = new SimpleFormatter();
                 handlerForLearningModeLogging.setFormatter(formatter);
                 // set logger level to fine to be verbose
