@@ -559,9 +559,12 @@ public final class ServerUtils {
         // Further details on URI encoding stuff: http://en.wikipedia.org/wiki/Percent-encoding
         try {
             return URLDecoder.decode(url, WebCastellumFilter.DEFAULT_CHARACTER_ENCODING);
+        } catch (UnsupportedEncodingException e) {
+            Logger.getLogger(ServerUtils.class.getName()).log(Level.SEVERE, "Unsupported character encoding configured for WebCastellum: {0}", WebCastellumFilter.DEFAULT_CHARACTER_ENCODING);
+            return url;
         } catch (IllegalArgumentException e) {
             return url;
-        }
+        } 
     }
     
     
