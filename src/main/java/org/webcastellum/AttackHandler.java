@@ -22,8 +22,8 @@ import javax.servlet.http.HttpSession;
 public final class AttackHandler {
     
     
-    private final Map<String,Counter> attackCounter = Collections.synchronizedMap(new HashMap());
-    private final Map<String,Counter> redirectCounter = Collections.synchronizedMap(new HashMap());
+    private final Map<String,Counter> attackCounter = Collections.synchronizedMap(new HashMap<>());
+    private final Map<String,Counter> redirectCounter = Collections.synchronizedMap(new HashMap<>());
     private final int blockAttackingClientsThreshold;
     private final int blockRepeatedRedirectsThreshold;
  
@@ -50,7 +50,7 @@ public final class AttackHandler {
 
     private final AttackLogger attackLogger;
     
-    public AttackHandler(final AttackLogger attackLogger, final int threshold, final long cleanupIntervalMillis, final long blockPeriodMillis, final long resetPeriodMillisAttack, final long resetPeriodMillisRedirectThreshold, final String learingModeAggregationDirectory, final String applicationName,
+    public AttackHandler(final AttackLogger attackLogger, final int threshold, final long cleanupIntervalMillis, final long blockPeriodMillis, final long resetPeriodMillisAttack, final long resetPeriodMillisRedirectThreshold, final String learningModeAggregationDirectory, final String applicationName,
             final boolean logSessionValuesOnAttack, final boolean invalidateSessionOnAttack,
             final int blockRepeatedRedirectsThreshold, final boolean isProductionMode, final boolean logVerboseForDevelopmentMode,
             final Pattern removeSensitiveDataRequestParamNamePattern, final Pattern removeSensitiveDataValuePattern, final boolean logClientUserData) {
@@ -81,7 +81,7 @@ public final class AttackHandler {
         this.removeSensitiveDataValuePattern = removeSensitiveDataValuePattern;
         this.logClientUserData = logClientUserData;
         initTimers(cleanupIntervalMillis);
-        initLogging(learingModeAggregationDirectory, applicationName);
+        initLogging(learningModeAggregationDirectory, applicationName);
     }
     
     private void initTimers(final long cleanupIntervalMillis) {

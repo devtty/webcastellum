@@ -12,15 +12,31 @@ public class AttackHandlerTest {
     private AttackLogger attackLogger;
     private AttackHandler attackHandler;
     
+    Pattern removeSensitiveDataRequestParamNamePattern = Pattern.compile(".");
+    Pattern removeSensitiveDataValuePattern = Pattern.compile(".");
+    
     @Before
     public void setUp(){
         attackLogger = Mockito.mock(AttackLogger.class);
-        Pattern removeSensitiveDataRequestParamNamePattern = Pattern.compile(".");
-        Pattern removeSensitiveDataValuePattern = Pattern.compile(".");
         attackHandler = new AttackHandler(attackLogger, 2, 1000L, 500L, 300L, 350L,"/tmp", "applicationName", true, true, 5, false, true, removeSensitiveDataRequestParamNamePattern, removeSensitiveDataValuePattern, true);
     }
     
     public AttackHandlerTest() {
+    }
+    
+    @Test(expected = IllegalArgumentException.class)
+    public void testConstructorWithNegativeThreshold(){
+        new AttackHandler(attackLogger, -1, 0, 0, 0, 0, "/tmp", "applicationName", true, true, 0, true, true, removeSensitiveDataRequestParamNamePattern, removeSensitiveDataValuePattern, true);
+    }
+    
+    @Test(expected = NullPointerException.class)
+    public void testConstructorWithoutSensitiveDataRequestParamNamePattern(){
+        new AttackHandler(attackLogger, 2, 0, 0, 0, 0, "/tmp", "applicationName", true, true, 0, true, true, null, removeSensitiveDataValuePattern, true);
+    }
+    
+    @Test(expected = NullPointerException.class)
+    public void testConstructorWithoutSensitiveDataValuePattern(){
+        new AttackHandler(attackLogger, 2, 0, 0, 0, 0, "/tmp", "applicationName", true, true, 0, true, true, removeSensitiveDataRequestParamNamePattern, null, true);
     }
 
     @Test
