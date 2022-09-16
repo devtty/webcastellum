@@ -31,7 +31,7 @@ public final class HttpStatusCodeTracker {
     private final String clusterJmsProviderUrl;
     private final String clusterJmsConnectionFactory;
     private final String clusterJmsTopic;
-    private final Map<String,IncrementingCounter> httpInvalidRequestOrNotFoundCounter = Collections.synchronizedMap(new HashMap<>());
+    private final Map<String,Counter> httpInvalidRequestOrNotFoundCounter = Collections.synchronizedMap(new HashMap<>());
     private final AttackHandler attackHandler;
     private final int httpInvalidRequestOrNotFoundAttackThreshold;
     
