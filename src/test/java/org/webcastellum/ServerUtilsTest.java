@@ -142,12 +142,17 @@ public class ServerUtilsTest {
     @Test
     public void testDecodeBrokenValueExceptUrlEncoding() {
         assertNull(ServerUtils.decodeBrokenValueUrlEncodingOnly(null));
+        
         //TODO test more
     }
 
     @Test
     public void testDecodeBrokenValue() {
         assertNull(ServerUtils.decodeBrokenValue(null));
+        assertEquals("¼", ServerUtils.decodeBrokenValue("%BC"));
+        assertEquals("¼", ServerUtils.decodeBrokenValue("\u00bc"));
+        assertEquals("¼", ServerUtils.decodeBrokenValue("\\XBC"));
+        assertEquals("¼ &", ServerUtils.decodeBrokenValue("\\XBC+&amp;"));
         //TODO test more
     }
 

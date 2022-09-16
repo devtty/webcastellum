@@ -7,32 +7,34 @@ import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
 
 
 
 public final class SessionCreationTracker {
 
-    private static final boolean DEBUG = false;
-    
- 
     /**
      * Used to identify myself in order to ignore broadcasts sent from me (for the JMS-based clustring support)
      */
     private static final String SYSTEM_IDENTIFIER_OF_THIS_BOX = IdGeneratorUtils.createId();
     private static final String TYPE = "SessionCreationTracker";
-   
     
-    
-    private final String clusterInitialContextFactory, clusterJmsProviderUrl, clusterJmsConnectionFactory, clusterJmsTopic;
-    private final Map/*<String,Counter>*/ sessionCreationCounter = Collections.synchronizedMap(new HashMap());
+    private final String clusterInitialContextFactory;
+    private final String clusterJmsProviderUrl;
+    private final String clusterJmsConnectionFactory;
+    private final String clusterJmsTopic;
+    private final Map<String,Counter> sessionCreationCounter = Collections.synchronizedMap(new HashMap<>());
     private final AttackHandler attackHandler;
     private final int sessionCreationAttackThreshold;
     
     private final long resetPeriodMillis;
     
-    private Timer cleanupTimer, clusterPublishTimer;
-    private TimerTask cleanupTask, clusterPublishTask;
+    private Timer cleanupTimer;
+    private Timer clusterPublishTimer;
+    private TimerTask cleanupTask;
+    private TimerTask clusterPublishTask;
     private SnapshotBroadcastListener broadcastListener;
     
     
@@ -97,7 +99,7 @@ public final class SessionCreationTracker {
     
     
     public void trackSessionCreation(final String ip, final HttpServletRequest request) {
-        if (DEBUG) System.out.println("Session creation: "+ip);
+        Logger.getLogger(SessionCreationTracker.class.getName()).log(Level.FINE, "Session creation: {0}", ip);
         if (this.sessionCreationAttackThreshold > 0 && this.cleanupTimer != null) {
             boolean broadcastRemoval = false;
             try {
@@ -118,7 +120,7 @@ public final class SessionCreationTracker {
                 }
             } finally {
                 if (broadcastRemoval) {
-                    final List/*<String>*/ removals = new ArrayList(1);
+                    final List<String> removals = new ArrayList<>(1);
                     removals.add(ip);
                     JmsUtils.publishSnapshot( new Snapshot(TYPE, SYSTEM_IDENTIFIER_OF_THIS_BOX, removals) );
                 }
@@ -127,10 +129,8 @@ public final class SessionCreationTracker {
     }
 
     
-    
-    
     public void trackSessionInvalidation(final String ip) {
-        if (DEBUG) System.out.println("Session invalidation: "+ip);
+        Logger.getLogger(SessionCreationTracker.class.getName()).log(Level.FINE, "Session invalidation: {0}", ip);
         if (this.sessionCreationAttackThreshold > 0 && this.cleanupTimer != null) {
             synchronized (this.sessionCreationCounter) {
                 final IncrementingCounter counter = (IncrementingCounter) this.sessionCreationCounter.get(ip);

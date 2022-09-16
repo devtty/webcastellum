@@ -23,13 +23,8 @@ import javax.servlet.ServletResponse;
 
 
 public final class WebCastellumFilter implements javax.servlet.Filter {
-
-
-    
     
     public static final String DEFAULT_CHARACTER_ENCODING = "UTF-8";
-    
-    
     
     private static final String PARAM_DEBUG = "Debug";
     private static final String PARAM_SHOW_TIMINGS = "ShowTimings";
@@ -54,9 +49,9 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
     private static final String PARAM_BLOCK_REQUESTS_WITH_DUPLICATE_HEADERS = "BlockRequestsWithDuplicateHeaders";
     private static final String PARAM_BLOCK_NON_LOCAL_REDIRECTS = "BlockNonLocalRedirects";
     private static final String PARAM_400_OR_404_ATTACK_THRESHOLD = "HttpInvalidRequestOrNotFoundStatusCodeAttackThreshold";
-    private static final String PARAM_400_OR_404_ATTACK_THRESHOLD__CLUSTER_AWARE = "HttpInvalidRequestOrNotFoundStatusCodeClusterAware";
+    private static final String PARAM_400_OR_404_ATTACK_THRESHOLD_CLUSTER_AWARE = "HttpInvalidRequestOrNotFoundStatusCodeClusterAware";
     private static final String PARAM_SESSION_CREATION_ATTACK_THRESHOLD = "SessionCreationAttackThreshold";
-    private static final String PARAM_SESSION_CREATION_ATTACK_THRESHOLD__CLUSTER_AWARE = "SessionCreationClusterAware";
+    private static final String PARAM_SESSION_CREATION_ATTACK_THRESHOLD_CLUSTER_AWARE = "SessionCreationClusterAware";
     
     private static final String PARAM_SECRET_TOKEN_LINK_INJECTION = "SecretTokenLinkInjection";
     private static final String PARAM_ENCRYPT_QUERY_STRINGS = "QueryStringEncryption";
@@ -106,7 +101,8 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
     private static final String PARAM_MASK_AMPERSANDS_IN_LINK_ADDITIONS = "MaskAmpersandsInLinkAdditions";
     private static final String PARAM_STRIP_HTML_COMMENTS = "StripHtmlComments";
     private static final String PARAM_FORCED_SESSION_INVALIDATION_PERIOD_MINUTES = "ForcedSessionInvalidationPeriod";
-    private static final String PARAM_RULE_LOADER = "RuleLoader"; private static final String LEGACY_PARAM_RULE_FILE_LOADER = "RuleFileLoader";
+    private static final String PARAM_RULE_LOADER = "RuleLoader";
+    private static final String LEGACY_PARAM_RULE_FILE_LOADER = "RuleFileLoader";
     private static final String PARAM_GEO_LOCATOR = "GeoLocator";
     private static final String PARAM_ATTACK_LOGGER = "AttackLogger";
     private static final String PARAM_CAPTCHA_GENERATOR = "CaptchaGenerator";
@@ -123,13 +119,15 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
     private static final String PARAM_APPLICATION_NAME = "ApplicationName";
     private static final String PARAM_LEARNING_MODE_AGGREGATION_DIRECTORY = "LearningModeAggregationDirectory";
     private static final String PARAM_LOG_SESSION_VALUES_ON_ATTACK = "LogSessionValuesOnAttack";
-    private static final String PARAM_RULE_RELOADING_INTERVAL = "RuleReloadingInterval"; private static final String LEGACY_PARAM_RULE_FILE_RELOADING_INTERVAL = "RuleFileReloadingInterval";
+    private static final String PARAM_RULE_RELOADING_INTERVAL = "RuleReloadingInterval";
+    private static final String LEGACY_PARAM_RULE_FILE_RELOADING_INTERVAL = "RuleFileReloadingInterval";
     private static final String PARAM_CONFIG_RELOADING_INTERVAL = "ConfigurationReinitializationInterval";
     private static final String PARAM_ANTI_CACHE_RESPONSE_HEADER_INJECTION_CONTENT_TYPES = "AntiCacheResponseHeaderInjectionContentTypes";
     private static final String PARAM_RESPONSE_MODIFICATION_CONTENT_TYPES = "ResponseBodyModificationContentTypes";
     private static final String PARAM_FORCE_ENTRANCE_THROUGH_ENTRY_POINTS = "ForceEntranceThroughEntryPoints";
     private static final String PARAM_REDIRECT_WELCOME_PAGE = "RedirectWelcomePage";
-    private static final String PARAM_CHARACTER_ENCODING = "CharacterEncoding"; private static final String LEGACY_PARAM_CHARACTER_ENCODING = "RequestCharacterEncoding";
+    private static final String PARAM_CHARACTER_ENCODING = "CharacterEncoding";
+    private static final String LEGACY_PARAM_CHARACTER_ENCODING = "RequestCharacterEncoding";
     private static final String PARAM_HANDLE_UNCAUGHT_EXCEPTIONS = "HandleUncaughtExceptions";
     private static final String PARAM_LOG_VERBOSE_FOR_DEVELOPMENT_MODE = "LogVerboseForDevelopmentMode";
     private static final String PARAM_BLOCK_REPEATED_REDIRECTS_THRESHOLD = "BlockRepeatedRedirectsThreshold"; // TODO hier RedirectThreshold ohne Plural-s besser und das andere als legacy
@@ -163,18 +161,14 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
 
     private static final String PARAM_VALIDATE_CLIENT_ADDRESS_FORMAT = "ValidateClientAddressFormat";
 
-    private static final String PARAM_TRANSPARENT_QUERYSTRING = "TransparentQueryString"; private static final String LEGACY_PARAM_TRANSPARENT_QUERYSTRING = "TransparentQuerystring";
+    private static final String PARAM_TRANSPARENT_QUERYSTRING = "TransparentQueryString";
+    private static final String LEGACY_PARAM_TRANSPARENT_QUERYSTRING = "TransparentQuerystring";
     private static final String PARAM_TRANSPARENT_FORWARDING = "TransparentForwarding";
-
 
 
     // tuning configs
     private static final String PARAM_USE_TUNED_BLOCK_PARSER = "UseTunedBlockParser";
     private static final String PARAM_USE_RESPONSE_BUFFERING = "UseResponseBuffering";
-    
-    
-    
-    
     
     
 //    static final String INTERNAL_CONTENT_PREFIX = WebCastellumFilter.class.getName()+"_";
@@ -232,14 +226,7 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
     static final int STATIC_REQUEST_CRYPTODETECTION_INSERTION_POSITION = CryptoUtils.generateRandomNumber(false, 0,150);
     
     
-    
     private static boolean isOldJavaEE13 = false;
-    
-    
-    
-    
-    
-    
     
     private final ContentInjectionHelper contentInjectionHelper = new ContentInjectionHelper();
     
@@ -262,7 +249,8 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
             hiddenFormFieldProtection, selectboxProtection, checkboxProtection, radiobuttonProtection, selectboxValueMasking, checkboxValueMasking, radiobuttonValueMasking, reuseSessionContent, parseMultipartForms, hideInternalSessionAttributes,imageMapParameterExclude,
             bufferFileUploadsToDisk, extraSessionTimeoutHandling;
     private String[] tieSessionToHeaderList;
-    private Set/*<String>*/ antiCacheResponseHeaderInjectionContentTypes, responseBodyModificationContentTypes;
+    private Set<String> antiCacheResponseHeaderInjectionContentTypes;
+    private Set<String> responseBodyModificationContentTypes;
     private HttpStatusCodeTracker httpStatusCodeCounter;
     private SessionCreationTracker sessionCreationCounter;
     private DenialOfServiceLimitTracker denialOfServiceLimitCounter;
@@ -279,7 +267,7 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
     private String honeylinkPrefix, honeylinkSuffix;
     private short honeylinkMaxPerPage;
     private boolean randomizeHoneylinksOnEveryRequest;
-    private Set/*<String>*/ allowedRequestMimeTypesLowerCased = new HashSet();
+    private Set<String> allowedRequestMimeTypesLowerCased = new HashSet<>();
     
 
     private boolean isHavingEnabledQueryStringCheckingRules = false, isHavingEnabledRequestParameterCheckingRules = false, isHavingEnabledHeaderCheckingRules = false, isHavingEnabledCookieCheckingRules = false;
@@ -318,7 +306,7 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
     
     
     public WebCastellumFilter() {
-        System.out.println( Version.tagLine() );
+        Logger.getLogger(WebCastellumFilter.class.getName()).log(Level.INFO, "Version: {0}", Version.tagLine());
     }
 
     
@@ -3146,8 +3134,9 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
                 final ProductionModeChecker productionModeChecker = (ProductionModeChecker) this.productionModeCheckerClass.newInstance();
                 productionModeChecker.setFilterConfig(filterConfig);
                 this.isProductionMode = productionModeChecker.isProductionMode();
-                System.out.println("WebCastellum is "+(this.isProductionMode?"":"NOT ")+"set into production mode for application "+this.applicationName);
-            } catch (Exception ex) {
+                Logger.getLogger(WebCastellumFilter.class.getName()).log(Level.INFO, "WebCastellum mode: {0}", (this.isProductionMode ? "PRODUCTION" : "DEVELOPMENT"));
+                Logger.getLogger(WebCastellumFilter.class.getName()).log(Level.INFO, "WebCastellum application name: {0}", this.applicationName);
+            } catch (IllegalAccessException | InstantiationException | FilterConfigurationException | ProductionModeCheckingException ex) {
                 throw new UnavailableException("Unable to check for production mode: "+ex.getMessage());
             }
         }
@@ -4492,7 +4481,7 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
         // Load config: 400or404 attack threshold - OPTIONAL
         {
             // general cluster awareness for this feature
-            String value = configManager.getConfigurationValue(PARAM_400_OR_404_ATTACK_THRESHOLD__CLUSTER_AWARE);
+            String value = configManager.getConfigurationValue(PARAM_400_OR_404_ATTACK_THRESHOLD_CLUSTER_AWARE);
             if (value == null) value = ""+false;
             final boolean clusterAware = (""+true).equals( value.trim().toLowerCase() );
             if (clusterAware) initJMS = true;
@@ -4512,7 +4501,7 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
         // Load config: session creation attack threshold - OPTIONAL
         {
             // general cluster awareness for this feature
-            String value = configManager.getConfigurationValue(PARAM_SESSION_CREATION_ATTACK_THRESHOLD__CLUSTER_AWARE);
+            String value = configManager.getConfigurationValue(PARAM_SESSION_CREATION_ATTACK_THRESHOLD_CLUSTER_AWARE);
             if (value == null) value = ""+false;
             final boolean clusterAware = (""+true).equals( value.trim().toLowerCase() );
             if (clusterAware) initJMS = true;
@@ -4802,7 +4791,7 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
                 record.setSourceMethodName("message");
                 logger.log(record);
                 */
-                System.out.println(msg+": "+e);
+                Logger.getLogger(WebCastellumFilter.class.getName()).log(Level.INFO, msg+": "+e);
             }
         } else {
             if (USE_WEB_SERVER_LOG && filterConfig != null && filterConfig.getServletContext() != null) filterConfig.getServletContext().log(msg);
@@ -4813,7 +4802,7 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
                 record.setSourceMethodName("message");
                 logger.log(record);
                 */
-                System.out.println(msg);
+                Logger.getLogger(WebCastellumFilter.class.getName()).log(Level.INFO, msg);
             }
         }
     }

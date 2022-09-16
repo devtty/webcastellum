@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -25,15 +27,20 @@ public final class HttpStatusCodeTracker {
 
     
     
-    private final String clusterInitialContextFactory, clusterJmsProviderUrl, clusterJmsConnectionFactory, clusterJmsTopic;
-    private final Map/*<String,IncrementingCounter>*/ httpInvalidRequestOrNotFoundCounter = Collections.synchronizedMap(new HashMap/*<String,IncrementingCounter>*/());
+    private final String clusterInitialContextFactory;
+    private final String clusterJmsProviderUrl;
+    private final String clusterJmsConnectionFactory;
+    private final String clusterJmsTopic;
+    private final Map<String,IncrementingCounter> httpInvalidRequestOrNotFoundCounter = Collections.synchronizedMap(new HashMap<>());
     private final AttackHandler attackHandler;
     private final int httpInvalidRequestOrNotFoundAttackThreshold;
     
     private final long resetPeriodMillis;
     
-    private Timer cleanupTimer, clusterPublishTimer;
-    private TimerTask cleanupTask, clusterPublishTask;
+    private Timer cleanupTimer;
+    private Timer clusterPublishTimer;
+    private TimerTask cleanupTask;
+    private TimerTask clusterPublishTask;
     private SnapshotBroadcastListener broadcastListener;
     
     
@@ -109,7 +116,7 @@ public final class HttpStatusCodeTracker {
                             counter = new IncrementingCounter(this.resetPeriodMillis);
                             this.httpInvalidRequestOrNotFoundCounter.put(ip, counter);
                         } else counter.increment(); // = overaged will automatically be reset and reused (i.e. starting again at 1)
-                        if (DEBUG) System.out.println("Current HTTP 400/404 status map: "+this.httpInvalidRequestOrNotFoundCounter);
+                        Logger.getLogger(HttpStatusCodeTracker.class.getName()).log(Level.FINE, "Current HTTP 400/404 status map: {0}", this.httpInvalidRequestOrNotFoundCounter);
                         if (counter.getCounter() > this.httpInvalidRequestOrNotFoundAttackThreshold) {
                             this.httpInvalidRequestOrNotFoundCounter.remove(ip);
                             this.attackHandler.handleAttack(request, ip, "HTTP 400/404 per-client threshold exceeded ("+this.httpInvalidRequestOrNotFoundAttackThreshold+")");
@@ -119,7 +126,7 @@ public final class HttpStatusCodeTracker {
                     }
                 } finally {
                     if (broadcastRemoval) {
-                        final List/*<String>*/ removals = new ArrayList(1);
+                        final List<String> removals = new ArrayList<>(1);
                         removals.add(ip);
                         JmsUtils.publishSnapshot( new Snapshot(TYPE, SYSTEM_IDENTIFIER_OF_THIS_BOX, removals) );
                     }
@@ -128,9 +135,4 @@ public final class HttpStatusCodeTracker {
         }
     }
             
-    
-    
-    
-    
-    
 }

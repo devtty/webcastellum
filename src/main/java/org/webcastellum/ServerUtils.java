@@ -361,7 +361,9 @@ public final class ServerUtils {
     
 
     public static String unmaskAmpersandsInLink(final String link) {
-        if (link == null) return null;
+        if (link == null) {
+            return null;
+        }
         return PATTERN_LINK_AMPERSAND_MASKED.matcher(link).replaceAll(LINK_AMPERSAND_UNMASKED);
     }
     
