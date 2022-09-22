@@ -21,9 +21,10 @@ import javax.servlet.http.HttpSession;
 
 public final class AttackHandler {
     
+    private static final Logger LOGGER = Logger.getLogger(AttackHandler.class.getName());
     
-    private final Map<String,Counter> attackCounter = Collections.synchronizedMap(new HashMap());
-    private final Map<String,Counter> redirectCounter = Collections.synchronizedMap(new HashMap());
+    private final Map<String,Counter> attackCounter = Collections.synchronizedMap(new HashMap<>());
+    private final Map<String,Counter> redirectCounter = Collections.synchronizedMap(new HashMap<>());
     private final int blockAttackingClientsThreshold;
     private final int blockRepeatedRedirectsThreshold;
  
@@ -50,7 +51,7 @@ public final class AttackHandler {
 
     private final AttackLogger attackLogger;
     
-    public AttackHandler(final AttackLogger attackLogger, final int threshold, final long cleanupIntervalMillis, final long blockPeriodMillis, final long resetPeriodMillisAttack, final long resetPeriodMillisRedirectThreshold, final String learingModeAggregationDirectory, final String applicationName,
+    public AttackHandler(final AttackLogger attackLogger, final int threshold, final long cleanupIntervalMillis, final long blockPeriodMillis, final long resetPeriodMillisAttack, final long resetPeriodMillisRedirectThreshold, final String learningModeAggregationDirectory, final String applicationName,
             final boolean logSessionValuesOnAttack, final boolean invalidateSessionOnAttack,
             final int blockRepeatedRedirectsThreshold, final boolean isProductionMode, final boolean logVerboseForDevelopmentMode,
             final Pattern removeSensitiveDataRequestParamNamePattern, final Pattern removeSensitiveDataValuePattern, final boolean logClientUserData) {
@@ -71,7 +72,7 @@ public final class AttackHandler {
         this.invalidateSessionOnAttack = invalidateSessionOnAttack;
         this.isProductionMode = isProductionMode;
         this.logVerboseForDevelopmentMode = logVerboseForDevelopmentMode;
-        this.blockMessage = String.format("%f seconds", Math.round(blockPeriodMillis / 1000d));
+        this.blockMessage = String.format("%d seconds", Math.round(blockPeriodMillis / 1000d));
         this.blockRepeatedRedirectsThreshold = blockRepeatedRedirectsThreshold;
         if (this.blockAttackingClientsThreshold > 0) {
             this.clientBlacklist = new ClientBlacklist(cleanupIntervalMillis, blockPeriodMillis);
@@ -81,7 +82,7 @@ public final class AttackHandler {
         this.removeSensitiveDataValuePattern = removeSensitiveDataValuePattern;
         this.logClientUserData = logClientUserData;
         initTimers(cleanupIntervalMillis);
-        initLogging(learingModeAggregationDirectory, applicationName);
+        initLogging(learningModeAggregationDirectory, applicationName);
     }
     
     private void initTimers(final long cleanupIntervalMillis) {
@@ -234,7 +235,7 @@ public final class AttackHandler {
         if (this.attackLogger != null) {
             this.attackLogger.log(true, logMessageString);
         } else {
-            Logger.getLogger(AttackHandler.class.getName()).log(Level.INFO, logMessageString);
+            LOGGER.log(Level.INFO, logMessageString);
         }
         return new Attack(logMessageString, logReferenceId);
     }
@@ -253,7 +254,7 @@ public final class AttackHandler {
         }
         boolean blocked = false;
         synchronized (this.attackCounter) {
-            Counter counter = (Counter) this.attackCounter.get(ip);
+            Counter counter = this.attackCounter.get(ip);
             if (counter == null) {
                 counter = new IncrementingCounter(this.resetPeriodMillisAttack);
                 this.attackCounter.put(ip, counter);
@@ -271,7 +272,7 @@ public final class AttackHandler {
     
     private boolean trackRedirecting(final String ip) {
         synchronized (this.redirectCounter) {
-            Counter counter = (Counter) this.redirectCounter.get(ip);
+            Counter counter = this.redirectCounter.get(ip);
             if (counter == null) {
                 counter = new IncrementingCounter(this.resetPeriodMillisRedirectThreshold);
                 this.redirectCounter.put(ip, counter);
@@ -333,9 +334,9 @@ public final class AttackHandler {
             final String applicationAdjusted;
             if (application == null || application.trim().length() == 0) {
                 applicationAdjusted = ""; 
-                Logger.getLogger(AttackHandler.class.getName()).log(Level.INFO, "WebCastellum logs learning mode data for this application to: {0}", file.getAbsolutePath());
+                LOGGER.log(Level.INFO, "WebCastellum logs learning mode data for this application to: {0}", file.getAbsolutePath());
             } else {
-                Logger.getLogger(AttackHandler.class.getName()).log(Level.INFO, "WebCastellum logs learning mode data for application: {0} to {1}", new Object[]{application.trim(), file.getAbsolutePath()});
+                LOGGER.log(Level.INFO, "WebCastellum logs learning mode data for application: {0} to {1}", new Object[]{application.trim(), file.getAbsolutePath()});
                 applicationAdjusted = "."+application.trim();
             }
             learningModeAggregationDirectory = getAbsolutePathLoggingSafe(file);
@@ -344,7 +345,7 @@ public final class AttackHandler {
                 this.learningModeLogger.setUseParentHandlers(false);
                 // TODO: hier die rotations, counts, und sizes des hier erzeugten FileHandlers von aussen setzbar machen ?!? 
                 handlerForLearningModeLogging = new FileHandler(learningModeAggregationDirectory+"/WebCastellum-LearningMode"+applicationAdjusted+"-%g-%u.log", 1024*1024*10, 50, false);
-                this.handlerForLearningModeLogging.setEncoding(WebCastellumFilter.DEFAULT_CHARACTER_ENCODING.name());
+                this.handlerForLearningModeLogging.setEncoding(WebCastellumFilter.DEFAULT_CHARACTER_ENCODING);
                 final Formatter formatter = new SimpleFormatter();
                 handlerForLearningModeLogging.setFormatter(formatter);
                 // set logger level to fine to be verbose

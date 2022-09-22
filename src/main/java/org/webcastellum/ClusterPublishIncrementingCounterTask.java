@@ -12,6 +12,7 @@ import javax.naming.NamingException;
 
 public final class ClusterPublishIncrementingCounterTask extends TimerTask {
     
+    private static final Logger LOGGER = Logger.getLogger(ClusterPublishIncrementingCounterTask.class.getName());
     
     private final String type, systemIdentifier;
     private final String clusterInitialContextFactory, clusterJmsProviderUrl, clusterJmsConnectionFactory, clusterJmsTopic;
@@ -36,7 +37,7 @@ public final class ClusterPublishIncrementingCounterTask extends TimerTask {
             JmsUtils.init(this.clusterInitialContextFactory, this.clusterJmsProviderUrl, this.clusterJmsConnectionFactory, this.clusterJmsTopic); // in case connection was dropped due to some reason (unreliable network etc.)
         } catch (NamingException | JMSException | RuntimeException e) {
             JmsUtils.closeQuietly(false); // to be re-initialized on the next call
-            Logger.getLogger(ClusterPublishIncrementingCounterTask.class.getName()).log(Level.WARNING, "Unable to init: {0}", e);
+            LOGGER.log(Level.WARNING, "Unable to init: {0}", e);
         }
         // shortcut
         if (this.map.isEmpty()) return;
@@ -57,9 +58,8 @@ public final class ClusterPublishIncrementingCounterTask extends TimerTask {
                 System.err.println("Unable to clone: "+e); // TODO: better logging
             }
         }
-        if (JmsUtils.DEBUG) {
-            Logger.getLogger(ClusterPublishIncrementingCounterTask.class.getName()).log(Level.FINE, "map: {0} payload: {1}", new Object[]{this.map, payload});
-        }
+	LOGGER.log(Level.FINE, "map: {0} payload: {1}", new Object[]{this.map, payload});
+        
         final Snapshot snapshot = new Snapshot(this.type, this.systemIdentifier, payload);
         // PUBLISH THE SNAPSHOT USING JMS
         JmsUtils.publishSnapshot(snapshot);

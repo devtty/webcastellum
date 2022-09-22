@@ -23,13 +23,10 @@ import javax.servlet.ServletResponse;
 
 
 public final class WebCastellumFilter implements javax.servlet.Filter {
-
-
     
+    private static final Logger LOGGER = Logger.getLogger(WebCastellumFilter.class.getName());
     
     public static final String DEFAULT_CHARACTER_ENCODING = "UTF-8";
-    
-    
     
     private static final String PARAM_DEBUG = "Debug";
     private static final String PARAM_SHOW_TIMINGS = "ShowTimings";
@@ -54,9 +51,9 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
     private static final String PARAM_BLOCK_REQUESTS_WITH_DUPLICATE_HEADERS = "BlockRequestsWithDuplicateHeaders";
     private static final String PARAM_BLOCK_NON_LOCAL_REDIRECTS = "BlockNonLocalRedirects";
     private static final String PARAM_400_OR_404_ATTACK_THRESHOLD = "HttpInvalidRequestOrNotFoundStatusCodeAttackThreshold";
-    private static final String PARAM_400_OR_404_ATTACK_THRESHOLD__CLUSTER_AWARE = "HttpInvalidRequestOrNotFoundStatusCodeClusterAware";
+    private static final String PARAM_400_OR_404_ATTACK_THRESHOLD_CLUSTER_AWARE = "HttpInvalidRequestOrNotFoundStatusCodeClusterAware";
     private static final String PARAM_SESSION_CREATION_ATTACK_THRESHOLD = "SessionCreationAttackThreshold";
-    private static final String PARAM_SESSION_CREATION_ATTACK_THRESHOLD__CLUSTER_AWARE = "SessionCreationClusterAware";
+    private static final String PARAM_SESSION_CREATION_ATTACK_THRESHOLD_CLUSTER_AWARE = "SessionCreationClusterAware";
     
     private static final String PARAM_SECRET_TOKEN_LINK_INJECTION = "SecretTokenLinkInjection";
     private static final String PARAM_ENCRYPT_QUERY_STRINGS = "QueryStringEncryption";
@@ -106,7 +103,8 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
     private static final String PARAM_MASK_AMPERSANDS_IN_LINK_ADDITIONS = "MaskAmpersandsInLinkAdditions";
     private static final String PARAM_STRIP_HTML_COMMENTS = "StripHtmlComments";
     private static final String PARAM_FORCED_SESSION_INVALIDATION_PERIOD_MINUTES = "ForcedSessionInvalidationPeriod";
-    private static final String PARAM_RULE_LOADER = "RuleLoader"; private static final String LEGACY_PARAM_RULE_FILE_LOADER = "RuleFileLoader";
+    private static final String PARAM_RULE_LOADER = "RuleLoader";
+    private static final String LEGACY_PARAM_RULE_FILE_LOADER = "RuleFileLoader";
     private static final String PARAM_GEO_LOCATOR = "GeoLocator";
     private static final String PARAM_ATTACK_LOGGER = "AttackLogger";
     private static final String PARAM_CAPTCHA_GENERATOR = "CaptchaGenerator";
@@ -123,13 +121,15 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
     private static final String PARAM_APPLICATION_NAME = "ApplicationName";
     private static final String PARAM_LEARNING_MODE_AGGREGATION_DIRECTORY = "LearningModeAggregationDirectory";
     private static final String PARAM_LOG_SESSION_VALUES_ON_ATTACK = "LogSessionValuesOnAttack";
-    private static final String PARAM_RULE_RELOADING_INTERVAL = "RuleReloadingInterval"; private static final String LEGACY_PARAM_RULE_FILE_RELOADING_INTERVAL = "RuleFileReloadingInterval";
+    private static final String PARAM_RULE_RELOADING_INTERVAL = "RuleReloadingInterval";
+    private static final String LEGACY_PARAM_RULE_FILE_RELOADING_INTERVAL = "RuleFileReloadingInterval";
     private static final String PARAM_CONFIG_RELOADING_INTERVAL = "ConfigurationReinitializationInterval";
     private static final String PARAM_ANTI_CACHE_RESPONSE_HEADER_INJECTION_CONTENT_TYPES = "AntiCacheResponseHeaderInjectionContentTypes";
     private static final String PARAM_RESPONSE_MODIFICATION_CONTENT_TYPES = "ResponseBodyModificationContentTypes";
     private static final String PARAM_FORCE_ENTRANCE_THROUGH_ENTRY_POINTS = "ForceEntranceThroughEntryPoints";
     private static final String PARAM_REDIRECT_WELCOME_PAGE = "RedirectWelcomePage";
-    private static final String PARAM_CHARACTER_ENCODING = "CharacterEncoding"; private static final String LEGACY_PARAM_CHARACTER_ENCODING = "RequestCharacterEncoding";
+    private static final String PARAM_CHARACTER_ENCODING = "CharacterEncoding";
+    private static final String LEGACY_PARAM_CHARACTER_ENCODING = "RequestCharacterEncoding";
     private static final String PARAM_HANDLE_UNCAUGHT_EXCEPTIONS = "HandleUncaughtExceptions";
     private static final String PARAM_LOG_VERBOSE_FOR_DEVELOPMENT_MODE = "LogVerboseForDevelopmentMode";
     private static final String PARAM_BLOCK_REPEATED_REDIRECTS_THRESHOLD = "BlockRepeatedRedirectsThreshold"; // TODO hier RedirectThreshold ohne Plural-s besser und das andere als legacy
@@ -163,18 +163,14 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
 
     private static final String PARAM_VALIDATE_CLIENT_ADDRESS_FORMAT = "ValidateClientAddressFormat";
 
-    private static final String PARAM_TRANSPARENT_QUERYSTRING = "TransparentQueryString"; private static final String LEGACY_PARAM_TRANSPARENT_QUERYSTRING = "TransparentQuerystring";
+    private static final String PARAM_TRANSPARENT_QUERYSTRING = "TransparentQueryString";
+    private static final String LEGACY_PARAM_TRANSPARENT_QUERYSTRING = "TransparentQuerystring";
     private static final String PARAM_TRANSPARENT_FORWARDING = "TransparentForwarding";
-
 
 
     // tuning configs
     private static final String PARAM_USE_TUNED_BLOCK_PARSER = "UseTunedBlockParser";
     private static final String PARAM_USE_RESPONSE_BUFFERING = "UseResponseBuffering";
-    
-    
-    
-    
     
     
 //    static final String INTERNAL_CONTENT_PREFIX = WebCastellumFilter.class.getName()+"_";
@@ -232,14 +228,7 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
     static final int STATIC_REQUEST_CRYPTODETECTION_INSERTION_POSITION = CryptoUtils.generateRandomNumber(false, 0,150);
     
     
-    
     private static boolean isOldJavaEE13 = false;
-    
-    
-    
-    
-    
-    
     
     private final ContentInjectionHelper contentInjectionHelper = new ContentInjectionHelper();
     
@@ -252,7 +241,8 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
     
     // TODO: auch hier die anderen dependent objects (AttackHandler, etc.) wie den ContentInjectionHelper final machen und bereits hier in der Deklaration instantiieren und im Config-Laden lediglich parametrisieren per Settern + dann ueberall wo die instanzen reingereicht werden diese non-nullable machen per NPE
     private AttackHandler attackHandler;
-    private String developmentAttackReplyMessage, productionAttackReplyMessage, developmentConfigurationMissingReplyMessage, productionConfigurationMissingReplyMessage, developmentExceptionReplyMessage, productionExceptionReplyMessage, redirectWelcomePage, sessionTimeoutRedirectPage, requestCharacterEncoding;
+    private String developmentAttackReplyMessage, productionAttackReplyMessage, developmentConfigurationMissingReplyMessage, productionConfigurationMissingReplyMessage, developmentExceptionReplyMessage, productionExceptionReplyMessage, redirectWelcomePage, sessionTimeoutRedirectPage;
+    private String requestCharacterEncoding;
     private int developmentAttackReplyStatusCode=200, productionAttackReplyStatusCode=200, developmentConfigurationMissingReplyStatusCode=503, productionConfigurationMissingReplyStatusCode=503, developmentExceptionReplyStatusCode=503, productionExceptionReplyStatusCode=503, forcedSessionInvalidationPeriodMinutes, housekeepingIntervalMinutes, blockPeriodMinutes;
     private long ruleFileReloadingIntervalMillis, nextRuleReloadingTime;
     private long configReloadingIntervalMillis, nextConfigReloadingTime;
@@ -261,7 +251,8 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
             hiddenFormFieldProtection, selectboxProtection, checkboxProtection, radiobuttonProtection, selectboxValueMasking, checkboxValueMasking, radiobuttonValueMasking, reuseSessionContent, parseMultipartForms, hideInternalSessionAttributes,imageMapParameterExclude,
             bufferFileUploadsToDisk, extraSessionTimeoutHandling;
     private String[] tieSessionToHeaderList;
-    private Set/*<String>*/ antiCacheResponseHeaderInjectionContentTypes, responseBodyModificationContentTypes;
+    private Set<String> antiCacheResponseHeaderInjectionContentTypes;
+    private Set<String> responseBodyModificationContentTypes;
     private HttpStatusCodeTracker httpStatusCodeCounter;
     private SessionCreationTracker sessionCreationCounter;
     private DenialOfServiceLimitTracker denialOfServiceLimitCounter;
@@ -278,7 +269,7 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
     private String honeylinkPrefix, honeylinkSuffix;
     private short honeylinkMaxPerPage;
     private boolean randomizeHoneylinksOnEveryRequest;
-    private Set/*<String>*/ allowedRequestMimeTypesLowerCased = new HashSet();
+    private Set<String> allowedRequestMimeTypesLowerCased = new HashSet<>();
     
 
     private boolean isHavingEnabledQueryStringCheckingRules = false, isHavingEnabledRequestParameterCheckingRules = false, isHavingEnabledHeaderCheckingRules = false, isHavingEnabledCookieCheckingRules = false;
@@ -317,7 +308,7 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
     
     
     public WebCastellumFilter() {
-        System.out.println( Version.tagLine() );
+        LOGGER.log(Level.INFO, "Version: {0}", Version.tagLine());
     }
 
     
@@ -358,10 +349,6 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
         if (this.blockInvalidEncodedQueryString && requestDetails.queryString != null) { // if defined to block wrong encodings, do so:
             try {
                 URLDecoder.decode(requestDetails.queryString, DEFAULT_CHARACTER_ENCODING);
-            } catch (UnsupportedEncodingException e) { // = wrong configuration
-                final StopFilterProcessingException ex = new StopFilterProcessingException("Unsupported request character encoding in WebCastellum: "+DEFAULT_CHARACTER_ENCODING);
-                sendUnavailableMessage((HttpServletResponse)response, ex);
-                throw ex;
             } catch (IllegalArgumentException e) {
                 // The query string contains invalid encoded data (i.e. %XV which is not hex)
                 final Attack attack = this.attackHandler.handleAttack(request, requestDetails.clientAddress, "Invalid encoded query string");
@@ -1389,7 +1376,7 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
             try {
                 final Captcha captcha = (Captcha) ServerUtils.getAttributeIncludingInternal(session, SESSION_CAPTCHA_IMAGES+captchaIdReceivedForImage);
                 if (captcha == null) {
-                    final Attack attack = this.attackHandler.handleAttack(request, requestDetails.clientAddress, "No captcha (image) available for ID: "+captchaIdReceivedForImage);
+                    final Attack attack = this.attackHandler.handleAttack(request, requestDetails.clientAddress, "No captcha (image) available for ID: "+captchaIdReceivedForImage.replaceAll("[\n\r\t]", "_"));
                     return new AllowedFlagWithMessage(false, attack);
                 }
                 if (response.isCommitted()) {
@@ -1790,7 +1777,7 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
         // Define request character encoding (usually UTF-8) !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ==> THIS MUST BE THE VERY FIRST THING TO TOUCH THE REQUEST !!!!!
         // =========================================================
         if (this.debug) logLocal("Original request character encoding: "+request.getCharacterEncoding());
-        if (this.requestCharacterEncoding != null && this.requestCharacterEncoding.length() > 0) {
+        if (this.requestCharacterEncoding != null) {
             try {
                 // IMPORTANT: set the encoding here as early as possible BEFORE ANY params are read,
                 // otherwise the request.setCharacterEncoding() won't work when already request parameters have been read !!!
@@ -2274,7 +2261,7 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
                             request.setAttribute(REQUEST_IS_URL_MANIPULATED_FLAG, decryptedRequest.wasManipulated);
                             request.removeAttribute(REQUEST_NESTED_FORWARD_CALL); // = to let the filter work on that forwarded (i.e. nested) call too we simulate that this is not a nested (forwarded) call
                             // set the response character encoding to the same custom request character encoding (when defined) as this is a very special situation here: we're including/forwarding stuff....
-                            if (this.requestCharacterEncoding != null && this.requestCharacterEncoding.length() > 0) {
+                            if (this.requestCharacterEncoding != null) {
                                 if (isOldJavaEE13) response.setContentType("text/html; charset="+this.requestCharacterEncoding); // TODO: was ist hier, wenn die App nun im Servlet des decrypteten Links ein Image streamed oder eine PDF-Datei erzeugt und den Content-Typ erneut setzt ... sollte ebenfalls hiermit gehen, oder?
                                 else response.setCharacterEncoding(this.requestCharacterEncoding);
                             }
@@ -2620,7 +2607,7 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
                 // CHAIN CHAIN CHAIN CHAIN CHAIN CHAIN CHAIN CHAIN CHAIN CHAIN CHAIN CHAIN CHAIN CHAIN CHAIN CHAIN CHAIN CHAIN CHAIN CHAIN CHAIN
             } catch(ServerAttackException e) {
                 attackSoFar = true;
-                Logger.getLogger(WebCastellumFilter.class.getName()).log(Level.SEVERE, "Exception (ServerAttack): {0}", e.getMessage());
+                LOGGER.log(Level.SEVERE, "Exception (ServerAttack): {0}", e.getMessage());
                 
                 wrappedRequest.setTransferProtectiveSessionContentToNewSessionsDefinedByApplication(false); // also clears the eventually used TreadLocal
                 // already handled by attack-handler, but send disallowed response nevertheless without counting it in AttackHandler
@@ -3064,7 +3051,8 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
         
         // Load config: request character encoding - OPTIONAL
         {
-            String value = configManager.getConfigurationValue(PARAM_CHARACTER_ENCODING);
+            //String value = configManager.getConfigurationValue(PARAM_CHARACTER_ENCODING);
+            String value = configManager.getConfigurationValue(PARAM_CHARACTER_ENCODING).trim();
             if (value == null) value = configManager.getConfigurationValue(LEGACY_PARAM_CHARACTER_ENCODING); // only for backwards-compatibility to old param name
             if (value == null) value = DEFAULT_CHARACTER_ENCODING;
             this.requestCharacterEncoding = value.trim();
@@ -3148,8 +3136,9 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
                 final ProductionModeChecker productionModeChecker = (ProductionModeChecker) this.productionModeCheckerClass.newInstance();
                 productionModeChecker.setFilterConfig(filterConfig);
                 this.isProductionMode = productionModeChecker.isProductionMode();
-                System.out.println("WebCastellum is "+(this.isProductionMode?"":"NOT ")+"set into production mode for application "+this.applicationName);
-            } catch (Exception ex) {
+                LOGGER.log(Level.INFO, "WebCastellum mode: {0}", (this.isProductionMode ? "PRODUCTION" : "DEVELOPMENT"));
+                LOGGER.log(Level.INFO, "WebCastellum application name: {0}", this.applicationName);
+            } catch (IllegalAccessException | InstantiationException | FilterConfigurationException | ProductionModeCheckingException ex) {
                 throw new UnavailableException("Unable to check for production mode: "+ex.getMessage());
             }
         }
@@ -4494,7 +4483,7 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
         // Load config: 400or404 attack threshold - OPTIONAL
         {
             // general cluster awareness for this feature
-            String value = configManager.getConfigurationValue(PARAM_400_OR_404_ATTACK_THRESHOLD__CLUSTER_AWARE);
+            String value = configManager.getConfigurationValue(PARAM_400_OR_404_ATTACK_THRESHOLD_CLUSTER_AWARE);
             if (value == null) value = ""+false;
             final boolean clusterAware = (""+true).equals( value.trim().toLowerCase() );
             if (clusterAware) initJMS = true;
@@ -4514,7 +4503,7 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
         // Load config: session creation attack threshold - OPTIONAL
         {
             // general cluster awareness for this feature
-            String value = configManager.getConfigurationValue(PARAM_SESSION_CREATION_ATTACK_THRESHOLD__CLUSTER_AWARE);
+            String value = configManager.getConfigurationValue(PARAM_SESSION_CREATION_ATTACK_THRESHOLD_CLUSTER_AWARE);
             if (value == null) value = ""+false;
             final boolean clusterAware = (""+true).equals( value.trim().toLowerCase() );
             if (clusterAware) initJMS = true;
@@ -4804,7 +4793,7 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
                 record.setSourceMethodName("message");
                 logger.log(record);
                 */
-                System.out.println(msg+": "+e);
+                LOGGER.log(Level.INFO, "{0}: {1}", new Object[]{msg, e});
             }
         } else {
             if (USE_WEB_SERVER_LOG && filterConfig != null && filterConfig.getServletContext() != null) filterConfig.getServletContext().log(msg);
@@ -4815,7 +4804,7 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
                 record.setSourceMethodName("message");
                 logger.log(record);
                 */
-                System.out.println(msg);
+                LOGGER.log(Level.INFO, msg);
             }
         }
     }

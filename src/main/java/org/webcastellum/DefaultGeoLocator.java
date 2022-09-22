@@ -20,6 +20,8 @@ import org.xml.sax.SAXException;
 
 // NOTE: For heavy-traffic systems it makes sense to cache the complete IP database of hostip.info into a local data store (and rsync it async)
 public final class DefaultGeoLocator implements GeoLocator {
+    
+    private static final Logger LOGGER = Logger.getLogger(DefaultGeoLocator.class.getName());
 
     public static final String PARAM_ENABLED = "DefaultGeoLocatorEnabled";
     public static final String PARAM_CACHING_NEGATIVES_ALLOWED = "DefaultGeoLocatorCachingOfNegativeRepliesAllowed";
@@ -117,7 +119,7 @@ public final class DefaultGeoLocator implements GeoLocator {
             final NodeList countryAbbrevs = document.getElementsByTagName(this.xmlElementName);
             if (countryAbbrevs.getLength() == 0) throw new GeoLocatingException("No country containing XML received from geo-locating site");
             final String result = countryAbbrevs.item(0).getTextContent();
-            Logger.getLogger(DefaultGeoLocator.class.getName()).log(Level.FINE, "DefaultGeoLocator: {0}", result);
+            LOGGER.log(Level.FINE, "DefaultGeoLocator: {0}", result);
             if ( "XX".equalsIgnoreCase(result) ) return null;
             return result;
         } catch (MalformedURLException e) {

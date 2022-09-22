@@ -7,6 +7,8 @@ import java.util.logging.Logger;
 
 public final class ClusterSubscribeIncrementingCounterClient implements SnapshotBroadcastListener {
 
+    private static final Logger LOGGER = Logger.getLogger(ClusterSubscribeIncrementingCounterClient.class.getName());
+    
     private final String type;
     private final String systemIdentifier;
     private final Map<String, Counter> map;
@@ -38,9 +40,7 @@ public final class ClusterSubscribeIncrementingCounterClient implements Snapshot
                     final String ip = (String) entry.getKey();
                     final IncrementingCounter foreignCounter = (IncrementingCounter) entry.getValue();
                     final IncrementingCounter localCounter = (IncrementingCounter) this.map.get(ip);
-                    if (JmsUtils.DEBUG) {
-                        Logger.getLogger(ClusterSubscribeIncrementingCounterClient.class.getName()).log(Level.FINE, "foreignCounter: {0}", foreignCounter);
-                    }
+                    LOGGER.log(Level.FINE, "foreignCounter: {0}", foreignCounter);
                     if (localCounter == null) {
                         final IncrementingCounter copy = new IncrementingCounter(foreignCounter); // using copy-constructor
                         copy.resetDelta(); // to avoid ping-pong back upon creation
@@ -59,9 +59,7 @@ public final class ClusterSubscribeIncrementingCounterClient implements Snapshot
                     final IncrementingCounter counter = (IncrementingCounter) this.map.get(ip);
                     if (counter != null) {
                         counter.resetAllOnForeignRemoval(snapshot.getRemovalTimestamp());
-                        if (JmsUtils.DEBUG) {
-                            Logger.getLogger(ClusterPublishIncrementingCounterTask.class.getName()).log(Level.FINE, "foreignRemoval (resetted to 0): {0}", ip);
-                        }
+                        LOGGER.log(Level.FINE, "foreignRemoval (resetted to 0): {0}", ip);
                     }
                 }
             }

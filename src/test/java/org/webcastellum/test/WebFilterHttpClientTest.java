@@ -1,6 +1,5 @@
 package org.webcastellum.test;
 
-import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
 import java.net.HttpURLConnection;
@@ -9,16 +8,6 @@ import java.net.http.HttpResponse.BodyHandlers;
 import java.io.File;
 import java.io.IOException;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
@@ -28,10 +17,7 @@ import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 
 import org.junit.Test;
-import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.runner.RunWith;
-import org.webcastellum.WebCastellumFilter;
 
 import static org.junit.Assert.*;
 
@@ -99,6 +85,22 @@ public class WebFilterHttpClientTest {
     public void testSQLInjectionViaGetParam2(){
 	String requestUri = contextPath.toExternalForm() + "test.jsp?test=1'%20or%20'1'%20=%20'1'))/*&amp;password=foo";
 	assertBlockedWithoutRedirect(requestUri);
+    }
+    
+    @Test
+    public void testDeleteRequest(){
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:8080/test/1"))
+                .DELETE()
+                .build();
+        try {
+            HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
+            //DELETE isn't declared as available method in 01B_Disllowed-Method and must fail
+            assertEquals(418, response.statusCode());
+        } catch (IOException | InterruptedException ex) {
+            fail(ex.getMessage());
+        }
     }
 
     private void assertBlockedWithoutRedirect(String requestUri){

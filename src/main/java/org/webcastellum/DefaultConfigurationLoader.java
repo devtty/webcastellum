@@ -9,14 +9,16 @@ import javax.servlet.FilterConfig;
  */
 public class DefaultConfigurationLoader implements ConfigurationLoader {
 
+    private static final Logger LOGGER = Logger.getLogger(DefaultConfigurationLoader.class.getName());
+    
     private FilterConfig filterConfig;
 
     public DefaultConfigurationLoader() {
-        Logger.getLogger(DefaultConfigurationLoader.class.getName()).log(Level.FINE, "Created new DefaultConfigurationLoader");
+        LOGGER.log(Level.FINE, "Created new DefaultConfigurationLoader");
     }
 
     public void setFilterConfig(final FilterConfig filterConfig) throws FilterConfigurationException {
-        Logger.getLogger(DefaultConfigurationLoader.class.getName()).log(Level.FINE, "Setting filterConfig");
+        LOGGER.log(Level.FINE, "Setting filterConfig");
         this.filterConfig = filterConfig;
     }
 
@@ -24,7 +26,7 @@ public class DefaultConfigurationLoader implements ConfigurationLoader {
         if (this.filterConfig == null) 
             throw new IllegalStateException("filterConfig must be set before fetching configuration values");
         
-        Logger.getLogger(DefaultConfigurationLoader.class.getName()).log(Level.FINE, "Fetching config (via DefaultConfigurationLoader) for: {0}", key);
+        LOGGER.log(Level.FINE, "Fetching config (via DefaultConfigurationLoader) for: {0}", key);
         return this.filterConfig.getInitParameter(key);
     }
 

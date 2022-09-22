@@ -88,7 +88,7 @@ public final class DefaultAttackLogger implements AttackLogger {
                 this.securityLogger.setUseParentHandlers(false);
                 // TODO: hier die rotations, counts, und sizes des hier erzeugten FileHandlers von aussen setzbar machen ?!?
                 FileHandler fileHandlerPointerForSecurityLogging = new FileHandler(directory + "/WebCastellum-Security" + applicationAdjusted + "-%g-%u.log", 1024 * 1024 * 5, 20, false);
-                fileHandlerPointerForSecurityLogging.setEncoding(WebCastellumFilter.DEFAULT_CHARACTER_ENCODING.name());
+                fileHandlerPointerForSecurityLogging.setEncoding(WebCastellumFilter.DEFAULT_CHARACTER_ENCODING);
                 final Formatter formatter = new SimpleFormatter();
                 fileHandlerPointerForSecurityLogging.setFormatter(formatter);
                 if (logVerboseForDevelopmentMode && !isProductionMode) {
@@ -99,7 +99,7 @@ public final class DefaultAttackLogger implements AttackLogger {
                     // filter through memory-handler when defined
                     if (this.prePostCount > 0) {
                         this.memoryHandlerPointerForSecurityLogging = new MemoryHandler(fileHandlerPointerForSecurityLogging, prePostCount + 1, Level.WARNING); // +1 since the attack itself is also counted
-                        this.memoryHandlerPointerForSecurityLogging.setEncoding(WebCastellumFilter.DEFAULT_CHARACTER_ENCODING.name());
+                        this.memoryHandlerPointerForSecurityLogging.setEncoding(WebCastellumFilter.DEFAULT_CHARACTER_ENCODING);
                         this.handlerForSecurityLogging = this.memoryHandlerPointerForSecurityLogging;
                         securityLogger.setLevel(Level.FINE); // to have the FINE logged pre-attack requests being written to the file on an attack
                     } else {

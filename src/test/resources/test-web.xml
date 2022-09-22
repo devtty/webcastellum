@@ -25,15 +25,15 @@
       <param-value>true</param-value>
     </init-param>
     <init-param>
-      <param-name>AttackLogDirectory</param-name>
-      <param-value>logs</param-value>
+      <param-name>CharacterEncoding</param-name>
+      <param-value>UTF-8</param-value>
     </init-param>
     <init-param>
       <param-name>DefaultAttackLoggerDirectory</param-name>
       <param-value>/home/runner/work/webcastellum/webcastellum/apache-tomcat-8.5.78/logs</param-value>
     </init-param>
 
-    
+
     <!-- Basisschutz -->
     <init-param>
       <param-name>BlockInvalidEncodedQueryString</param-name>
