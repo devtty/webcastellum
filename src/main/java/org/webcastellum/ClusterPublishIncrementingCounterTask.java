@@ -58,8 +58,7 @@ public final class ClusterPublishIncrementingCounterTask extends TimerTask {
                 System.err.println("Unable to clone: "+e); // TODO: better logging
             }
         }
-        if (JmsUtils.DEBUG) {
-            LOGGER.log(Level.FINE, "map: {0} payload: {1}", new Object[]{this.map, payload});
+	LOGGER.log(Level.FINE, "map: {0} payload: {1}", new Object[]{this.map, payload});
         }
         final Snapshot snapshot = new Snapshot(this.type, this.systemIdentifier, payload);
         // PUBLISH THE SNAPSHOT USING JMS
