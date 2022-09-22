@@ -61,9 +61,7 @@ public final class ClusterSubscribeIncrementingCounterClient implements Snapshot
                     final IncrementingCounter counter = (IncrementingCounter) this.map.get(ip);
                     if (counter != null) {
                         counter.resetAllOnForeignRemoval(snapshot.getRemovalTimestamp());
-                        if (JmsUtils.DEBUG) {
-                            LOGGER.log(Level.FINE, "foreignRemoval (resetted to 0): {0}", ip);
-                        }
+                        LOGGER.log(Level.FINE, "foreignRemoval (resetted to 0): {0}", ip);
                     }
                 }
             }

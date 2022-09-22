@@ -59,7 +59,7 @@ public final class ClusterPublishIncrementingCounterTask extends TimerTask {
             }
         }
 	LOGGER.log(Level.FINE, "map: {0} payload: {1}", new Object[]{this.map, payload});
-        }
+        
         final Snapshot snapshot = new Snapshot(this.type, this.systemIdentifier, payload);
         // PUBLISH THE SNAPSHOT USING JMS
         JmsUtils.publishSnapshot(snapshot);
