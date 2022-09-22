@@ -15,6 +15,8 @@ import javax.servlet.ServletOutputStream;
 
 public final class ContentInjectionHelper {
     
+    private static final Logger LOGGER = Logger.getLogger(ContentInjectionHelper.class.getName());
+    
     private boolean injectSecretTokenIntoLinks;
     private boolean stripHtmlComments;
     private boolean protectParametersAndForms;
@@ -281,7 +283,7 @@ public final class ContentInjectionHelper {
                     this.extraFullPathRemoval ? this.contentModificationExcludeDefinitions.isMatchingIncomingLinkModificationExclusionEvenWhenFullPathRemovalEnabled(linkTargetUri) : this.contentModificationExcludeDefinitions.isMatchingIncomingLinkModificationExclusion(linkTargetUri)
                 );
         
-        Logger.getLogger(ContentInjectionHelper.class.getName()).log(Level.FINE, "{0}: {1}", new Object[]{linkTargetUri, result});
+        LOGGER.log(Level.FINE, "{0}: {1}", new Object[]{linkTargetUri, result});
         
         return result;
     }
@@ -290,7 +292,7 @@ public final class ContentInjectionHelper {
         // expect servletPath to be empty, when WebLogic for example handles a static file access (like a .css or .js or .gif or .jpeg or .html file, etc.)
         final boolean result = this.contentModificationExcludeDefinitions != null && this.contentModificationExcludeDefinitions.isMatchingOutgoingResponseModificationExclusion(servletPath, requestURI);
         
-        Logger.getLogger(ContentInjectionHelper.class.getName()).log(Level.FINE, "{0}: {1}", new Object[]{requestURI, result});
+        LOGGER.log(Level.FINE, "{0}: {1}", new Object[]{requestURI, result});
         
         return result;
     }

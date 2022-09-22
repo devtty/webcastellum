@@ -21,6 +21,7 @@ import javax.servlet.http.HttpSession;
 
 public final class AttackHandler {
     
+    private static final Logger LOGGER = Logger.getLogger(AttackHandler.class.getName());
     
     private final Map<String,Counter> attackCounter = Collections.synchronizedMap(new HashMap<>());
     private final Map<String,Counter> redirectCounter = Collections.synchronizedMap(new HashMap<>());
@@ -234,7 +235,7 @@ public final class AttackHandler {
         if (this.attackLogger != null) {
             this.attackLogger.log(true, logMessageString);
         } else {
-            Logger.getLogger(AttackHandler.class.getName()).log(Level.INFO, logMessageString);
+            LOGGER.log(Level.INFO, logMessageString);
         }
         return new Attack(logMessageString, logReferenceId);
     }
@@ -333,9 +334,9 @@ public final class AttackHandler {
             final String applicationAdjusted;
             if (application == null || application.trim().length() == 0) {
                 applicationAdjusted = ""; 
-                Logger.getLogger(AttackHandler.class.getName()).log(Level.INFO, "WebCastellum logs learning mode data for this application to: {0}", file.getAbsolutePath());
+                LOGGER.log(Level.INFO, "WebCastellum logs learning mode data for this application to: {0}", file.getAbsolutePath());
             } else {
-                Logger.getLogger(AttackHandler.class.getName()).log(Level.INFO, "WebCastellum logs learning mode data for application: {0} to {1}", new Object[]{application.trim(), file.getAbsolutePath()});
+                LOGGER.log(Level.INFO, "WebCastellum logs learning mode data for application: {0} to {1}", new Object[]{application.trim(), file.getAbsolutePath()});
                 applicationAdjusted = "."+application.trim();
             }
             learningModeAggregationDirectory = getAbsolutePathLoggingSafe(file);

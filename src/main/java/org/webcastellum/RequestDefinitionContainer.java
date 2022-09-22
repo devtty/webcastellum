@@ -21,6 +21,9 @@ import java.util.regex.PatternSyntaxException;
 import javax.servlet.http.HttpServletRequest;
 
 public abstract class RequestDefinitionContainer/*<T extends RequestDefinition>*/ extends AbstractDefinitionContainer {
+    
+    private static final Logger LOGGER = Logger.getLogger(RequestDefinitionContainer.class.getName());
+    
     public static final String FORMAT_TIME = "yyyyMMddHHmmss";
     public static final String FORMAT_TIME_YEAR = "yyyy";
     public static final String FORMAT_TIME_MONTH = "MM";
@@ -847,7 +850,7 @@ public abstract class RequestDefinitionContainer/*<T extends RequestDefinition>*
                 continue; // short-circuit to ignore this disabled rule: continue with next request-definition to check
             }
 
-            Logger.getLogger(RequestDefinitionContainer.class.getName()).log(Level.FINEST, "{0} start of rule '{1}'", new Object[]{System.currentTimeMillis(), requestDefinition.getIdentification()});
+            LOGGER.log(Level.FINEST, "{0} start of rule '{1}'", new Object[]{System.currentTimeMillis(), requestDefinition.getIdentification()});
 
             // now decide if a standard rule file or a custom-request-matcher based rule file should be worked on
             if (requestDefinition.isHavingCustomRequestMatcher()) { //= custom-request-matcher based rule file @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@

@@ -24,6 +24,8 @@ import javax.servlet.http.HttpSession;
 
 public final class ServerUtils {
 
+    private static final Logger LOGGER = Logger.getLogger(ServerUtils.class.getName());
+    
     private static final boolean DEBUG_PRINT_TUNING_TIMINGS = false;
 
     private static final Character[] CACHE = new Character[127 + 1];
@@ -559,7 +561,7 @@ public final class ServerUtils {
         try {
             return URLDecoder.decode(url, WebCastellumFilter.DEFAULT_CHARACTER_ENCODING);
         } catch (UnsupportedEncodingException e) {
-            Logger.getLogger(ServerUtils.class.getName()).log(Level.SEVERE, "Unsupported character encoding configured for WebCastellum: {0}", WebCastellumFilter.DEFAULT_CHARACTER_ENCODING);
+            LOGGER.log(Level.SEVERE, "Unsupported character encoding configured for WebCastellum: {0}", WebCastellumFilter.DEFAULT_CHARACTER_ENCODING);
             return url;
         } catch (IllegalArgumentException e) {
             return url;

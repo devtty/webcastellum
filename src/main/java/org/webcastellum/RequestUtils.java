@@ -31,6 +31,7 @@ public final class RequestUtils {
     private RequestUtils() {}
     
     private static final boolean DEBUG = false;
+    private static final Logger LOGGER = Logger.getLogger(RequestUtils.class.getName());
 //    private static final boolean SHOW_DETAIL_TIMINGS = false;
     
     private static boolean isOldJavaEE13 = false;
@@ -60,9 +61,9 @@ public final class RequestUtils {
                 final String result = clientIpDeterminator.determineClientIp(request);
                 return result != null ? result : request.getRemoteAddr();
             } catch (ClientIpDeterminationException e) {
-                Logger.getLogger(RequestUtils.class.getName()).log(Level.WARNING, "Unable to determine client IP: {0}", e.getMessage());
+                LOGGER.log(Level.WARNING, "Unable to determine client IP: {0}", e.getMessage());
             } catch (RuntimeException e) {
-                Logger.getLogger(RequestUtils.class.getName()).log(Level.WARNING, "Unable to determine client IP (RuntimeException): {0}", e.getMessage());
+                LOGGER.log(Level.WARNING, "Unable to determine client IP (RuntimeException): {0}", e.getMessage());
             }
         }
         return request.getRemoteAddr();
@@ -421,17 +422,17 @@ public final class RequestUtils {
             end++;
             // extract string
             
-            Logger.getLogger(RequestUtils.class.getName()).log(Level.FINE, "=================");
-            Logger.getLogger(RequestUtils.class.getName()).log(Level.FINE, "queryString: {0}", queryString);
-            Logger.getLogger(RequestUtils.class.getName()).log(Level.FINE, "isAmpersandBefore: {0}", isAmpersandBefore);
-            Logger.getLogger(RequestUtils.class.getName()).log(Level.FINE, "isMaskedAmpersandBefore: {0}", isMaskedAmpersandBefore);
-            Logger.getLogger(RequestUtils.class.getName()).log(Level.FINE, "isAmpersandAfter: {0}", isAmpersandAfter);
-            Logger.getLogger(RequestUtils.class.getName()).log(Level.FINE, "isMaskedAmpersandAfter: {0}", isMaskedAmpersandAfter);
-            Logger.getLogger(RequestUtils.class.getName()).log(Level.FINE, "Extracting: {0}", queryString.substring(start,end));
+            LOGGER.log(Level.FINE, "=================");
+            LOGGER.log(Level.FINE, "queryString: {0}", queryString);
+            LOGGER.log(Level.FINE, "isAmpersandBefore: {0}", isAmpersandBefore);
+            LOGGER.log(Level.FINE, "isMaskedAmpersandBefore: {0}", isMaskedAmpersandBefore);
+            LOGGER.log(Level.FINE, "isAmpersandAfter: {0}", isAmpersandAfter);
+            LOGGER.log(Level.FINE, "isMaskedAmpersandAfter: {0}", isMaskedAmpersandAfter);
+            LOGGER.log(Level.FINE, "Extracting: {0}", queryString.substring(start,end));
             
             queryString = queryString.substring(0,start) + queryString.substring(end);
             
-            Logger.getLogger(RequestUtils.class.getName()).log(Level.FINE, "Result: "+queryString);
+            LOGGER.log(Level.FINE, "Result: "+queryString);
             
         }
         return queryString;
@@ -546,7 +547,7 @@ public final class RequestUtils {
                 // decrypt the query-string
                 StringBuilder result = new StringBuilder(servletPathWithQueryStringEncrypted.length());
                 String decryptedQueryString = CryptoUtils.decryptURLSafe(decrypt, key);
-                Logger.getLogger(RequestUtils.class.getName()).log(Level.FINE, "decryptedQueryString: {0}", decryptedQueryString);
+                LOGGER.log(Level.FINE, "decryptedQueryString: {0}", decryptedQueryString);
                 // extract the decrypted payload by removing the resource-to-be-accessed value and the request-type-get/post value (and double-checking it for security reasons)
                 int delimiterPos = decryptedQueryString.lastIndexOf(WebCastellumFilter.INTERNAL_URL_DELIMITER);
                 if (delimiterPos == -1 || delimiterPos == decryptedQueryString.length()-1) throw new ServerAttackException("Decrypted URL contains no matching flags");
@@ -632,8 +633,8 @@ public final class RequestUtils {
                     if (decryptedQuerystring.resourceEndsWithSlash != null && decryptedQuerystring.resourceEndsWithSlash.booleanValue()) {
                         // hier einfach den parent entfernen (die nummer) und am ende ein slash hinter den resource name packen (echo zu echo/)
                         
-                        Logger.getLogger(RequestUtils.class.getName()).log(Level.FINE, "Intermediate result: {0}", result);
-                        Logger.getLogger(RequestUtils.class.getName()).log(Level.FINE, "alreadyUnencryptedPrefixWithParamsRemoved: {0}", alreadyUnencryptedPrefixWithParamsRemoved);
+                        LOGGER.log(Level.FINE, "Intermediate result: {0}", result);
+                        LOGGER.log(Level.FINE, "alreadyUnencryptedPrefixWithParamsRemoved: {0}", alreadyUnencryptedPrefixWithParamsRemoved);
                         
                         if (alreadyUnencryptedPrefixWithParamsRemoved.charAt(alreadyUnencryptedPrefixWithParamsRemoved.length()-1) == '?') {
                             result.append(alreadyUnencryptedPrefixWithParamsRemoved.substring(0,alreadyUnencryptedPrefixWithParamsRemoved.length()-1));
@@ -642,10 +643,10 @@ public final class RequestUtils {
                     result.append("?");
                 } else {
                     result.append(alreadyUnencryptedPrefixWithParamsRemoved);
-                    Logger.getLogger(RequestUtils.class.getName()).log(Level.FINE, "alreadyUnencryptedPrefixWithParamsRemoved: {0}", alreadyUnencryptedPrefixWithParamsRemoved);
+                    LOGGER.log(Level.FINE, "alreadyUnencryptedPrefixWithParamsRemoved: {0}", alreadyUnencryptedPrefixWithParamsRemoved);
                 }
                 //if (result.toString().endsWith("..?")) result.insert(result.length()-1, "/");
-                Logger.getLogger(RequestUtils.class.getName()).log(Level.FINE, "Decrypted yet without querystring: "+result);
+                LOGGER.log(Level.FINE, "Decrypted yet without querystring: "+result);
                 result.append(decryptedQueryString);
                 result.append(alreadyUnencryptedSuffixWithParamsRemoved);
                 if (anchor != null) result.append(anchor);
@@ -658,17 +659,17 @@ public final class RequestUtils {
                     // replace also && by & in result to be more compatible
                     result = new StringBuilder( result.toString().replaceAll("\\&\\&","&") );
                 }
-                Logger.getLogger(RequestUtils.class.getName()).log(Level.FINE, "result={0}", result);
+                LOGGER.log(Level.FINE, "result={0}", result);
                 decryptedQuerystring.decryptedString = result.toString();
                 return decryptedQuerystring;
             } catch (IllegalBlockSizeException | InvalidKeyException | NoSuchAlgorithmException | BadPaddingException |NoSuchPaddingException | UnsupportedEncodingException e) {
-                Logger.getLogger(RequestUtils.class.getName()).log(Level.FINE, "Exception while decrypting the querystring",  e);
+                LOGGER.log(Level.FINE, "Exception while decrypting the querystring",  e);
                 throw new ServerAttackException("Unable to decrypt URL: "+e.getMessage());
             } catch (ServerAttackException e) {
-                Logger.getLogger(RequestUtils.class.getName()).log(Level.FINE, "Exception while decrypting the querystring",  e);
+                LOGGER.log(Level.FINE, "Exception while decrypting the querystring",  e);
                 throw e;
             } catch (RuntimeException e) {
-                Logger.getLogger(RequestUtils.class.getName()).log(Level.FINE, "Exception while decrypting the querystring",  e);
+                LOGGER.log(Level.FINE, "Exception while decrypting the querystring",  e);
                 throw new ServerAttackException("Unable to decrypt URL: "+e.getMessage());
             }
         } else {

@@ -24,6 +24,8 @@ import javax.servlet.ServletResponse;
 
 public final class WebCastellumFilter implements javax.servlet.Filter {
     
+    private static final Logger LOGGER = Logger.getLogger(WebCastellumFilter.class.getName());
+    
     public static final String DEFAULT_CHARACTER_ENCODING = "UTF-8";
     
     private static final String PARAM_DEBUG = "Debug";
@@ -306,7 +308,7 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
     
     
     public WebCastellumFilter() {
-        Logger.getLogger(WebCastellumFilter.class.getName()).log(Level.INFO, "Version: {0}", Version.tagLine());
+        LOGGER.log(Level.INFO, "Version: {0}", Version.tagLine());
     }
 
     
@@ -2605,7 +2607,7 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
                 // CHAIN CHAIN CHAIN CHAIN CHAIN CHAIN CHAIN CHAIN CHAIN CHAIN CHAIN CHAIN CHAIN CHAIN CHAIN CHAIN CHAIN CHAIN CHAIN CHAIN CHAIN
             } catch(ServerAttackException e) {
                 attackSoFar = true;
-                Logger.getLogger(WebCastellumFilter.class.getName()).log(Level.SEVERE, "Exception (ServerAttack): {0}", e.getMessage());
+                LOGGER.log(Level.SEVERE, "Exception (ServerAttack): {0}", e.getMessage());
                 
                 wrappedRequest.setTransferProtectiveSessionContentToNewSessionsDefinedByApplication(false); // also clears the eventually used TreadLocal
                 // already handled by attack-handler, but send disallowed response nevertheless without counting it in AttackHandler
@@ -3134,8 +3136,8 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
                 final ProductionModeChecker productionModeChecker = (ProductionModeChecker) this.productionModeCheckerClass.newInstance();
                 productionModeChecker.setFilterConfig(filterConfig);
                 this.isProductionMode = productionModeChecker.isProductionMode();
-                Logger.getLogger(WebCastellumFilter.class.getName()).log(Level.INFO, "WebCastellum mode: {0}", (this.isProductionMode ? "PRODUCTION" : "DEVELOPMENT"));
-                Logger.getLogger(WebCastellumFilter.class.getName()).log(Level.INFO, "WebCastellum application name: {0}", this.applicationName);
+                LOGGER.log(Level.INFO, "WebCastellum mode: {0}", (this.isProductionMode ? "PRODUCTION" : "DEVELOPMENT"));
+                LOGGER.log(Level.INFO, "WebCastellum application name: {0}", this.applicationName);
             } catch (IllegalAccessException | InstantiationException | FilterConfigurationException | ProductionModeCheckingException ex) {
                 throw new UnavailableException("Unable to check for production mode: "+ex.getMessage());
             }
@@ -4791,7 +4793,7 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
                 record.setSourceMethodName("message");
                 logger.log(record);
                 */
-                Logger.getLogger(WebCastellumFilter.class.getName()).log(Level.INFO, "{0}: {1}", new Object[]{msg, e});
+                LOGGER.log(Level.INFO, "{0}: {1}", new Object[]{msg, e});
             }
         } else {
             if (USE_WEB_SERVER_LOG && filterConfig != null && filterConfig.getServletContext() != null) filterConfig.getServletContext().log(msg);
@@ -4802,7 +4804,7 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
                 record.setSourceMethodName("message");
                 logger.log(record);
                 */
-                Logger.getLogger(WebCastellumFilter.class.getName()).log(Level.INFO, msg);
+                LOGGER.log(Level.INFO, msg);
             }
         }
     }

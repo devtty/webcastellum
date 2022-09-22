@@ -14,6 +14,8 @@ import javax.servlet.http.HttpServletRequest;
 
 
 public final class SessionCreationTracker {
+    
+    private static final Logger LOGGER = Logger.getLogger(SessionCreationTracker.class.getName());
 
     /**
      * Used to identify myself in order to ignore broadcasts sent from me (for the JMS-based clustring support)
@@ -99,7 +101,7 @@ public final class SessionCreationTracker {
     
     
     public void trackSessionCreation(final String ip, final HttpServletRequest request) {
-        Logger.getLogger(SessionCreationTracker.class.getName()).log(Level.FINE, "Session creation: {0}", ip);
+        LOGGER.log(Level.FINE, "Session creation: {0}", ip);
         if (this.sessionCreationAttackThreshold > 0 && this.cleanupTimer != null) {
             boolean broadcastRemoval = false;
             try {
@@ -130,7 +132,7 @@ public final class SessionCreationTracker {
 
     
     public void trackSessionInvalidation(final String ip) {
-        Logger.getLogger(SessionCreationTracker.class.getName()).log(Level.FINE, "Session invalidation: {0}", ip);
+        LOGGER.log(Level.FINE, "Session invalidation: {0}", ip);
         if (this.sessionCreationAttackThreshold > 0 && this.cleanupTimer != null) {
             synchronized (this.sessionCreationCounter) {
                 final IncrementingCounter counter = (IncrementingCounter) this.sessionCreationCounter.get(ip);

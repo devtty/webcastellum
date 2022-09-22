@@ -15,6 +15,8 @@ import javax.servlet.http.HttpServletResponse;
 
 
 public final class HttpStatusCodeTracker {
+    
+    private static final Logger LOGGER = Logger.getLogger(HttpStatusCodeTracker.class.getName());
 
     /**
      * Used to identify myself in order to ignore broadcasts sent from me (for the JMS-based clustring support)
@@ -113,7 +115,7 @@ public final class HttpStatusCodeTracker {
                             counter = new IncrementingCounter(this.resetPeriodMillis);
                             this.httpInvalidRequestOrNotFoundCounter.put(ip, counter);
                         } else counter.increment(); // = overaged will automatically be reset and reused (i.e. starting again at 1)
-                        Logger.getLogger(HttpStatusCodeTracker.class.getName()).log(Level.FINE, "Current HTTP 400/404 status map: {0}", this.httpInvalidRequestOrNotFoundCounter);
+                        LOGGER.log(Level.FINE, "Current HTTP 400/404 status map: {0}", this.httpInvalidRequestOrNotFoundCounter);
                         if (counter.getCounter() > this.httpInvalidRequestOrNotFoundAttackThreshold) {
                             this.httpInvalidRequestOrNotFoundCounter.remove(ip);
                             this.attackHandler.handleAttack(request, ip, "HTTP 400/404 per-client threshold exceeded ("+this.httpInvalidRequestOrNotFoundAttackThreshold+")");

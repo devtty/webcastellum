@@ -18,7 +18,7 @@ import javax.servlet.http.HttpServletRequestWrapper;
 
 public final class MultipartServletRequest extends HttpServletRequestWrapper {
 
-    private static final boolean DEBUG = false;
+    private static final Logger LOGGER = Logger.getLogger(MultipartServletRequest.class.getName());
 
     private boolean hasUrlParamsOnFirstAttempt = false;
 
@@ -55,7 +55,7 @@ public final class MultipartServletRequest extends HttpServletRequestWrapper {
         super(request);
         this.bufferFileUploadsToDisk = bufferFileUploadsToDisk;
         this.multipartSizeLimit = multipartSizeLimit; // may be null
-        Logger.getLogger(MultipartServletRequest.class.getName()).log(Level.FINE, "Calling constructor for a potentially multipart submitted form: {0}", request);
+        LOGGER.log(Level.FINE, "Calling constructor for a potentially multipart submitted form: {0}", request);
         try {
             this.parsedRequest = parser.parse(request, multipartSizeLimit == null ? 0 : multipartSizeLimit.getMaxInputStreamLength(), bufferFileUploadsToDisk);
             extractSubmittedFormValues();
@@ -196,17 +196,17 @@ public final class MultipartServletRequest extends HttpServletRequestWrapper {
             return;
         }
         // NOW THE URL PARAMS ALSO (they can be safely taken from the underlying original request, which holds all URL params BUT NO form params since we're havig a multipart form submit here...)
-        Logger.getLogger(MultipartServletRequest.class.getName()).log(Level.INFO, "==> in delegate: {0}", getRequest().getParameterMap());
+        LOGGER.log(Level.INFO, "==> in delegate: {0}", getRequest().getParameterMap());
         for (final Enumeration urlParamNames = getRequest().getParameterNames(); urlParamNames.hasMoreElements();) {
             final String urlParamName = (String) urlParamNames.nextElement();
-            Logger.getLogger(MultipartServletRequest.class.getName()).log(Level.FINE, "---> URL PARAM IN MULTIPART FORM: {0}", urlParamName);
+            LOGGER.log(Level.FINE, "---> URL PARAM IN MULTIPART FORM: {0}", urlParamName);
             final String[] values = getRequest().getParameterValues(urlParamName);
             if (values != null) {
                 for (String value : values) {
                     addToMapOfCollections(this.urlParametersOfRequest, urlParamName, value);
                     addToMapOfCollections(this.urlAndFormParametersOfRequestMerged, urlParamName, value);
                     hasUrlParamsOnFirstAttempt = true;
-                    Logger.getLogger(MultipartServletRequest.class.getName()).log(Level.INFO, "           ---> with value: {0}", value);
+                    LOGGER.log(Level.INFO, "           ---> with value: {0}", value);
                 }
             }
         }

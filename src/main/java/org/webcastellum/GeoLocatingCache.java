@@ -18,6 +18,8 @@ import java.util.logging.Logger;
  */
 public final class GeoLocatingCache {
 
+    private static final Logger LOGGER = Logger.getLogger(GeoLocatingCache.class.getName());
+    
     private static final boolean DEBUG = false;
     private static final boolean PRINT_COUNTRY = false;
 
@@ -82,13 +84,13 @@ public final class GeoLocatingCache {
             try {
                 final String country = this.locator.getCountryCode(ip);
                 if (PRINT_COUNTRY) {
-                    Logger.getLogger(GeoLocatingCache.class.getName()).log(Level.INFO, "Looked up country: {0}", country);
+                    LOGGER.log(Level.INFO, "Looked up country: {0}", country);
                 }
                 if (country != null || this.locator.isCachingOfNegativeRepliesAllowed()) {
                     location = new GeoLocation(subnet, country);
                 }
             } catch (GeoLocatingException | RuntimeException e) {
-                Logger.getLogger(GeoLocatingCache.class.getName()).log(Level.WARNING, e.getMessage());
+                LOGGER.log(Level.WARNING, e.getMessage());
                 if (this.locator.isCachingOfNegativeRepliesAllowed()) {
                     location = new GeoLocation(subnet, null);
                 }
@@ -125,7 +127,7 @@ public final class GeoLocatingCache {
                     break;
                 }
             }
-            Logger.getLogger(GeoLocatingCache.class.getName()).log(Level.FINE, "*** CLEANUP: Geo-Location cache reduced to {0} (cache limit reached, removed {1} loosers) ***", new Object[]{this.geoLocations.size(), i});
+            LOGGER.log(Level.FINE, "*** CLEANUP: Geo-Location cache reduced to {0} (cache limit reached, removed {1} loosers) ***", new Object[]{this.geoLocations.size(), i});
         }
     }
 
@@ -198,7 +200,7 @@ public final class GeoLocatingCache {
         private final Map<String,GeoLocation> map;
 
         public CleanupGeoLocatingCacheTask(final String name, final Map<String,GeoLocation> map) {
-            Logger.getLogger(GeoLocatingCache.class.getName()).log(Level.FINE, "Created cleanup timer");
+            LOGGER.log(Level.FINE, "Created cleanup timer");
             if (name == null) {
                 throw new NullPointerException("name must not be null");
             }
@@ -211,7 +213,7 @@ public final class GeoLocatingCache {
 
         public void run() {
             int loosers = 0;
-            Logger.getLogger(GeoLocatingCache.class.getName()).log(Level.FINE, "*** CLEANUP: waiting to get monitor ***");
+            LOGGER.log(Level.FINE, "*** CLEANUP: waiting to get monitor ***");
             synchronized (this.map) {
                 // here we remove all outdated cache entries
                 final long cutoff = System.currentTimeMillis() - (DEBUG ? 100 : MAXIMUM_CACHE_TTL_MILLIS);
@@ -224,7 +226,7 @@ public final class GeoLocatingCache {
                     }
                 }
             }
-            Logger.getLogger(GeoLocatingCache.class.getName()).log(Level.FINE, "*** CLEANUP: {0} old geo-locations removed (from {1}) ***", new Object[]{loosers, this.name});
+            LOGGER.log(Level.FINE, "*** CLEANUP: {0} old geo-locations removed (from {1}) ***", new Object[]{loosers, this.name});
         }
 
     }

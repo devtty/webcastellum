@@ -29,7 +29,7 @@ public final class JmsUtils {
     private JmsUtils() {
     }
 
-    static final boolean DEBUG = false;
+    private static final Logger LOGGER = Logger.getLogger(JmsUtils.class.getName());
 
     private static final int STANDARD_PRIORITY = Message.DEFAULT_PRIORITY;
     private static final int HIGHER_PRIORITY = STANDARD_PRIORITY + 3;
@@ -53,7 +53,7 @@ public final class JmsUtils {
 
     public static synchronized void init(final String clusterInitialContextFactory, final String clusterJmsProviderUrl, final String clusterJmsConnectionFactory, final String clusterJmsTopic) throws NamingException, JMSException {
         if (!initialized) {
-            Logger.getLogger(JmsUtils.class.getName()).log(Level.FINE, "JMS init");
+            LOGGER.log(Level.FINE, "JMS init");
         }
 
         if (context == null) {
@@ -91,11 +91,11 @@ public final class JmsUtils {
             connection.start();
         }
         initialized = true;
-        Logger.getLogger(JmsUtils.class.getName()).log(Level.FINE, "topic: {0}", topic);
+        LOGGER.log(Level.FINE, "topic: {0}", topic);
     }
 
     public static void closeQuietly(final boolean destroy) {
-        Logger.getLogger(JmsUtils.class.getName()).log(Level.FINE, "JMS closeQuietly");
+        LOGGER.log(Level.FINE, "JMS closeQuietly");
         if (publisher != null) {
             try {
                 publisher.close();
@@ -147,23 +147,23 @@ public final class JmsUtils {
     }
 
     public static synchronized void publishSnapshot(final Snapshot snapshot) {
-        Logger.getLogger(JmsUtils.class.getName()).log(Level.FINE, "JMS publishSnapshot");
+        LOGGER.log(Level.FINE, "JMS publishSnapshot");
         if (snapshot == null || snapshot.isEmpty()) {
             return;
         }
         try {
             final ObjectMessage message = session.createObjectMessage(snapshot);
-            Logger.getLogger(JmsUtils.class.getName()).log(Level.FINE, "JMS publishMessage: {0}", message);
+            LOGGER.log(Level.FINE, "JMS publishMessage: {0}", message);
             final int priority = snapshot.hasRemovals() ? HIGHER_PRIORITY : STANDARD_PRIORITY;
             publisher.publish(message, DeliveryMode.NON_PERSISTENT, priority, TIME_TO_LIVE);
         } catch (JMSException | RuntimeException e) {
             closeQuietly(false); // to be re-initialized on the next call
-            Logger.getLogger(JmsUtils.class.getName()).log(Level.SEVERE, "Unable to publish message: {0}", e); // TODO: add better logging (using AttackHandler to log into the rotated file)
+            LOGGER.log(Level.SEVERE, "Unable to publish message: {0}", e); // TODO: add better logging (using AttackHandler to log into the rotated file)
         }
     }
 
     public static synchronized void addSnapshotBroadcastListener(final String type, final SnapshotBroadcastListener listener) {
-        Logger.getLogger(JmsUtils.class.getName()).log(Level.FINE, "JMS addSnapshotBroadcastListener");
+        LOGGER.log(Level.FINE, "JMS addSnapshotBroadcastListener");
         if (type == null) {
             throw new NullPointerException("type must not be null");
         }
@@ -185,10 +185,10 @@ public final class JmsUtils {
 
         public void onMessage(final Message message) {
             try {
-                Logger.getLogger(JmsUtils.class.getName()).log(Level.FINE, "JMS RECEIVED: {0}", message);
+                LOGGER.log(Level.FINE, "JMS RECEIVED: {0}", message);
                 final Snapshot snapshot = (Snapshot) ((ObjectMessage) message).getObject();
                 final List<SnapshotBroadcastListener> listeners = (List) type2listeners.get(snapshot.getType());
-                Logger.getLogger(JmsUtils.class.getName()).log(Level.FINE, "listeners ({0}): {1}", new Object[]{snapshot.getType(), listeners});
+                LOGGER.log(Level.FINE, "listeners ({0}): {1}", new Object[]{snapshot.getType(), listeners});
                 if (listeners != null && !listeners.isEmpty()) {
                     for (final Iterator iter = listeners.iterator(); iter.hasNext();) {
                         final SnapshotBroadcastListener listener = (SnapshotBroadcastListener) iter.next();
@@ -196,7 +196,7 @@ public final class JmsUtils {
                     }
                 }
             } catch (JMSException | RuntimeException e) {
-                Logger.getLogger(JmsUtils.class.getName()).log(Level.SEVERE, "Unable to handle incoming message: {0}", e); // TODO: add better logging (using AttackHandler to log into the rotated file)
+                LOGGER.log(Level.SEVERE, "Unable to handle incoming message: {0}", e); // TODO: add better logging (using AttackHandler to log into the rotated file)
             }
         }
     }

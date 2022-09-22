@@ -17,7 +17,7 @@ public class PropertiesFileConfigurationLoader implements ConfigurationLoader {
     private static final String PARAM_PROPERTIES_FILE = "PropertiesFileConfigurationLoader_File";
     private static final String PARAM_PROPERTIES_FALLBACK = "PropertiesFileConfigurationLoader_FallbackToWebXml";
 
-    private static final boolean DEBUG = false;
+    private static final Logger LOGGER = Logger.getLogger(PropertiesFileConfigurationLoader.class.getName());
 
     private Properties properties;
     private String filename;
@@ -25,11 +25,11 @@ public class PropertiesFileConfigurationLoader implements ConfigurationLoader {
 
 
     public PropertiesFileConfigurationLoader() {
-        Logger.getLogger(PropertiesFileConfigurationLoader.class.getName()).log(Level.FINE, "Created new PropertiesFileConfigurationLoader");
+        LOGGER.log(Level.FINE, "Created new PropertiesFileConfigurationLoader");
     }
 
     public void setFilterConfig(final FilterConfig filterConfig) throws FilterConfigurationException {
-        Logger.getLogger(PropertiesFileConfigurationLoader.class.getName()).log(Level.FINE,"Setting filterConfig");
+        LOGGER.log(Level.FINE,"Setting filterConfig");
         // Not using ConfigurationManager here since this class here is itself a configuration loader !
         { // read file pointer
             this.filename = ConfigurationUtils.extractMandatoryConfigValue(filterConfig, PARAM_PROPERTIES_FILE); // yes, read directly hard via filterConfig since we're inside a configuration loader
@@ -51,7 +51,7 @@ public class PropertiesFileConfigurationLoader implements ConfigurationLoader {
     }
 
     public String getConfigurationValue(final String key) {
-        Logger.getLogger(PropertiesFileConfigurationLoader.class.getName()).log(Level.FINE, "Fetching config (via PropertiesFileConfigurationLoader) for: {0}", key);
+        LOGGER.log(Level.FINE, "Fetching config (via PropertiesFileConfigurationLoader) for: {0}", key);
         String result = this.properties.getProperty(key);
         if (this.filterConfig != null && result == null) { // use web.xml fallback
             result = this.filterConfig.getInitParameter(key);

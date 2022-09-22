@@ -18,7 +18,7 @@ public final class ResponseUtils {
     
     private ResponseUtils() {}
     
-    
+    private static final Logger LOGGER = Logger.getLogger(ResponseUtils.class.getName());
 
     // TODO: konfigurierbar machen (aber immer capturing group 1 oder diese auch konfigurierbar machen)
     private static final Pattern PATTERN_FORM_ACTION = Pattern.compile("(?i)(?s)action\\s*=\\s*[\"']?([^\"'\\s>]*)[\"']?");
@@ -263,7 +263,7 @@ public final class ResponseUtils {
     
     public static final boolean isAlreadyEncrypted(final String cryptoDetectionString, final String url) {
         
-        Logger.getLogger(ResponseUtils.class.getName()).log(Level.FINE, "cryptoDetectionString={0} and url={1}", new Object[]{cryptoDetectionString, url});
+        LOGGER.log(Level.FINE, "cryptoDetectionString={0} and url={1}", new Object[]{cryptoDetectionString, url});
         
         if (cryptoDetectionString == null) return false;
         if (!ALWAYS_INSERT_CRYPTO_DETECTION_STRING_AFTER_FIRST_QUESTIONMARK) {
@@ -282,7 +282,7 @@ public final class ResponseUtils {
             }
         }
     
-        Logger.getLogger(ResponseUtils.class.getName()).log(Level.FINE, "zeigerDetection={0} cryptoDetectionString.length()={1}", new Object[]{zeigerDetection, cryptoDetectionString.length()});
+        LOGGER.log(Level.FINE, "zeigerDetection={0} cryptoDetectionString.length()={1}", new Object[]{zeigerDetection, cryptoDetectionString.length()});
     
         return zeigerDetection >= cryptoDetectionString.length(); // weil wenn url zu kurz, dann nada...
         
@@ -320,7 +320,7 @@ public final class ResponseUtils {
                 boolean resourceEndsWithSlash = false;
                 // determine the resource that is to be accessed
 
-                Logger.getLogger(ResponseUtils.class.getName()).log(Level.FINE, "url={0}", url);
+                LOGGER.log(Level.FINE, "url={0}", url);
                 
                 final String leaveUnencrypted = url.substring(0,firstQuestionMark+1);
                 final int lastCharIndex = leaveUnencrypted.length()-1;
@@ -331,7 +331,7 @@ public final class ResponseUtils {
                     resourceEndsWithSlash = true; // it is a directory so in can be safely left unencrypted
 //                    leaveUnencrypted = leaveUnencrypted.substring(0, leaveUnencrypted.length()-2) + "?";
                 }
-                Logger.getLogger(ResponseUtils.class.getName()).log(Level.FINE, "leaveUnencrypted: {0}", leaveUnencrypted);
+                LOGGER.log(Level.FINE, "leaveUnencrypted: {0}", leaveUnencrypted);
                 
                 String resourceToBeAccessed = ServerUtils.extractResourceToBeAccessed(leaveUnencrypted, currentContextPathAccessed, currentServletPathAccessed, useFullPathForResourceToBeAccessedProtection);
                 if (resourceToBeAccessed == null || resourceToBeAccessed.trim().length() == 0) {
@@ -346,7 +346,7 @@ public final class ResponseUtils {
 //                    resourceToBeAccessed += "/..";
                 }
                 
-                Logger.getLogger(ResponseUtils.class.getName()).log(Level.FINE, "resourceToBeAccessed={0}", resourceToBeAccessed);
+                LOGGER.log(Level.FINE, "resourceToBeAccessed={0}", resourceToBeAccessed);
                 // temporarily remove any anchor
                 String anchor = null; final int anchorPos = determineAnchorPos(url,true);
                 StringBuilder encrypt = null;
@@ -361,7 +361,7 @@ public final class ResponseUtils {
                 if (isRequestMethodPOST == null) requestMethodGetOrPostFlag = WebCastellumFilter.INTERNAL_METHOD_TYPE_UNDEFINED; // = unknown at HTML parsing time since it might be dynamic JavaScript for example
                 else requestMethodGetOrPostFlag = isRequestMethodPOST.booleanValue() ? WebCastellumFilter.INTERNAL_METHOD_TYPE_POST: WebCastellumFilter.INTERNAL_METHOD_TYPE_GET;
                 
-                Logger.getLogger(ResponseUtils.class.getName()).log(Level.FINE, "Using GET/POST flag: "+requestMethodGetOrPostFlag);
+                LOGGER.log(Level.FINE, "Using GET/POST flag: "+requestMethodGetOrPostFlag);
                 // BUILD ENCRYPTED STRING
                 encrypt.append(WebCastellumFilter.INTERNAL_URL_DELIMITER).append(resourceToBeAccessed).append(WebCastellumFilter.INTERNAL_URL_DELIMITER).append(requestMethodGetOrPostFlag);
                 encrypt.append(WebCastellumFilter.INTERNAL_URL_DELIMITER).append((isFormAction?WebCastellumFilter.INTERNAL_TYPE_FORM_FLAG:WebCastellumFilter.INTERNAL_TYPE_LINK_FLAG));
@@ -402,13 +402,13 @@ public final class ResponseUtils {
                     if (!resourceEndsWithSlash && ( fileToBeAccessed == null || fileToBeAccessed.trim().length() == 0 ) ) {
                         // it seems to be a form with a self-submit (i.e. an empty action)...
                         // so on an self-submit we are safe to take the current page (current resource) as resourceToBeAccessed
-                        Logger.getLogger(ResponseUtils.class.getName()).log(Level.FINE, "currentRequestUrlToCompareWith: {0}", currentRequestUrlToCompareWith);
+                        LOGGER.log(Level.FINE, "currentRequestUrlToCompareWith: {0}", currentRequestUrlToCompareWith);
                         fileToBeAccessed = ServerUtils.extractFileFromURL(currentRequestUrlToCompareWith);
                     }
                     if (fileToBeAccessed == null || fileToBeAccessed.trim().length() == 0) result.append(leaveUnencrypted);
                     else {
                         // replace file within URL with a random string
-                        Logger.getLogger(ResponseUtils.class.getName()).log(Level.FINE, "fileToBeAccessed: {0}", fileToBeAccessed);
+                        LOGGER.log(Level.FINE, "fileToBeAccessed: {0}", fileToBeAccessed);
                         final int pos = leaveUnencrypted.indexOf(fileToBeAccessed);
                         if (pos == -1) 
                             result.append(leaveUnencrypted);
@@ -425,7 +425,7 @@ public final class ResponseUtils {
                 if (WebCastellumFilter.APPEND_EQUALS_SIGN_TO_VALUELESS_URL_PARAM_NAMES) result.append("=").append(WebCastellumFilter.INTERNAL_TYPE_URL);
                 if (appendQuestionmarkOrAmpersandToLinks) result.append('&'); // TODO: klappt das denn auch mit Ankern #123 noch sauber ? 
                 if (anchor != null) result.append(anchor);
-                Logger.getLogger(ResponseUtils.class.getName()).log(Level.FINE, "encrypted: {0}", result);
+                LOGGER.log(Level.FINE, "encrypted: {0}", result);
                 return useResponseEncodeURL ? response.encodeURL(result.toString()) : result.toString(); // encrypted URLs don't have any & in the query string since they only have 1 param
             } catch (InvalidKeyException | IllegalBlockSizeException | NoSuchAlgorithmException |BadPaddingException | NoSuchPaddingException | UnsupportedEncodingException | RuntimeException e) {
                 Logger.getLogger(ResponseUtils.class.getCanonicalName()).log(Level.FINE, "Exception while encrypting the querystring" , e);
@@ -472,7 +472,7 @@ public final class ResponseUtils {
             return ServerUtils.findReusableSessionContentKeyOrCreateNewOne(session, parameterAndFormProtection, reuseSessionContent, applySetAfterWrite);
         } catch (IllegalStateException e) {
             // TODO: better exception handling
-            Logger.getLogger(ResponseUtils.class.getName()).log(Level.WARNING, "Strange situation: session exists but is invalidated where it should be valid: {0}", link);
+            LOGGER.log(Level.WARNING, "Strange situation: session exists but is invalidated where it should be valid: {0}", link);
         }
         return null;
     }
