@@ -4791,7 +4791,7 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
                 record.setSourceMethodName("message");
                 logger.log(record);
                 */
-                Logger.getLogger(WebCastellumFilter.class.getName()).log(Level.INFO, msg+": "+e);
+                Logger.getLogger(WebCastellumFilter.class.getName()).log(Level.INFO, "{0}: {1}", new Object[]{msg, e});
             }
         } else {
             if (USE_WEB_SERVER_LOG && filterConfig != null && filterConfig.getServletContext() != null) filterConfig.getServletContext().log(msg);

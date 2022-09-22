@@ -16,9 +16,6 @@ import javax.servlet.http.HttpServletResponse;
 
 public final class HttpStatusCodeTracker {
 
-    private static final boolean DEBUG = false;
-
-    
     /**
      * Used to identify myself in order to ignore broadcasts sent from me (for the JMS-based clustring support)
      */
