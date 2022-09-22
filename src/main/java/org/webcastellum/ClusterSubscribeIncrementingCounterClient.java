@@ -40,9 +40,7 @@ public final class ClusterSubscribeIncrementingCounterClient implements Snapshot
                     final String ip = (String) entry.getKey();
                     final IncrementingCounter foreignCounter = (IncrementingCounter) entry.getValue();
                     final IncrementingCounter localCounter = (IncrementingCounter) this.map.get(ip);
-                    if (JmsUtils.DEBUG) {
-                        LOGGER.log(Level.FINE, "foreignCounter: {0}", foreignCounter);
-                    }
+                    LOGGER.log(Level.FINE, "foreignCounter: {0}", foreignCounter);
                     if (localCounter == null) {
                         final IncrementingCounter copy = new IncrementingCounter(foreignCounter); // using copy-constructor
                         copy.resetDelta(); // to avoid ping-pong back upon creation
