@@ -624,7 +624,7 @@ public final class ResponseUtils {
         return isFormFieldHavingAttribute(tag, MULTIPLE_LOWERCASED);
     }
     public static boolean isFormFieldHavingAttribute(final String tag, final String attribute) {
-        if (tag == null) return true;
+        if (tag == null) return false;
         final String withoutValuesLowerCased = removeAttributeValues(tag).toLowerCase();
         final int pos = withoutValuesLowerCased.indexOf(attribute);
         if (pos == -1 || pos == 0 || pos == withoutValuesLowerCased.length()-attribute.length()) return false; // attribute must be there AND within the tag so at least a < or > should be around

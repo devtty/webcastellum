@@ -30,13 +30,17 @@ public final class ServerUtils {
 
     private static final Character[] CACHE = new Character[127 + 1];
     
+    private static final String AMP = "&amp;";            
+            
     static {
-        for(int i = 0; i < CACHE.length; i++) CACHE[i] = new Character((char)i);
+        for(int i = 0; i < CACHE.length; i++) 
+            CACHE[i] = (char)i;
     }
     
     private static Character makeCharacter(final char c) {
-        if(c < CACHE.length) return CACHE[(int)c];
-        return new Character(c);
+        if(c < CACHE.length) 
+            return CACHE[(int)c];
+        return c;
     }
 
     
@@ -44,7 +48,7 @@ public final class ServerUtils {
 
     // TODO: diese regexps patterns hier durch einfachere zeichenwese operationen ersetzen bzw. aho corasick davor (prefilter) bzw. matcher reusen
     
-    private static final Pattern PATTERN_LINK_AMPERSAND_MASKED = Pattern.compile("&amp;");
+    private static final Pattern PATTERN_LINK_AMPERSAND_MASKED = Pattern.compile(AMP);
     //OLD private static final Pattern PATTERN_LINK_AMPERSAND_UNMASKED = Pattern.compile("&");
     //OLD private static final String LINK_AMPERSAND_MASKED = "&amp;";
     private static final String LINK_AMPERSAND_UNMASKED = "&";
@@ -68,13 +72,11 @@ public final class ServerUtils {
     private static final Pattern PATTERN_XML_CDATA_CLOSING = Pattern.compile("\\]\\]>");
     private static final String XML_CDATA_CLOSING_REPLACEMENT = "";
     
-    
-    
     private static final Pattern PATTERN_SPECIAL_CHAR = Pattern.compile("&[a-zA-Z0-9]{2,8};|\\\\[tnrbf\\\\'\"]");
     private static final Pattern PATTERN_SPECIAL_CHAR_HTML_ONLY = Pattern.compile("&[a-zA-Z0-9]{2,8};");
-    private static final Map/*<String,String>*/ SPECIAL_CHAR_MAPPINGS = new HashMap();
-    private static final Map/*<String,String>*/ SPECIAL_CHAR_HTML_ONLY_MAPPINGS = new HashMap();
-    private static final Map/*<Character,String>*/ HTML_ENCODING_MAPPING = new HashMap();
+    private static final Map<String,String> SPECIAL_CHAR_MAPPINGS = new HashMap<>();
+    private static final Map<String,String> SPECIAL_CHAR_HTML_ONLY_MAPPINGS = new HashMap<>();
+    private static final Map<Character,String> HTML_ENCODING_MAPPING = new HashMap<>();
     static {
         // See also:  http://de.wikipedia.org/wiki/Hilfe:Sonderzeichenreferenz
         SPECIAL_CHAR_HTML_ONLY_MAPPINGS.put("&quot;",""+(char)34);
@@ -337,7 +339,7 @@ public final class ServerUtils {
         for (final Iterator entries = SPECIAL_CHAR_MAPPINGS.entrySet().iterator(); entries.hasNext();) {
             final Map.Entry entry = (Map.Entry) entries.next();
             final String key = (String) entry.getKey();
-            if (key.charAt(0) == '&' && !"&amp;".equals(key)) { // = it is an HTML entity mapping, so use it in the reverse mapping... don't encode the ampersand (poor man's workaround for avoiding to encode even the URL param delimiter & signs into &amp; literals)
+            if (key.charAt(0) == '&' && !AMP.equals(key)) { // = it is an HTML entity mapping, so use it in the reverse mapping... don't encode the ampersand (poor man's workaround for avoiding to encode even the URL param delimiter & signs into &amp; literals)
                 final String value = (String) entry.getValue();
                 final Character character = makeCharacter( value.charAt(0) ); //1.5 better use auto-boxing
                 HTML_ENCODING_MAPPING.put(character, key);
@@ -346,22 +348,13 @@ public final class ServerUtils {
     };
     
     
-    
-
-    
-    
     private static final Pattern PATTERN_ENCODED_CHAR_EXCEPT_URL_ENCODING = Pattern.compile("(?:\\\\[xX]|\\\\[uU]00)[a-fA-F0-9]{2}|&#[0-9]{0,5}[0-9]{2};?|&#[xX][0-9]{0,5}[a-fA-F0-9]{2};?");
     private static final Pattern PATTERN_ENCODED_CHAR = Pattern.compile("\\+|(?:%|\\\\[xX]|\\\\[uU]00)[a-fA-F0-9]{2}|&#[0-9]{0,5}[0-9]{2};?|&#[xX][0-9]{0,5}[a-fA-F0-9]{2};?");
     private static final Pattern PATTERN_ENCODED_CHAR_URL_ENCODING_ONLY = Pattern.compile("\\+|%[a-fA-F0-9]{2}");
 
     
-    
-    
-    
     private ServerUtils() {}
     
-    
-
     public static String unmaskAmpersandsInLink(final String link) {
         if (link == null) {
             return null;
@@ -625,7 +618,7 @@ public final class ServerUtils {
             result.append( value.substring(pos,matcher.start()) );
             pos = matcher.end();
             mapping = matcher.group();
-            if (!alsoDecodeAmpersand && "&amp;".equals(mapping)) specialCharacter = "&amp;"; // = decode &amp; simply to &amp; (= effectively ignoring it) when alsoDecodeAmpersand is false
+            if (!alsoDecodeAmpersand && AMP.equals(mapping)) specialCharacter = AMP; // = decode &amp; simply to &amp; (= effectively ignoring it) when alsoDecodeAmpersand is false
             else specialCharacter = (String) SPECIAL_CHAR_HTML_ONLY_MAPPINGS.get(mapping);
             if (specialCharacter != null) result.append(specialCharacter);
             else result.append(mapping);
@@ -1038,7 +1031,7 @@ public final class ServerUtils {
             } else if (character == '\\') {
                 result.append("&#092;");
             } else if (character == '&') {
-                result.append("&amp;");
+                result.append(AMP);
             } else {
                 //the char is not a special one
                 //add it to the result as is
