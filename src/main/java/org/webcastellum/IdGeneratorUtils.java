@@ -10,7 +10,6 @@ public final class IdGeneratorUtils {
     
     private static boolean useJava5 = true;
     
-    
     /**
      * Secure random to provide nonrepeating seed
      */
@@ -21,17 +20,7 @@ public final class IdGeneratorUtils {
      */
     private static String midValue;
     
-    
-    
-
-    
-    
     private IdGeneratorUtils() {}
-    
-    
-    
-    
-    
     
     public static synchronized String createId() { // TODO: muss das hier synchronzed sein ?
         if (!IdGeneratorUtils.useJava5) return createIdJavaOld();
@@ -43,12 +32,9 @@ public final class IdGeneratorUtils {
         }
     }
     
-    
-    
     private static String createIdJavaNew() {
         UUID uuid = UUID.randomUUID();
-        return uuid.toString().replaceAll("-", "").toUpperCase();
-//  OLD        throw new NoClassDefFoundError("Compiled under Java SE 1.4");
+        return uuid.toString().replace("-", "").toUpperCase();
     }
     
     private static String createIdJavaOld() {
@@ -67,8 +53,7 @@ public final class IdGeneratorUtils {
         int iTimeLow = (int) lTimeNow & 0xFFFFFFFF;
         // get next random value
         int iNode = IdGeneratorUtils.seeder.nextInt();
-        String sUUID = (hexFormat(iTimeLow, 8) + IdGeneratorUtils.midValue + hexFormat(iNode, 8)).toUpperCase();
-        return sUUID;
+        return (hexFormat(iTimeLow, 8) + IdGeneratorUtils.midValue + hexFormat(iNode, 8)).toUpperCase();
     }
     
     
@@ -97,7 +82,11 @@ public final class IdGeneratorUtils {
      */
     private static String hexFormat(int iValue, int iPadding) {
         String sHex = Integer.toHexString(iValue);
-        while (sHex.length() < iPadding) sHex = "0" + sHex;
+        StringBuilder sHexb = new StringBuilder();
+        sHexb.append(Integer.toHexString(iValue));
+        while (sHex.length() < iPadding){
+            sHex = "0" + sHex;
+        }
         return sHex;
     }
     
