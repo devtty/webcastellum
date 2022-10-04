@@ -18,12 +18,12 @@ public class IdGeneratorUtilsTest {
         
         for(int i = 0; i<100; i++){
             uuid = IdGeneratorUtils.createId();
-            assertTrue(uuid.length() == 32);
+            assertEquals(32 ,uuid.length());
             assertTrue(uuid.matches("^[0-9A-F]{8}[0-9A-F]{4}[0-9A-F]{4}[0-9A-F]{4}[0-9A-F]{12}$"));
             s.add(uuid);
         }
         
-        assertTrue(s.size() == 100);
+        assertEquals(100, s.size());
     }
         
     

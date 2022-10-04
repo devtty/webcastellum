@@ -130,8 +130,8 @@ public class RequestUtilsTest {
         String[] leftPart = new String[]{"a", "b"};
         String[] rightPart = new String[]{"c", "d"};
         String[] combined = RequestUtils.combineArrays(leftPart, rightPart);
-        assertTrue(combined.length == 4);
-        assertTrue(combined[3].equals("d"));
+        assertEquals(4, combined.length);
+        assertEquals("d", combined[3]);
     }
 
     @Test
@@ -174,17 +174,17 @@ public class RequestUtilsTest {
     @Test
     public void testCreateOrRetrieveRandomTokenFromSession_HttpSession_String() {
         String token = RequestUtils.createOrRetrieveRandomTokenFromSession(session, "sessionKey");
-        assertTrue(token!=null);
-        assertFalse(token.equals(RequestUtils.createOrRetrieveRandomTokenFromSession(session, "sessionKey")));
+        assertNotNull(token);
+        assertNotEquals(RequestUtils.createOrRetrieveRandomTokenFromSession(session, "sessionKey"), token);
     }
 
     @Test
     public void testCreateOrRetrieveRandomTokenFromSession_4args() {
         String token = RequestUtils.createOrRetrieveRandomTokenFromSession(session, "sessionKey", 4, 5);
-        assertTrue(token!=null);
+        assertNotNull(token);
         assertTrue(token.length()>=4);
         assertTrue(token.length()<=5);
-        assertFalse(token.equals(RequestUtils.createOrRetrieveRandomTokenFromSession(session, "sessionKey")));
+        assertNotEquals(RequestUtils.createOrRetrieveRandomTokenFromSession(session, "sessionKey"), token);
     }
 
     @Test
@@ -285,7 +285,7 @@ public class RequestUtilsTest {
         
         //TODO filter removes 'gx' --> dont know how it helps to for imageMapParameterExclude here, seems wrong
         assertFalse(filterRequestParameterMap.contains("_]ygx"));
-        assertTrue(filterRequestParameterMap.size()==3);
+        assertEquals(3, filterRequestParameterMap.size());
         assertTrue(filterRequestParameterMap.contains("_]y"));
     }
 
