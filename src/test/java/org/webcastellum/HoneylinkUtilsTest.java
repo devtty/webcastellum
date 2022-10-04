@@ -23,7 +23,7 @@ public class HoneylinkUtilsTest {
             System.out.println(honeyLink);
         }
         
-        assertTrue(links.size()==10);
+        assertEquals(10, links.size());
     }
 
     @Test

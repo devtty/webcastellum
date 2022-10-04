@@ -39,7 +39,7 @@ public final class ServerUtils {
     
     private static Character makeCharacter(final char c) {
         if(c < CACHE.length) 
-            return CACHE[(int)c];
+            return CACHE[c];
         return c;
     }
 
@@ -80,7 +80,7 @@ public final class ServerUtils {
     static {
         // See also:  http://de.wikipedia.org/wiki/Hilfe:Sonderzeichenreferenz
         SPECIAL_CHAR_HTML_ONLY_MAPPINGS.put("&quot;",""+(char)34);
-        SPECIAL_CHAR_HTML_ONLY_MAPPINGS.put("&amp;",""+(char)38);
+        SPECIAL_CHAR_HTML_ONLY_MAPPINGS.put(AMP,""+(char)38);
         SPECIAL_CHAR_HTML_ONLY_MAPPINGS.put("&lt;",""+(char)60);
         SPECIAL_CHAR_HTML_ONLY_MAPPINGS.put("&gt;",""+(char)62);
         SPECIAL_CHAR_HTML_ONLY_MAPPINGS.put("&lsqb;",""+(char)91);
@@ -570,7 +570,7 @@ public final class ServerUtils {
         String mapping;
         for (int i=0; i<value.length(); i++) {
             character = makeCharacter(value.charAt(i));
-            mapping = (String) HTML_ENCODING_MAPPING.get(character);
+            mapping = HTML_ENCODING_MAPPING.get(character);
             if (mapping != null) {
                 result.append(mapping);
                 continue;
@@ -618,12 +618,16 @@ public final class ServerUtils {
             result.append( value.substring(pos,matcher.start()) );
             pos = matcher.end();
             mapping = matcher.group();
-            if (!alsoDecodeAmpersand && AMP.equals(mapping)) specialCharacter = AMP; // = decode &amp; simply to &amp; (= effectively ignoring it) when alsoDecodeAmpersand is false
-            else specialCharacter = (String) SPECIAL_CHAR_HTML_ONLY_MAPPINGS.get(mapping);
-            if (specialCharacter != null) result.append(specialCharacter);
+            if (!alsoDecodeAmpersand && AMP.equals(mapping)) 
+                specialCharacter = AMP; // = decode &amp; simply to &amp; (= effectively ignoring it) when alsoDecodeAmpersand is false
+            else 
+                specialCharacter =  SPECIAL_CHAR_HTML_ONLY_MAPPINGS.get(mapping);
+            if (specialCharacter != null) 
+                result.append(specialCharacter);
             else result.append(mapping);
         }
-        if (pos < value.length()) result.append( value.substring(pos) );
+        if (pos < value.length()) 
+            result.append( value.substring(pos) );
         return result.toString();
     }
     public static String decodeBrokenValueExceptUrlEncoding(String value) {
@@ -637,9 +641,11 @@ public final class ServerUtils {
                 result.append( value.substring(pos,matcher.start()) );
                 pos = matcher.end();
                 mapping = matcher.group();
-                specialCharacter = (String) SPECIAL_CHAR_MAPPINGS.get(mapping);
-                if (specialCharacter != null) result.append(specialCharacter);
-                else result.append(mapping);
+                specialCharacter = SPECIAL_CHAR_MAPPINGS.get(mapping);
+                if (specialCharacter != null)
+                    result.append(specialCharacter);
+                else
+                    result.append(mapping);
             }
             if (pos < value.length()) result.append( value.substring(pos) );
             value = result.toString();
