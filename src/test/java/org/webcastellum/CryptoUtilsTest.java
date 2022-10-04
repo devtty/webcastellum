@@ -195,11 +195,32 @@ public class CryptoUtilsTest {
         assertTrue(CryptoUtils.getHashLength() == 32);
     }
 
-    /*
+    
     @Test
     public void testHash() throws Exception {
+        byte[] saltBefore = "salt".getBytes();
+        byte[] saltAfter = "pepper".getBytes();
+                
+        assertNull(CryptoUtils.hash(saltBefore, null, saltAfter, 0));
+        
+        byte[] hashContent0 = CryptoUtils.hash(saltBefore, "content", saltAfter, 0);
+        byte[] hashContent1 = CryptoUtils.hash(saltBefore, "content", saltAfter, 1);
+        byte[] hashContent2 = CryptoUtils.hash(saltBefore, "content", saltAfter, 2);
+        
+        assertNotNull(hashContent0);
+        assertEquals(32, hashContent0.length);
+        
+        assertNotNull(hashContent1);
+        assertEquals(32, hashContent1.length);
+        assertNotEquals(hashContent0, hashContent1);
+        
+        assertNotNull(hashContent2);
+        assertEquals(32, hashContent2.length);
+        assertNotEquals(hashContent1, hashContent2);
     }
 
+    
+    /*
     @Test
     public void testGetCipher() throws Exception {
     }
