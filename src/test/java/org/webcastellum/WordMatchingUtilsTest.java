@@ -8,13 +8,9 @@ public class WordMatchingUtilsTest {
     
     public WordMatchingUtilsTest() {
     }
-
+   
     @Test
     public void testMatchesWord() {
-    }
-    
-    @Test
-    public void testMatchesWordWithoutWordDictionary() {
         assertTrue(WordMatchingUtils.matchesWord(null, "text", 0));
         
         WordDictionary wordDictionary = new WordDictionary(Collections.emptyList());
@@ -34,6 +30,7 @@ public class WordMatchingUtilsTest {
         
         //tree matching
         assertFalse(WordMatchingUtils.matchesWord(wordDictionary, "false", 1));
+        assertTrue(WordMatchingUtils.matchesWord(wordDictionary, "test1", 1));
         assertTrue(WordMatchingUtils.matchesWord(wordDictionary, "Test1", 1));
     }
     

@@ -488,8 +488,10 @@ public final class ResponseUtils {
         if (matcher.find()) {
             //String actionURL = extractAttributeValueFromAttributeAndValueString( matcher.group() ).trim();
             String actionURL = matcher.group(1);
-            if (!includeQueryString) actionURL = stripQueryString(actionURL);
-            return actionURL.trim();
+            if(!includeQueryString) 
+                actionURL = stripQueryString(actionURL);
+            if(actionURL!=null)
+                return actionURL.trim();
         }
         return ""; // = treat a missing action attribute like an empty action attribute
     }

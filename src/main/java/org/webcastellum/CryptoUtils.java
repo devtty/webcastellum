@@ -111,6 +111,9 @@ public final class CryptoUtils {
             //else matcher.reset(result);
             if (!WordMatchingUtils.matchesWord(UNWANTED_RANDOM_CONTENT, result.toString(), WebCastellumFilter.TRIE_MATCHING_THRSHOLD)) break;
         }
+        if(result==null){
+            throw new NullPointerException("couldn't generate random token");
+        }
         return result.toString();
     }
     
