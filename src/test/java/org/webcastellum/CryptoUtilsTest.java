@@ -1,10 +1,13 @@
 package org.webcastellum;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.zip.DataFormatException;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import org.junit.Ignore;
 
 public class CryptoUtilsTest {
 
@@ -253,22 +256,37 @@ public class CryptoUtilsTest {
 
     }
 
-    
-    /*
     @Test
     public void testBytesToHex() {
+        try {
+            assertNull(CryptoUtils.bytesToHex(null));
+            assertEquals("", CryptoUtils.bytesToHex(new byte[0]));
+            
+            String test = "Hello World!";
+            assertEquals("48656C6C6F20576F726C6421", CryptoUtils.bytesToHex(test.getBytes("UTF-8")));
+            assertEquals("C88593939640E6969993845A", CryptoUtils.bytesToHex(test.getBytes("IBM01140")));
+        } catch (UnsupportedEncodingException ex) {
+            fail("Unsupported Encoding");
+        }
     }
 
     @Test
     public void testHexToBytes() {
+        assertEquals("Hello World!", new String(CryptoUtils.hexToBytes("48656C6C6F20576F726C6421")));
     }
 
     @Test
-    public void testCompress() {
+    public void testCompressAndBack() {
+        byte[] original = "Hello World!".getBytes();
+        byte[] compressed = CryptoUtils.compress(original);
+        
+        assertNotNull(compressed);
+        assertNotEquals(original, compressed);
+        
+        try {
+            assertArrayEquals(original, CryptoUtils.decompress(compressed));
+        } catch (DataFormatException ex) {
+            fail("DataFormat Exception");
+        }
     }
-
-    @Test
-    public void testDecompress() throws Exception {
-    }
-     */
 }
