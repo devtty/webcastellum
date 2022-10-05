@@ -7,13 +7,29 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import org.junit.Before;
 import org.mockito.Mockito;
 
 public class ResponseUtilsTest {
     
+    Cipher cipher;
+    CryptoKeyAndSalt key;
+    HttpServletResponse response;
+    
     public ResponseUtilsTest() {
     }
 
+    @Before
+    public void setUp(){
+        try {
+            cipher = CryptoUtils.getCipher();
+            key = CryptoUtils.generateRandomCryptoKeyAndSalt(true);
+            response = Mockito.mock(HttpServletResponse.class);
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException ex) {
+            fail("failed setUp");
+        }
+    }
+    
     @Test
     public void testExtractURI() {
         assertNull(ResponseUtils.extractURI(null));
@@ -21,6 +37,8 @@ public class ResponseUtilsTest {
         assertEquals("http://test/test", ResponseUtils.extractURI("http://test/test"));
         assertEquals("http://test/test", ResponseUtils.extractURI("http://test/test?test"));
         assertEquals("http://test/test", ResponseUtils.extractURI("http://test/test?test;test"));
+        assertEquals("http://test/test", ResponseUtils.extractURI("http://test/test#test;test"));
+        assertEquals("http://test/test", ResponseUtils.extractURI("http://test/test;test#test"));
         assertEquals("http://test/test", ResponseUtils.extractURI("http://test/test#test?test"));
         assertEquals("http://test/test", ResponseUtils.extractURI("http://test/test#test?test;test"));
         assertEquals("ftp://user@test:25/test", ResponseUtils.extractURI("ftp://user@test:25/test#test?test;test"));
@@ -46,21 +64,37 @@ public class ResponseUtilsTest {
         assertEquals("javascript://test?tokenKey=tokenValue", ResponseUtils.injectParameterIntoURL("javascript://test", "tokenKey", "tokenValue", false, false, true));
         assertEquals("javascript://test", ResponseUtils.injectParameterIntoURL("javascript://test", "tokenKey", "tokenValue", false, false, false));
     }
+    
+    @Test
+    public void testInjectParameterIntoURLWithAnchor() {
+        assertEquals("test?param=value+1%20%3F&param2=value2&tokenKey=tokenValue#anchor", ResponseUtils.injectParameterIntoURL(
+                "test?param=value+1%20%3F&param2=value2#anchor",
+                "tokenKey", "tokenValue", false, false, true));
+    }
 
     @Test
     public void testSetFieldValue() {
         assertNull(ResponseUtils.setFieldValue(null, "test"));
+        
+        assertEquals("<input value=\"\"  type=\"radio\"  ></input>", ResponseUtils.setFieldValue(" <input type=\"radio\" value=\"empty field\"></input> ", null));
         assertEquals("<input value=\"test\"  type=\"radio\"  ></input>", ResponseUtils.setFieldValue(" <input type=\"radio\" value=\"empty field\"></input> ", "test"));
         assertEquals("<input value='test'  type='radio'  ></input>", ResponseUtils.setFieldValue(" <input type='radio' value='empty field'></input> ", "test"));
-        //TODO DR method removes old value and inserts new value but doesnt care about position and spaces
+        //TODO DR method removes old value and inserts new value but doesnt care about position and spaces; test should proof content not string equality
     }
 
     @Test
     public void testSetFieldAction() {
         assertNull(ResponseUtils.setFieldAction(null, "test"));
-        assertEquals(ResponseUtils.setFieldAction("<form action=\"oldAction\" method=\"POST\">", "newAction").replaceAll(" ", "x"),"<form action=\"newAction\"    method=\"POST\">", ResponseUtils.setFieldAction("<form action=\"oldAction\" method=\"POST\">", "newAction"));
-        assertEquals(ResponseUtils.setFieldAction("<form action='oldAction' method='POST'>", "newAction").replace(" ", "x"), "<form action='newAction'    method='POST'>", ResponseUtils.setFieldAction("<form action='oldAction' method='POST'>", "newAction"));
-        //TODO DR method removes old value and inserts new value but doesnt care about position and spaces
+        
+        assertEquals("<form action=\"\"    method=\"POST\">", ResponseUtils.setFieldAction("<form action=\"oldAction\" method=\"POST\">", null));
+        assertEquals("<form action=\"newAction\"    method=\"POST\">", ResponseUtils.setFieldAction("<form action=\"oldAction\" method=\"POST\">", "newAction"));
+        assertEquals("<form action='newAction'    method='POST'>", ResponseUtils.setFieldAction("<form action='oldAction' method='POST'>", "newAction"));
+        
+        assertEquals(" action=\"newAction\"  ", ResponseUtils.setFieldAction("action=\"oldAction", "newAction"));
+        assertEquals(" action=\"newAction\"  ", ResponseUtils.setFieldAction("action=\"oldAction", "newAction"));
+        assertEquals("<form action=\"newAction\"  method=\"GET\"  ", ResponseUtils.setFieldAction("<form method=\"GET\" action=\"oldAction", "newAction"));
+        assertEquals("<form action=\"newAction\"  method=GET  ", ResponseUtils.setFieldAction("<form method=GET action=oldAction", "newAction"));
+        //TODO DR method removes old value and inserts new value but doesnt care about position and spaces; test should proof content not string equality
     }
 
     @Test
@@ -70,6 +104,7 @@ public class ResponseUtilsTest {
         assertEquals("test", ResponseUtils.extractFieldValue("<input value='test'>"));
         assertEquals("test", ResponseUtils.extractFieldValue("<input value=test>"));
         assertEquals("test", ResponseUtils.extractFieldValue("<input value = test >"));
+        assertNull(ResponseUtils.extractFieldValue("<input type = radio"));
     }
 
     @Test
@@ -79,6 +114,7 @@ public class ResponseUtilsTest {
         assertEquals("test", ResponseUtils.extractFieldEnctype("<form enctype='test'>"));
         assertEquals("test", ResponseUtils.extractFieldEnctype("<form enctype=test>"));
         assertEquals("test", ResponseUtils.extractFieldEnctype("<form enctype = test >"));
+        assertNull(ResponseUtils.extractFieldEnctype("<form method = POST >"));
     }
 
     @Test
@@ -111,34 +147,47 @@ public class ResponseUtilsTest {
         assertFalse(ResponseUtils.isAlreadyEncrypted(null, "test"));
     }
     
+    @Test(expected = IllegalArgumentException.class)
+    public void testEncryptQueryStringInURLWithBothRemovals(){
+        ResponseUtils.encryptQueryStringInURL("", "", "", "", true, true, Boolean.TRUE, true, "", cipher, key, true, true, true, response, true);
+    }
+
+    @Test
+    public void testEncryptQueryStringInURLWithoutURL(){
+        assertNull(ResponseUtils.encryptQueryStringInURL("currentRequestUrlToCompareWith", "currentContextPathAccessed", "currentServletPathAccessed", null, true, false, Boolean.TRUE, true, "cryptoDetectionString", cipher, key, true, true, true, response, true));
+    }
+    
     @Test
     public void testEncryptQueryStringInURL() {
-        try {
-            Cipher cipher = CryptoUtils.getCipher();
-            CryptoKeyAndSalt key = CryptoUtils.generateRandomCryptoKeyAndSalt(true);
-            HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
-            
-            assertNull(ResponseUtils.encryptQueryStringInURL("currentRequestUrlToCompareWith", "currentContextPathAccessed", "currentServletPathAccessed", null, true, true, Boolean.TRUE, true, "cryptoDetectionString", cipher, key, true, true, true, response, true));
-            
-            try{
-                ResponseUtils.encryptQueryStringInURL("", "", "", "", true, true, Boolean.TRUE, true, "", cipher, key, true, true, true, response, true);
-            }catch(IllegalArgumentException iae){
-                assertTrue(iae.getMessage().contains("additionalFullResourceRemoval AND additionalMediumResourceRemoval is impossible"));
-            }
-            
-            String encrypted = ResponseUtils.encryptQueryStringInURL("http://www.example.com/demo/hahah?1=2", "contextPath", "servletPath", "http://www.example.com/demo/test;jsession=uuuuuu?id=16&huhu=haha#anchor7", true, false, Boolean.TRUE, true, "1234567890", cipher, key, false, false, true, response, false);
-                   
-            RequestUtils.DecryptedQuerystring r = RequestUtils.decryptQueryStringInServletPathWithQueryString("contextPath", "servletPath", encrypted, "1234567890", key, "http://www.example.com/demo/test", true, true, true, true, true);
-
-            assertTrue(r.isFormSubmit);
-            assertFalse(r.isFormMultipart);
-            assertTrue(r.decryptedString.startsWith("test"));
-            assertTrue(r.decryptedString.contains("&huhu=haha#anchor7"));
-            assertFalse(r.wasManipulated);
-        } catch (NoSuchAlgorithmException | NoSuchPaddingException ex) {
-            fail("failed: " + ex.getMessage());
-        }
+        String encryptedString = ResponseUtils.encryptQueryStringInURL("http://www.example.com/demo/hahah?1=2", "contextPath", "servletPath", "http://www.example.com/demo/test?id=16&huhu=haha#anchor7;jsession=uuuuuu", true, false, Boolean.TRUE, true, "1234567890", cipher, key, false, false, true, response, false);
         
+        assertTrue(encryptedString.startsWith("http://www.example.com/demo/"));
+        assertFalse(encryptedString.contains("huhu=haha"));
+        assertTrue(encryptedString.contains("#anchor7"));
+        assertTrue(encryptedString.endsWith("jsession=uuuuuu"));
+        
+        RequestUtils.DecryptedQuerystring r = RequestUtils.decryptQueryStringInServletPathWithQueryString("contextPath", "servletPath", encryptedString, "1234567890", key, "http://www.example.com/demo/test", true, true, true, true, true);
+        
+        assertTrue(r.isFormSubmit);
+        assertFalse(r.isFormMultipart);
+        assertTrue(r.decryptedString.startsWith("test"));
+        assertTrue(r.decryptedString.contains("&huhu=haha#anchor7"));
+        assertFalse(r.wasManipulated);
+        
+        //now with dir
+        encryptedString = ResponseUtils.encryptQueryStringInURL("http://www.example.com/demo/hahah?1=2", "contextPath", "servletPath", "/demo/?id=16&huhu=haha#anchor7;jsession=uuuuuu", true, false, Boolean.TRUE, true, "1234567890", cipher, key, false, false, true, response, false);
+        
+        assertTrue(encryptedString.startsWith("/demo/"));
+        assertFalse(encryptedString.contains("huhu=haha"));
+        assertTrue(encryptedString.contains("#anchor7"));
+        assertTrue(encryptedString.endsWith("jsession=uuuuuu"));
+        
+        r = RequestUtils.decryptQueryStringInServletPathWithQueryString("contextPath", "servletPath", encryptedString, "1234567890", key, "http://www.example.com/demo/test", true, true, true, true, true);
+        
+        assertTrue(r.isFormSubmit);
+        assertFalse(r.isFormMultipart);
+        assertTrue(r.decryptedString.contains("&huhu=haha#anchor7"));
+        assertFalse(r.wasManipulated);        
     }
 
     @Test
