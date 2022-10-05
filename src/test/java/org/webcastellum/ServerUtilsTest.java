@@ -25,18 +25,32 @@ public class ServerUtilsTest {
     }
 
     @Test
+    public void testParseContentDispositionWithoutDisposition() {
+        assertTrue(ServerUtils.parseContentDisposition(null).isEmpty());
+        assertTrue(ServerUtils.parseContentDisposition("").isEmpty());
+        assertTrue(ServerUtils.parseContentDisposition(" ").isEmpty());
+    }
+    
+    @Test
     public void testParseContentDisposition() {
-        //TODO implement
+        Map result = ServerUtils.parseContentDisposition("Content-Disposition: form-data; name=\"field_value\"; filename=\"file_name.html\"");
+        
+        assertTrue(result.containsKey("filename"));
+        assertTrue(result.containsKey("name"));
+        assertEquals("file_name.html", result.get("filename"));
+        assertEquals("field_value", result.get("name"));        
     }
 
     @Test
     public void testStartsWithJavaScriptOrMailto() {
         assertFalse(ServerUtils.startsWithJavaScriptOrMailto(null));
-        assertTrue(ServerUtils.startsWithJavaScriptOrMailto("javascript:x"));
-        assertTrue(ServerUtils.startsWithJavaScriptOrMailto("mailto:x"));
-        assertTrue(ServerUtils.startsWithJavaScriptOrMailto(" mAiltO:x"));
-        assertTrue(ServerUtils.startsWithJavaScriptOrMailto("    JaVAscriPt:x"));
-        assertFalse(ServerUtils.startsWithJavaScriptOrMailto("    JaVAscriP:x"));
+        assertTrue(ServerUtils.startsWithJavaScriptOrMailto("javascript:test"));
+        assertTrue(ServerUtils.startsWithJavaScriptOrMailto("mailto:test"));
+        assertTrue(ServerUtils.startsWithJavaScriptOrMailto("JAVASCRIPT:test"));
+        assertTrue(ServerUtils.startsWithJavaScriptOrMailto("MAILTO:test"));
+        assertTrue(ServerUtils.startsWithJavaScriptOrMailto(" mAiltO:test"));
+        assertTrue(ServerUtils.startsWithJavaScriptOrMailto("    JaVAscriPt:test"));
+        assertFalse(ServerUtils.startsWithJavaScriptOrMailto("    JaVAscriP:test"));
     }
 
     @Test
@@ -54,6 +68,8 @@ public class ServerUtilsTest {
 
     @Test
     public void testConvertObjectToSimpleArray() {
+        assertNull(ServerUtils.convertObjectToSimpleArray(null));
+        
         Integer[] values = {1,2,3};
         int[] result = ServerUtils.convertObjectToSimpleArray(values);
         //TODO refactor usages of convertObjectToSimpleArray
@@ -99,6 +115,9 @@ public class ServerUtilsTest {
         assertFalse(ServerUtils.isSameServer("http://test.org/a", "http://test.com/a"));
         assertFalse(ServerUtils.isSameServer("http://test.org", "htp://test.org"));
         //TODO correct method name would be isSameHostName
+        assertFalse(ServerUtils.isSameServer("http://test.org/index.html", "index.html"));
+        assertFalse(ServerUtils.isSameServer("index.html", "index.html"));
+        assertFalse(ServerUtils.isSameServer("index.html", "http://test.org/index.html"));
     }
 
     @Test

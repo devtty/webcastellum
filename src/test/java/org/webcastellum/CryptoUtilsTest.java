@@ -1,11 +1,14 @@
 package org.webcastellum;
 
 import java.io.UnsupportedEncodingException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.zip.DataFormatException;
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -181,15 +184,20 @@ public class CryptoUtilsTest {
     }
     
     @Test(expected = IllegalArgumentException.class)
-    public void testGenerateRandomNumber_negativeMin(){
+    public void testGenerateRandomNumber_negativeLow(){
         CryptoUtils.generateRandomNumber(true, -1, 10);
+    }
+    
+    @Test(expected = IllegalArgumentException.class)
+    public void testGenerateRandomNumber_negativeHigh(){
+        CryptoUtils.generateRandomNumber(true, 1, -10);
     }
     
     @Test(expected = IllegalArgumentException.class)
     public void testGenerateRandomNumber_negativeDifference(){
         CryptoUtils.generateRandomNumber(true, 5, 4);
     }
-
+    
     @Test
     public void testGetHashLength() throws Exception {
         assertTrue(CryptoUtils.getHashLength() == 32);
@@ -257,24 +265,51 @@ public class CryptoUtilsTest {
         }
         
     }
-
+    
     @Test
-    public void testEncryptAndDecryptURLSafe() throws Exception {
+    public void testencryptAndDecryptURLSafe(){
+        encryptAndDecryptURLSafe("https://test.com/context/path?id=1&test=d");
+        encryptAndDecryptURLSafe("https://test.com/context/path?id=1%20&test=d");
+        encryptAndDecryptURLSafe("https://test.com/context/path?id=1+&test=d");
+    }
 
-        String URL = "https://test.com/context/path?id=1&test=d";
+    private void encryptAndDecryptURLSafe(String content){
 
-        CryptoKeyAndSalt ckas = CryptoUtils.generateRandomCryptoKeyAndSalt(true);
-        String s = CryptoUtils.encryptURLSafe(URL, ckas, null);
+        try {
+            CryptoKeyAndSalt ckas = CryptoUtils.generateRandomCryptoKeyAndSalt(true);
+            String s = CryptoUtils.encryptURLSafe(content, ckas, null);
+            
+            String decrypted = CryptoUtils.decryptURLSafe(s, ckas);
+            
+            assertEquals(content, decrypted);
+            
+            ckas = CryptoUtils.generateRandomCryptoKeyAndSalt(false);
+            s = CryptoUtils.encryptURLSafe(content, ckas, null);
+            decrypted = CryptoUtils.decryptURLSafe(s, ckas);
+            assertEquals(content, decrypted);
+        } catch (UnsupportedEncodingException | InvalidKeyException | NoSuchAlgorithmException | BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException ex) {
+            fail("En-/De-cryption failed");
+        }
 
-        String decrypted = CryptoUtils.decryptURLSafe(s, ckas);
-
-        assertEquals(URL, decrypted);
-
-        ckas = CryptoUtils.generateRandomCryptoKeyAndSalt(false);
-        s = CryptoUtils.encryptURLSafe(URL, ckas, null);
-        decrypted = CryptoUtils.decryptURLSafe(s, ckas);
-        assertEquals(URL, decrypted);
-
+    }
+    
+    @Test(expected = NullPointerException.class)
+    public void testDecryptURLSafeWithoutContent(){
+        try{
+            CryptoKeyAndSalt ckas = CryptoUtils.generateRandomCryptoKeyAndSalt(true);
+            CryptoUtils.decryptURLSafe(null, ckas);
+        }catch (UnsupportedEncodingException | InvalidKeyException | NoSuchAlgorithmException | BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException ex){
+            fail("En-/De-cryption failed");
+        }
+    }
+    
+    @Test(expected = NullPointerException.class)
+    public void testDecryptURLSafeWithoutKey(){
+        try{
+            CryptoUtils.decryptURLSafe("test", null);
+        }catch (UnsupportedEncodingException | InvalidKeyException | NoSuchAlgorithmException | BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException ex){
+            fail("En-/De-cryption failed");
+        }
     }
 
     @Test
