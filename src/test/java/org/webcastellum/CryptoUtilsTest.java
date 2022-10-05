@@ -1,10 +1,16 @@
 package org.webcastellum;
 
+import java.io.UnsupportedEncodingException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.zip.DataFormatException;
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import org.junit.Ignore;
 
 public class CryptoUtilsTest {
 
@@ -178,25 +184,51 @@ public class CryptoUtilsTest {
     }
     
     @Test(expected = IllegalArgumentException.class)
-    public void testGenerateRandomNumber_negativeMin(){
+    public void testGenerateRandomNumber_negativeLow(){
         CryptoUtils.generateRandomNumber(true, -1, 10);
+    }
+    
+    @Test(expected = IllegalArgumentException.class)
+    public void testGenerateRandomNumber_negativeHigh(){
+        CryptoUtils.generateRandomNumber(true, 1, -10);
     }
     
     @Test(expected = IllegalArgumentException.class)
     public void testGenerateRandomNumber_negativeDifference(){
         CryptoUtils.generateRandomNumber(true, 5, 4);
     }
-
+    
     @Test
     public void testGetHashLength() throws Exception {
         assertTrue(CryptoUtils.getHashLength() == 32);
     }
 
-    /*
+    
     @Test
     public void testHash() throws Exception {
+        byte[] saltBefore = "salt".getBytes();
+        byte[] saltAfter = "pepper".getBytes();
+                
+        assertNull(CryptoUtils.hash(saltBefore, null, saltAfter, 0));
+        
+        byte[] hashContent0 = CryptoUtils.hash(saltBefore, "content", saltAfter, 0);
+        byte[] hashContent1 = CryptoUtils.hash(saltBefore, "content", saltAfter, 1);
+        byte[] hashContent2 = CryptoUtils.hash(saltBefore, "content", saltAfter, 2);
+        
+        assertNotNull(hashContent0);
+        assertEquals(32, hashContent0.length);
+        
+        assertNotNull(hashContent1);
+        assertEquals(32, hashContent1.length);
+        assertNotEquals(hashContent0, hashContent1);
+        
+        assertNotNull(hashContent2);
+        assertEquals(32, hashContent2.length);
+        assertNotEquals(hashContent1, hashContent2);
     }
 
+    
+    /*
     @Test
     public void testGetCipher() throws Exception {
     }
@@ -233,42 +265,84 @@ public class CryptoUtilsTest {
         }
         
     }
-
+    
     @Test
-    public void testEncryptAndDecryptURLSafe() throws Exception {
-
-        String URL = "https://test.com/context/path?id=1&test=d";
-
-        CryptoKeyAndSalt ckas = CryptoUtils.generateRandomCryptoKeyAndSalt(true);
-        String s = CryptoUtils.encryptURLSafe(URL, ckas, null);
-
-        String decrypted = CryptoUtils.decryptURLSafe(s, ckas);
-
-        assertEquals(URL, decrypted);
-
-        ckas = CryptoUtils.generateRandomCryptoKeyAndSalt(false);
-        s = CryptoUtils.encryptURLSafe(URL, ckas, null);
-        decrypted = CryptoUtils.decryptURLSafe(s, ckas);
-        assertEquals(URL, decrypted);
-
+    public void testencryptAndDecryptURLSafe(){
+        encryptAndDecryptURLSafe("https://test.com/context/path?id=1&test=d");
+        encryptAndDecryptURLSafe("https://test.com/context/path?id=1%20&test=d");
+        encryptAndDecryptURLSafe("https://test.com/context/path?id=1+&test=d");
     }
 
+    private void encryptAndDecryptURLSafe(String content){
+
+        try {
+            CryptoKeyAndSalt ckas = CryptoUtils.generateRandomCryptoKeyAndSalt(true);
+            String s = CryptoUtils.encryptURLSafe(content, ckas, null);
+            
+            String decrypted = CryptoUtils.decryptURLSafe(s, ckas);
+            
+            assertEquals(content, decrypted);
+            
+            ckas = CryptoUtils.generateRandomCryptoKeyAndSalt(false);
+            s = CryptoUtils.encryptURLSafe(content, ckas, null);
+            decrypted = CryptoUtils.decryptURLSafe(s, ckas);
+            assertEquals(content, decrypted);
+        } catch (UnsupportedEncodingException | InvalidKeyException | NoSuchAlgorithmException | BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException ex) {
+            fail("En-/De-cryption failed");
+        }
+
+    }
     
-    /*
+    @Test(expected = NullPointerException.class)
+    public void testDecryptURLSafeWithoutContent(){
+        try{
+            CryptoKeyAndSalt ckas = CryptoUtils.generateRandomCryptoKeyAndSalt(true);
+            CryptoUtils.decryptURLSafe(null, ckas);
+        }catch (UnsupportedEncodingException | InvalidKeyException | NoSuchAlgorithmException | BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException ex){
+            fail("En-/De-cryption failed");
+        }
+    }
+    
+    @Test(expected = NullPointerException.class)
+    public void testDecryptURLSafeWithoutKey(){
+        try{
+            CryptoUtils.decryptURLSafe("test", null);
+        }catch (UnsupportedEncodingException | InvalidKeyException | NoSuchAlgorithmException | BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException ex){
+            fail("En-/De-cryption failed");
+        }
+    }
+
     @Test
     public void testBytesToHex() {
+        try {
+            assertNull(CryptoUtils.bytesToHex(null));
+            assertEquals("", CryptoUtils.bytesToHex(new byte[0]));
+            
+            String test = "Hello World!";
+            assertEquals("48656C6C6F20576F726C6421", CryptoUtils.bytesToHex(test.getBytes("UTF-8")));
+            assertEquals("C88593939640E6969993845A", CryptoUtils.bytesToHex(test.getBytes("IBM01140")));
+        } catch (UnsupportedEncodingException ex) {
+            fail("Unsupported Encoding");
+        }
     }
 
     @Test
     public void testHexToBytes() {
+        assertEquals("Hello World!", new String(CryptoUtils.hexToBytes("48656C6C6F20576F726C6421")));
     }
 
     @Test
-    public void testCompress() {
+    public void testCompressAndBack() {
+        byte[] original = "Hello World!".getBytes();
+        byte[] compressed = CryptoUtils.compress(original);
+        
+        assertNotNull(compressed);
+        assertNotEquals(original, compressed);
+        
+        try {
+            assertArrayEquals(original, CryptoUtils.decompress(compressed));
+        } catch (DataFormatException ex) {
+            fail("DataFormat Exception");
+        }
     }
-
-    @Test
-    public void testDecompress() throws Exception {
-    }
-     */
 }
