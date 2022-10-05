@@ -691,7 +691,7 @@ public final class ServerUtils {
                 result.append( value.substring(pos,matcher.start()) );
                 pos = matcher.end();
                 mapping = matcher.group();
-                specialCharacter = (String) SPECIAL_CHAR_MAPPINGS.get(mapping);
+                specialCharacter = SPECIAL_CHAR_MAPPINGS.get(mapping);
                 if (specialCharacter != null) result.append(specialCharacter);
                 else result.append(mapping);
             }

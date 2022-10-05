@@ -14,6 +14,7 @@ import javax.servlet.FilterConfig;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import static junit.framework.TestCase.assertEquals;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import org.junit.Before;
@@ -165,12 +166,12 @@ public class RequestUtilsTest {
     }
 
     @Test
-    @Ignore
+    @Ignore(value = "tested in org.webcastellum.test.RequestUtilsTest and ServerUtils")
     public void testRemoveParameter() {
-        //this is tested in the original org.webcastellum.test.RequestUtilsTest
-        //TODO compare RequestUtils.removeParameter and ServerUtils.removeParameterFromQueryString
+        //TODO compare RequestUtils.removeParameter and ServerUtils.removeParameterFromQueryStringFromQueryString
+        //ServerUtils has different ampersand handling
     }
-
+        
     @Test
     public void testCreateOrRetrieveRandomTokenFromSession_HttpSession_String() {
         String token = RequestUtils.createOrRetrieveRandomTokenFromSession(session, "sessionKey");
