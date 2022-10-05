@@ -1,11 +1,15 @@
 package org.webcastellum;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.junit.Assert;
@@ -33,12 +37,17 @@ public class ServerUtilsTest {
     
     @Test
     public void testParseContentDisposition() {
-        Map result = ServerUtils.parseContentDisposition("Content-Disposition: form-data; name=\"field_value\"; filename=\"file_name.html\"");
+        Map resulta = ServerUtils.parseContentDisposition("Content-Disposition: form-data; name=\"field_value\"; filename=\"file_name.html\"");
+        Map resultb = ServerUtils.parseContentDisposition("Content-Disposition: form-data; name=field_value; filename=file_name.html");
         
-        assertTrue(result.containsKey("filename"));
-        assertTrue(result.containsKey("name"));
-        assertEquals("file_name.html", result.get("filename"));
-        assertEquals("field_value", result.get("name"));        
+        assertTrue(resulta.containsKey("filename"));
+        assertTrue(resulta.containsKey("name"));
+        assertEquals("file_name.html", resulta.get("filename"));
+        assertEquals("field_value", resulta.get("name"));
+        assertTrue(resultb.containsKey("filename"));
+        assertTrue(resultb.containsKey("name"));
+        assertEquals("file_name.html", resultb.get("filename"));
+        assertEquals("field_value", resultb.get("name"));
     }
 
     @Test
@@ -128,14 +137,36 @@ public class ServerUtilsTest {
         assertFalse(ServerUtils.containsColonBeforeFirstSlashOrQuestionmark("colonBehind/:"));
         assertTrue(ServerUtils.containsColonBeforeFirstSlashOrQuestionmark("colon:before?"));
         assertTrue(ServerUtils.containsColonBeforeFirstSlashOrQuestionmark("colon:before/"));
+        assertTrue(ServerUtils.containsColonBeforeFirstSlashOrQuestionmark("has:colon"));
+    }
+    
+    @Test(expected = NullPointerException.class)
+    public void testIsInternalHostURLWithoutCompareWith(){
+        ServerUtils.isInternalHostURL(null, "linkedUrl");
+    }
+    
+    @Test(expected = NullPointerException.class)
+    public void testIsInternalHostURLWithoutUrl(){
+        ServerUtils.isInternalHostURL("url", null);
     }
     
     @Test
-    @Ignore
     public void testIsInternalHostURL() {
+        String currentRequestUrlToCompareWith = "http://test.org";
+        assertTrue(ServerUtils.isInternalHostURL(currentRequestUrlToCompareWith, "http://test.org/index.php?hello=world"));
+        assertTrue(ServerUtils.isInternalHostURL(currentRequestUrlToCompareWith, "https://test.org/index.php?hello=world"));
+        assertTrue(ServerUtils.isInternalHostURL(currentRequestUrlToCompareWith, "./index.php"));
+        assertTrue(ServerUtils.isInternalHostURL(currentRequestUrlToCompareWith, "index.php"));
+        assertTrue(ServerUtils.isInternalHostURL(currentRequestUrlToCompareWith, "/test/index.php"));
+        assertTrue(ServerUtils.isInternalHostURL(currentRequestUrlToCompareWith, "http://test.org:8080/index.php"));
+        
+        assertFalse(ServerUtils.isInternalHostURL(currentRequestUrlToCompareWith, "http://test.de:/index.php"));
+        assertFalse(ServerUtils.isInternalHostURL(currentRequestUrlToCompareWith, "https://test.de:/index.php"));
+        assertFalse(ServerUtils.isInternalHostURL(currentRequestUrlToCompareWith, "https://test.org:-80/index.php"));
+        
         //TODO later
     }
-
+    
     @Test
     public void testEncodeHtmlSafe() {
         assertNull(ServerUtils.encodeHtmlSafe(null));
@@ -153,14 +184,18 @@ public class ServerUtilsTest {
     @Test
     public void testDecodeBrokenValueHtmlOnly() {
         assertNull(ServerUtils.decodeBrokenValueHtmlOnly(null, true));
-        //TODO test more
+        assertEquals("Hello%20World%3F&", ServerUtils.decodeBrokenValueHtmlOnly("Hello%20World%3F&amp;", true));
+        assertEquals("Hello%20World%3F&amp;", ServerUtils.decodeBrokenValueHtmlOnly("Hello%20World%3F&amp;", false));
+        assertEquals("Hello%20World%3F&±", ServerUtils.decodeBrokenValueHtmlOnly("Hello%20World%3F&amp;&plusmn;", true));
+        assertEquals("Hello%20World%3F&amp;±", ServerUtils.decodeBrokenValueHtmlOnly("Hello%20World%3F&amp;&plusmn;", false));
     }
 
     @Test
     public void testDecodeBrokenValueExceptUrlEncoding() {
         assertNull(ServerUtils.decodeBrokenValueUrlEncodingOnly(null));
         
-        //TODO test more
+        assertEquals("Hello%20World%3F&", ServerUtils.decodeBrokenValueExceptUrlEncoding("Hello%20World%3F&amp;"));
+        assertEquals("Hello%20World%3F&±", ServerUtils.decodeBrokenValueExceptUrlEncoding("Hello%20World%3F&amp;&plusmn;"));
     }
 
     @Test
