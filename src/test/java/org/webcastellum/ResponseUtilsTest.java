@@ -158,6 +158,27 @@ public class ResponseUtilsTest {
     }
     
     @Test
+    public void testEncryptQueryStringInURLRemovals(){
+        String encryptedString = ResponseUtils.encryptQueryStringInURL("http://www.example.com/demo/hahah?1=2", "contextPath", "servletPath", "http://www.example.com/demo/test.html?id=16&huhu=haha#anchor7;jsession=uuuuuu", true, false, Boolean.TRUE, true, "1234567890", cipher, key, false, false, false, response, false);
+        assertTrue(encryptedString.startsWith("http://www.example.com/demo/test.html"));
+        assertTrue(encryptedString.contains("#anchor7"));
+        assertTrue(encryptedString.contains("jsession=uuuuuu"));
+        
+        encryptedString = ResponseUtils.encryptQueryStringInURL("http://www.example.com/demo/hahah?1=2", "contextPath", "servletPath", "http://www.example.com/demo/test.html?id=16&huhu=haha#anchor7;jsession=uuuuuu", true, false, Boolean.TRUE, true, "1234567890", cipher, key, false, false, true, response, false);
+        assertTrue(encryptedString.startsWith("http://www.example.com/demo"));
+        assertFalse(encryptedString.contains("test.html"));
+        assertTrue(encryptedString.contains("#anchor7"));
+        assertTrue(encryptedString.contains("jsession=uuuuuu"));
+
+        encryptedString = ResponseUtils.encryptQueryStringInURL("http://www.example.com/demo/hahah?1=2", "contextPath", "servletPath", "http://www.example.com/demo/test.html?id=16&huhu=haha#anchor7;jsession=uuuuuu", true, false, Boolean.TRUE, true, "1234567890", cipher, key, false, true, false, response, false);
+        assertFalse(encryptedString.contains("http://www.example.com"));
+        assertFalse(encryptedString.contains("demo"));
+        assertFalse(encryptedString.contains("test.html"));
+        assertTrue(encryptedString.contains("#anchor7"));
+        assertTrue(encryptedString.contains("jsession=uuuuuu"));
+    }
+    
+    @Test
     public void testEncryptQueryStringInURL() {
         String encryptedString = ResponseUtils.encryptQueryStringInURL("http://www.example.com/demo/hahah?1=2", "contextPath", "servletPath", "http://www.example.com/demo/test?id=16&huhu=haha#anchor7;jsession=uuuuuu", true, false, Boolean.TRUE, true, "1234567890", cipher, key, false, false, true, response, false);
         
