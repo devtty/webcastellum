@@ -1,21 +1,16 @@
 package org.webcastellum;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.junit.Assert;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import org.junit.Ignore;
 
 public class ServerUtilsTest {
     
@@ -211,7 +206,9 @@ public class ServerUtilsTest {
     @Test
     public void testDecodeBrokenUTF8() {
         assertNull(ServerUtils.decodeBrokenUTF8(null));
-        //TODO test more
+        assertEquals("Hello World?&", ServerUtils.decodeBrokenUTF8("Hello%20World%3F&"));
+        assertEquals("a/_2%K72F0abcd", ServerUtils.decodeBrokenUTF8("a%2F_2%K72F0abcd"));
+        assertEquals("a/_2%2KF0abcd", ServerUtils.decodeBrokenUTF8("a%2F_2%2KF0abcd"));
     }
 
     @Test

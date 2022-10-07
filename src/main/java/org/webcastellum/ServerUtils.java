@@ -738,16 +738,20 @@ public final class ServerUtils {
 
     // useful, since UTF-8 is also a variable-length encoding scheme
     public static final String decodeBrokenUTF8(String input) {
+        if(input==null)
+            return null;
         try {
             // at first find all invalid UTF-8 encodings (i.e. replace %K7 or %7K or %KK with %25 since K is not a valid hex digit
             final int length = input.length();
             final StringBuilder tmp = new StringBuilder(length);
             for (int i=0; i<length; i++) {
                 final char c = input.charAt(i);
-                if ('%' == c &&
-                        ( i+2 >= length 
-                            || (!isHexDigit(input.charAt(i+1)) || !isHexDigit(input.charAt(i+2))) )
-                          ) tmp.append("%25"); else tmp.append(c);
+                if ('%' == c
+                        && (i + 2 >= length
+                        || (!isHexDigit(input.charAt(i + 1)) || !isHexDigit(input.charAt(i + 2)))))
+                    tmp.append("%25");
+                else
+                    tmp.append(c);
             }
             input = tmp.toString();
             // now try to decode the URL-encoded string using UTF-8 (see http://en.wikipedia.org/wiki/Percent-encoding )

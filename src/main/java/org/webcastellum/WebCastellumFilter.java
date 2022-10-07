@@ -1110,12 +1110,12 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
                 final String parameterName = (String) parameters.nextElement();
                 final String[] parameterValues = request.getParameterValues(parameterName);
                 for (String parameterValue : parameterValues) {
-                    logLocal(parameterName+" = " + parameterValue);
+                    logLocal((parameterName+" = " + parameterValue).replaceAll("[\n\r\t]", ""));
                 }
             }
             
             // Session stuff
-            logLocal("WebCastellum:doBeforeProcessing: requested session-id: "+requestDetails.requestedSessionId);
+            logLocal("WebCastellum:doBeforeProcessing: requested session-id: "+requestDetails.requestedSessionId.replaceAll("[\n\r\t]", ""));
             if (session != null) {
                 try {
                     // TODO use StringBuilder
@@ -1325,7 +1325,7 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
                 }
                 // when it is still null, there's someone attacking us
                 if (captcha == null) {
-                    final Attack attack = this.attackHandler.handleAttack(request, requestDetails.clientAddress, "No captcha available for ID: "+captchaIdReceivedForForm);
+                    final Attack attack = this.attackHandler.handleAttack(request, requestDetails.clientAddress, "No captcha available for ID: "+captchaIdReceivedForForm.replaceAll("[\n\r\t]", "_"));
                     return new AllowedFlagWithMessage(false, attack);
                 }
                 assert captcha != null;
