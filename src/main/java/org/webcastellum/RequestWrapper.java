@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -185,20 +184,17 @@ public final class RequestWrapper extends HttpServletRequestWrapper {
     public Enumeration<String> getParameterNames() { // TODO: ist laut Servlet-Spec es theoretisch moeglich, dass ein Caller auf die Enumeration ein .remove() aufruft und damit einen Wert entfernen moechte? Falls ja, Wrapper-Enumeration hier zurueckgeben
         LOGGER.log(Level.FINE, "getParameterNames()");
         ArrayList<String> names = new ArrayList<>();
-        final Enumeration<String> rawNames = getRequest().getParameterNames();
-        if (rawNames == null && this.overwrittenParams.isEmpty()) return null;
-        if(rawNames!=null){
-            while (rawNames.hasMoreElements()) {
-                final String rawName = rawNames.nextElement();
-                if (!this.removedRequestParameters.contains(rawName)) names.add(rawName);
-            }
-        }
+        
+        getRequest().getParameterNames().asIterator().forEachRemaining(a -> {if(!this.removedRequestParameters.contains(a)){
+            names.add((String) a);    
+        }});
+        
         for (final Iterator<String> keys = this.overwrittenParams.keySet().iterator(); keys.hasNext();) {
             final String key = keys.next();
             if (!names.contains(key) && !this.removedRequestParameters.contains(key))
                 names.add(key);
         }
-        return (names!=null && !names.isEmpty()) ? Collections.enumeration( names ) : Collections.emptyEnumeration();
+        return (!names.isEmpty()) ? Collections.enumeration( names ) : Collections.emptyEnumeration();
     }
     
     @Override
@@ -215,7 +211,7 @@ public final class RequestWrapper extends HttpServletRequestWrapper {
             LOGGER.log(Level.FINE, "getParameterMap() ==> null");
             return null;
         }
-        final Map copy = new HashMap<String,String[]>( parameterMap.size() ); // defensive copy, since it will be modified locally
+        final Map<String,String[]> copy = new HashMap<>( parameterMap.size() ); // defensive copy, since it will be modified locally
         for (final Iterator<Map.Entry<String,String[]>> entries = parameterMap.entrySet().iterator(); entries.hasNext();) {
             final Map.Entry<String,String[]> entry = entries.next();
             final String key = entry.getKey();
