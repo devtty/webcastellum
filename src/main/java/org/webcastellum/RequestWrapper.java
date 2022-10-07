@@ -14,7 +14,7 @@ import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
-import javax.servlet.RequestDispatcher;
+import javax.servlet.RequestDispatcher;g
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpSession;
@@ -142,9 +142,10 @@ public final class RequestWrapper extends HttpServletRequestWrapper {
     private Set<String> removedRequestParameters = new HashSet();
     
     protected void removeEncryptedQueryString(final String cryptoDetectionString) {
-        getParameterNames().asIterator().forEachRemaining(action -> {if(action.contains(cryptoDetectionString)){
-            removeParameter(action);
-        }});
+        if(getParameterNames()!=null)
+            getParameterNames().asIterator().forEachRemaining(action -> {if(action.contains(cryptoDetectionString)){
+                removeParameter(action);
+            }});
     }
     
     protected void removeParameter(final String name) {
