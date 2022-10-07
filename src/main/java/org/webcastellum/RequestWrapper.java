@@ -5,16 +5,13 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
-import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpSession;
@@ -136,10 +133,8 @@ public final class RequestWrapper extends HttpServletRequestWrapper {
         return Boolean.TRUE.equals( super.getAttribute(WebCastellumFilter.REQUEST_NESTED_FORWARD_CALL) );
     }
 
-    
-    //private Hashtable/*<String,String[]>*/ overwrittenParams = new Hashtable();
-    private HashMap<String, String[]> overwrittenParams = new HashMap();
-    private Set<String> removedRequestParameters = new HashSet();
+    private HashMap<String, String[]> overwrittenParams = new HashMap<>();
+    private Set<String> removedRequestParameters = new HashSet<>();
     
     protected void removeEncryptedQueryString(final String cryptoDetectionString) {
         getParameterNames().asIterator().forEachRemaining(action -> {if(action.contains(cryptoDetectionString)){
@@ -168,7 +163,7 @@ public final class RequestWrapper extends HttpServletRequestWrapper {
         if (this.removedRequestParameters.contains(name)) result = null;
         else if (!this.overwrittenParams.containsKey(name)) result = checkForUnsecureValue(getRequest().getParameter(name));
         else {
-            final String[] values = (String[]) this.overwrittenParams.get(name);
+            final String[] values = this.overwrittenParams.get(name);
             if (values == null || values.length == 0) result = null;
             else result = checkForUnsecureValue(values[0]);
         }
@@ -181,7 +176,7 @@ public final class RequestWrapper extends HttpServletRequestWrapper {
         final String[] result;
         if (this.removedRequestParameters.contains(name)) result = null;
         else if (!this.overwrittenParams.containsKey(name)) result = checkForUnsecureValues(getRequest().getParameterValues(name));
-        else result = checkForUnsecureValues((String[])this.overwrittenParams.get(name));
+        else result = checkForUnsecureValues(this.overwrittenParams.get(name));
         LOGGER.log(Level.FINE, "getParameterValues({0})", name);
         return result;
     }
@@ -189,7 +184,7 @@ public final class RequestWrapper extends HttpServletRequestWrapper {
     @Override
     public Enumeration<String> getParameterNames() { // TODO: ist laut Servlet-Spec es theoretisch moeglich, dass ein Caller auf die Enumeration ein .remove() aufruft und damit einen Wert entfernen moechte? Falls ja, Wrapper-Enumeration hier zurueckgeben
         LOGGER.log(Level.FINE, "getParameterNames()");
-        ArrayList<String> names = new ArrayList();
+        ArrayList<String> names = new ArrayList<>();
         final Enumeration<String> rawNames = getRequest().getParameterNames();
         if (rawNames == null && this.overwrittenParams.isEmpty()) return null;
         if(rawNames!=null){
@@ -203,7 +198,7 @@ public final class RequestWrapper extends HttpServletRequestWrapper {
             if (!names.contains(key) && !this.removedRequestParameters.contains(key))
                 names.add(key);
         }
-        return Collections.enumeration((names!=null)? names : Collections.emptyEnumeration());
+        return (names!=null && !names.isEmpty()) ? Collections.enumeration( names ) : Collections.emptyEnumeration();
     }
     
     @Override
@@ -222,10 +217,10 @@ public final class RequestWrapper extends HttpServletRequestWrapper {
         }
         final Map copy = new HashMap<String,String[]>( parameterMap.size() ); // defensive copy, since it will be modified locally
         for (final Iterator<Map.Entry<String,String[]>> entries = parameterMap.entrySet().iterator(); entries.hasNext();) {
-            final Map.Entry<String,String[]> entry = (Entry) entries.next();
-            final String key = (String) entry.getKey();
+            final Map.Entry<String,String[]> entry = entries.next();
+            final String key = entry.getKey();
             if (!this.removedRequestParameters.contains(key)) {
-                copy.put(key, checkForUnsecureValues((String[]) entry.getValue()));
+                copy.put(key, checkForUnsecureValues(entry.getValue()));
             }
         }
         LOGGER.log(Level.FINE, "getParameterMap()");
@@ -346,9 +341,9 @@ public final class RequestWrapper extends HttpServletRequestWrapper {
     public Enumeration<String> getHeaders(String name) {
         Enumeration<String> result = super.getHeaders(name);
         if (WebCastellumFilter.REMOVE_COMPRESSION_ACCEPT_ENCODING_HEADER_VALUES && (name != null && result != null && HEADER_ACCEPT_ENCODING.equalsIgnoreCase(name.trim()))) {
-            final ArrayList<String> modified = new ArrayList(5);
+            final ArrayList<String> modified = new ArrayList<>(5);
             while (result.hasMoreElements()) {
-                final String value = (String) result.nextElement();
+                final String value = result.nextElement();
                 modified.add(removeCompressionEncodings(value));
             }
             result = Collections.enumeration(modified);

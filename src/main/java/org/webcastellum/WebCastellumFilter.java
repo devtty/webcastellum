@@ -1110,7 +1110,7 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
                 final String parameterName = (String) parameters.nextElement();
                 final String[] parameterValues = request.getParameterValues(parameterName);
                 for (String parameterValue : parameterValues) {
-                    logLocal((parameterName+" = " + parameterValue).replaceAll("[\n\r\t]", ""));
+                    logLocal((parameterName+" = " + parameterValue).replaceAll(PATTERN_BREAKING, ""));
                 }
             }
             
@@ -1325,7 +1325,7 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
                 }
                 // when it is still null, there's someone attacking us
                 if (captcha == null) {
-                    final Attack attack = this.attackHandler.handleAttack(request, requestDetails.clientAddress, "No captcha available for ID: "+captchaIdReceivedForForm.replaceAll("[\n\r\t]", "_"));
+                    final Attack attack = this.attackHandler.handleAttack(request, requestDetails.clientAddress, "No captcha available for ID: "+captchaIdReceivedForForm.replaceAll(PATTERN_BREAKING, "_"));
                     return new AllowedFlagWithMessage(false, attack);
                 }
                 assert captcha != null;
@@ -1376,7 +1376,7 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
             try {
                 final Captcha captcha = (Captcha) ServerUtils.getAttributeIncludingInternal(session, SESSION_CAPTCHA_IMAGES+captchaIdReceivedForImage);
                 if (captcha == null) {
-                    final Attack attack = this.attackHandler.handleAttack(request, requestDetails.clientAddress, "No captcha (image) available for ID: "+captchaIdReceivedForImage.replaceAll("[\n\r\t]", "_"));
+                    final Attack attack = this.attackHandler.handleAttack(request, requestDetails.clientAddress, "No captcha (image) available for ID: "+captchaIdReceivedForImage.replaceAll(PATTERN_BREAKING, "_"));
                     return new AllowedFlagWithMessage(false, attack);
                 }
                 if (response.isCommitted()) {
@@ -1489,6 +1489,7 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
         this.attackHandler.handleRegularRequest(request, requestDetails.clientAddress);
         return new AllowedFlagWithMessage(true);
     }
+    private static final String PATTERN_BREAKING = "[\n\r\t]";
     
     
     
