@@ -1115,7 +1115,7 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
             }
             
             // Session stuff
-            logLocal("WebCastellum:doBeforeProcessing: requested session-id: "+requestDetails.requestedSessionId.replaceAll("[\n\r\t]", ""));
+            logLocal("WebCastellum:doBeforeProcessing: requested session-id: "+requestDetails.requestedSessionId);
             if (session != null) {
                 try {
                     // TODO use StringBuilder
@@ -1716,11 +1716,11 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
         if (this.catchAll) {
             try {
                 internalDoFilter(request, response, chain);
-            } catch (Exception e) {
+            } catch (IOException | ServletException e) {
                 logLocal("Uncaught exception: "+e.getClass().getName()+": "+e.getMessage()); // TODO: hier auch den root-cause loggen !
                 try {
                     sendUncaughtExceptionResponse((HttpServletResponse)response, e);
-                } catch (Exception e2) {
+                } catch (IOException e2) {
                     logLocal("Uncaught exception during return of exception message: "+e2.getClass().getName()+": "+e2.getMessage());
                 }
             }
@@ -2557,8 +2557,8 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
             this.attackHandler.handleRegularRequest(httpRequest, clientAddress); // = since we're about to stop this request, we log it here
             this.attackHandler.logWarningRequestMessage("Desired stop in filter processing of previously logged request: "+e.getMessage());
             return; // = stop processing as desired :-)
-        } catch (Exception e) {
-            final String message = "Exception ("+e.getMessage()+") while checking request (therefore disallowing it by default)";
+        } catch (IOException | NoSuchAlgorithmException | ServletException | CustomRequestMatchingException e) {
+            final String message = "Exception ("+e.getClass().getName()+e.getMessage()+") while checking request (therefore disallowing it by default)";
             allowed = new AllowedFlagWithMessage(false, new Attack(message));
             if (!(e instanceof ServerAttackException)) {
                 Logger.getGlobal().log(Level.SEVERE, message);
