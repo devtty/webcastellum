@@ -5,13 +5,16 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpSession;
@@ -139,10 +142,9 @@ public final class RequestWrapper extends HttpServletRequestWrapper {
     private Set<String> removedRequestParameters = new HashSet();
     
     protected void removeEncryptedQueryString(final String cryptoDetectionString) {
-        if(getParameterNames()!=null)
-            getParameterNames().asIterator().forEachRemaining(action -> {if(action.contains(cryptoDetectionString)){
-                removeParameter(action);
-            }});
+        getParameterNames().asIterator().forEachRemaining(action -> {if(action.contains(cryptoDetectionString)){
+            removeParameter(action);
+        }});
     }
     
     protected void removeParameter(final String name) {
@@ -201,7 +203,7 @@ public final class RequestWrapper extends HttpServletRequestWrapper {
             if (!names.contains(key) && !this.removedRequestParameters.contains(key))
                 names.add(key);
         }
-        return Collections.enumeration(names);
+        return Collections.enumeration((names!=null)? names : Collections.emptyEnumeration());
     }
     
     @Override
