@@ -8,6 +8,7 @@ import java.util.Map;
 import static java.util.Map.entry;
 import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import org.mockito.Mockito;
@@ -39,6 +40,21 @@ public class RequestWrapperTest {
         sessionCreationTracker = new SessionCreationTracker(attackHandler, 0, 600000, 300000, 0, "", "", "", "");        
     }
 
+    @Test(expected = NullPointerException.class)
+    public void testRequestWrapperConstructorWithoutContentInjectionHelper(){
+        new RequestWrapper(request, null, sessionCreationTracker, "", false, false, false);
+    }
+    
+    @Test(expected = NullPointerException.class)
+    public void testRequestWrapperConstructorWithoutSessionCreationTracker(){
+        new RequestWrapper(request, helper, null, "", false, false, false);
+    }
+    
+    @Test(expected = NullPointerException.class)
+    public void testRequestWrapperConstructorWithoutClient(){
+        new RequestWrapper(request, helper, sessionCreationTracker, null, false, false, false);
+    }
+    
     @Test
     public void testGetQueryString() {
         RequestWrapper wrapper = new RequestWrapper(request, helper, sessionCreationTracker,  "123.456.789.000", false, true, true);
@@ -49,6 +65,22 @@ public class RequestWrapperTest {
     public void testGetAttribute() {
         RequestWrapper wrapper = new RequestWrapper(request, helper, sessionCreationTracker,  "123.456.789.000", false, true, true);
         assertEquals("testAttributeValue", wrapper.getAttribute("testAttribute"));
+    }
+    
+    @Test
+    public void testGetAttributeNullWhenApiSpecific(){
+        when(request.getAttribute("javax.servlet.forward.context_path")).thenReturn("test");
+        
+        RequestWrapper wrapper = new RequestWrapper(request, helper, sessionCreationTracker,  "123.456.789.000", false, true, true);
+        assertEquals("test", wrapper.getAttribute("javax.servlet.forward.context_path"));
+        
+        helper.setEncryptQueryStringInLinks(true);
+
+        wrapper = new RequestWrapper(request, helper, sessionCreationTracker,  "123.456.789.000", false, true, true);
+        assertNull(wrapper.getAttribute("javax.servlet.forward.context_path"));
+        
+        wrapper = new RequestWrapper(request, helper, sessionCreationTracker,  "123.456.789.000", false, true, false);
+        assertEquals("test", wrapper.getAttribute("javax.servlet.forward.context_path"));        
     }
 
     @Test
@@ -68,7 +100,31 @@ public class RequestWrapperTest {
         RequestWrapper wrapper = new RequestWrapper(request, helper, sessionCreationTracker,  "123.456.789.000", false, true, true);
         Enumeration e = wrapper.getParameterNames();
         assertEquals("param1", (String) e.nextElement());
+        assertTrue(e.hasMoreElements());
         assertEquals("param2", (String) e.nextElement());
+        assertFalse(e.hasMoreElements());
+    }
+    
+    @Test
+    public void testGetParameterNamesWithRemovedParameter() {
+        RequestWrapper wrapper = new RequestWrapper(request, helper, sessionCreationTracker,  "123.456.789.000", false, true, true);
+        wrapper.removeParameter("param1");
+        
+        Enumeration e = wrapper.getParameterNames();
+        assertEquals("param2", (String) e.nextElement());
+        assertFalse(e.hasMoreElements());
+    }
+    
+    @Test
+    public void testGetParameterNamesWithParameterOverwrite(){
+        RequestWrapper wrapper = new RequestWrapper(request, helper, sessionCreationTracker,  "123.456.789.000", false, true, true);
+        wrapper.setParameter("param1", new String[]{"x", "y"}, true);
+        
+        Enumeration e = wrapper.getParameterNames();
+        assertEquals("param1", (String) e.nextElement());
+        assertTrue(e.hasMoreElements());
+        assertEquals("param2", (String) e.nextElement());
+        assertFalse(e.hasMoreElements());
     }
 
     @Test
@@ -79,5 +135,5 @@ public class RequestWrapperTest {
         assertNotNull(get);
         assertArrayEquals(new String[]{"a", "b"}, (String[]) get);
     }
-    
+
 }
