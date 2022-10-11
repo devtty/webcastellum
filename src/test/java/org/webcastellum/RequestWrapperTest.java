@@ -59,6 +59,26 @@ public class RequestWrapperTest {
     public void testGetQueryString() {
         RequestWrapper wrapper = new RequestWrapper(request, helper, sessionCreationTracker,  "123.456.789.000", false, true, true);
         assertEquals("/test?param1=value1&secret_key=token", wrapper.getQueryString());
+        
+
+        //add session and secret key
+        HttpSession session = Mockito.mock(HttpSession.class);
+        when(session.getAttribute(WebCastellumFilter.SESSION_SECRET_RANDOM_TOKEN_KEY_KEY)).thenReturn("secret_key");
+        
+        when(request.getSession()).thenReturn(session);
+        when(request.getSession(false)).thenReturn(session);
+        //when(request.getSession(true)).thenReturn(session);
+        
+        when(request.getQueryString()).thenReturn("/test?param1=value1&secret_key=token");
+        
+        //secret_key shouldn't appear in query string
+        assertEquals("/test?param1=value1", wrapper.getQueryString());
+        
+        when(session.getAttribute(WebCastellumFilter.SESSION_PARAMETER_AND_FORM_PROTECTION_RANDOM_TOKEN_KEY_KEY)).thenReturn("secret_paf");
+        when(request.getQueryString()).thenReturn("/test?param1=value1&secret_key=token&secret_paf=token2");
+        
+        //secret_key & secret_paf shouldn't appear in query string
+        assertEquals("/test?param1=value1", wrapper.getQueryString());
     }
 
     @Test
@@ -70,6 +90,7 @@ public class RequestWrapperTest {
     @Test
     public void testGetAttributeNullWhenApiSpecific(){
         when(request.getAttribute("javax.servlet.forward.context_path")).thenReturn("test");
+        when(request.getAttribute("attribute")).thenReturn("value");
         
         RequestWrapper wrapper = new RequestWrapper(request, helper, sessionCreationTracker,  "123.456.789.000", false, true, true);
         assertEquals("test", wrapper.getAttribute("javax.servlet.forward.context_path"));
@@ -78,9 +99,11 @@ public class RequestWrapperTest {
 
         wrapper = new RequestWrapper(request, helper, sessionCreationTracker,  "123.456.789.000", false, true, true);
         assertNull(wrapper.getAttribute("javax.servlet.forward.context_path"));
+        assertEquals("value", wrapper.getAttribute("attribute"));
         
         wrapper = new RequestWrapper(request, helper, sessionCreationTracker,  "123.456.789.000", false, true, false);
         assertEquals("test", wrapper.getAttribute("javax.servlet.forward.context_path"));        
+        assertEquals("value", wrapper.getAttribute("attribute"));
     }
 
     @Test
@@ -166,6 +189,14 @@ public class RequestWrapperTest {
     }
     
     @Test
+    public void testGetParameterMapWithParameterMapIsNull(){
+        when(request.getParameterMap()).thenReturn(null);
+        RequestWrapper wrapper = new RequestWrapper(request, helper, sessionCreationTracker,  "123.456.789.000", false, true, true);
+        
+        assertNull(wrapper.getParameterMap());
+    }
+    
+    @Test
     public void testGetParameterMapWithOverwrittenParameter(){
         RequestWrapper wrapper = new RequestWrapper(request, helper, sessionCreationTracker,  "123.456.789.000", false, true, true);
         wrapper.setParameter("param1", new String[]{"overwritten"}, true);
@@ -174,6 +205,19 @@ public class RequestWrapperTest {
         Object get = parameterMap.get("param1");
         assertNotNull(get);
         assertArrayEquals(new String[]{"overwritten"}, (String[]) get);
+    }
+    
+    @Test
+    public void testGetParameterMapWithOverwrittenParameterAndMapIsNull(){
+        when(request.getParameterMap()).thenReturn(null);
+        
+        RequestWrapper wrapper = new RequestWrapper(request, helper, sessionCreationTracker,  "123.456.789.000", false, true, true);
+        wrapper.setParameter("param1", new String[]{"overwritten"}, true);
+        
+        Map parameterMap = wrapper.getParameterMap();
+        Object get = parameterMap.get("param1");
+        assertNotNull(get);
+        assertArrayEquals(new String[]{"overwritten"}, (String[]) get);  
     }
     
     @Test
