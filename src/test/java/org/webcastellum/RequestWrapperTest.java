@@ -88,10 +88,39 @@ public class RequestWrapperTest {
         RequestWrapper wrapper = new RequestWrapper(request, helper, sessionCreationTracker,  "123.456.789.000", false, true, true);
         assertEquals("testParameterValue", wrapper.getParameter("testParameter"));
     }
+    
+    @Test
+    public void testGetParameterIfRemoved(){
+        RequestWrapper wrapper = new RequestWrapper(request, helper, sessionCreationTracker,  "123.456.789.000", false, true, true);
+        wrapper.removeParameter("testParameter");
+        assertNull(wrapper.getParameter("testParameter"));
+    }
+    
+    @Test
+    public void testGetParameterIfOverwritten(){
+        RequestWrapper wrapper = new RequestWrapper(request, helper, sessionCreationTracker,  "123.456.789.000", false, true, true);
+        wrapper.setParameter("testParameter", new String[]{"x"}, false);
+        assertEquals("x", wrapper.getParameter("testParameter"));
+    }
+    
 
     @Test
     public void testGetParameterValues() {
         RequestWrapper wrapper = new RequestWrapper(request, helper, sessionCreationTracker,  "123.456.789.000", false, true, true);
+        assertArrayEquals(new String[]{"x", "y", "z"}, wrapper.getParameterValues("paramValues"));
+    }
+    
+    @Test
+    public void testGetParameterValuesIfRemoved(){
+        RequestWrapper wrapper = new RequestWrapper(request, helper, sessionCreationTracker,  "123.456.789.000", false, true, true);
+        wrapper.removeParameter("paramValues");
+        assertNull(wrapper.getParameterValues("paramValues"));
+    }
+    
+    @Test
+    public void testGetParameterValuesIfOverwritten(){
+        RequestWrapper wrapper = new RequestWrapper(request, helper, sessionCreationTracker,  "123.456.789.000", false, true, true);
+        wrapper.setParameter("paramValues", new String[]{"x", "y", "z"}, true);
         assertArrayEquals(new String[]{"x", "y", "z"}, wrapper.getParameterValues("paramValues"));
     }
 
@@ -134,6 +163,35 @@ public class RequestWrapperTest {
         Object get = parameterMap.get("param1");
         assertNotNull(get);
         assertArrayEquals(new String[]{"a", "b"}, (String[]) get);
+    }
+    
+    @Test
+    public void testGetParameterMapWithOverwrittenParameter(){
+        RequestWrapper wrapper = new RequestWrapper(request, helper, sessionCreationTracker,  "123.456.789.000", false, true, true);
+        wrapper.setParameter("param1", new String[]{"overwritten"}, true);
+        
+        Map parameterMap = wrapper.getParameterMap();
+        Object get = parameterMap.get("param1");
+        assertNotNull(get);
+        assertArrayEquals(new String[]{"overwritten"}, (String[]) get);
+    }
+    
+    @Test
+    public void testGetSession(){
+        RequestWrapper wrapper = new RequestWrapper(request, helper, sessionCreationTracker,  "123.456.789.000", false, true, true);
+        
+        when(request.getSession()).thenReturn(null);
+        assertNull(wrapper.getSession());
+        
+        HttpSession session = Mockito.mock(HttpSession.class);
+        
+        when(request.getSession()).thenReturn(session);
+        
+        HttpSession retrievedSession = wrapper.getSession();
+        
+        assertNotNull(retrievedSession);
+        
+        assertTrue(retrievedSession instanceof SessionWrapper);        
     }
 
 }
