@@ -3,17 +3,28 @@ package org.webcastellum;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import static java.util.Map.entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.servlet.http.HttpSession;
 import org.junit.Assert;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import org.junit.Before;
+import static org.mockito.ArgumentMatchers.any;
+import org.mockito.Mockito;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class ServerUtilsTest {
+    
+    
+    private HttpSession session;
+    
     
     private static final String PERMUTATION_TEST_STRING = "&Auml;a&szlig; Äaß "
             + "Hello World? Hello%20World%3F Hello World& Hello+World%26"
@@ -34,6 +45,11 @@ public class ServerUtilsTest {
             + "Hello \\World Hello \\\\World Hello \\\\\\World Hello \\\\World \\\\\\Test";
 
     public ServerUtilsTest() {
+    }
+    
+    @Before
+    public void setUp(){
+        session = Mockito.mock(HttpSession.class);
     }
 
     @Test
@@ -321,14 +337,6 @@ public class ServerUtilsTest {
             System.out.println(action);
         });*/
     }
-
-    
-    @Test
-    public void testPermutateVariants_3args_2() {
-        Permutation permutation = ServerUtils.permutateVariants("asdf", true, (byte) 0);
-        
-        
-    }
     
     @Test(expected = IllegalArgumentException.class)
     public void testPermutateVariantsWithNegativeLevel(){
@@ -486,19 +494,42 @@ public class ServerUtilsTest {
         //assertEquals("param1=test", ServerUtils.removeParameterFromQueryString("param1=test&", "world"));
     }
 
-    /*
-    @Test
-    public void testFindReusableSessionContentKeyOrCreateNewOne() {
-        
+    
+    
+    @Test(expected = NullPointerException.class)
+    public void testFindReusableSessionContentKeyOrCreateNewOneWithoutContent() {
+        ServerUtils.findReusableSessionContentKeyOrCreateNewOne(session, null, true, true);
     }
 
     @Test
-    public void testRenameSecretTokenParameterInAllCachedParameterAndFormProtectionObjects() {
+    public void testFindReusableSessionContentKeyOrCreateNewOneWithoutReuseSession(){
+        ParameterAndFormProtection content = new ParameterAndFormProtection(true);
+        String result = ServerUtils.findReusableSessionContentKeyOrCreateNewOne(session, content, false, false);
+        
+        assertNotNull(result);
+        assertFalse(result.isEmpty());
+        verify(session).setAttribute(WebCastellumFilter.INTERNAL_CONTENT_PREFIX+result, content);
     }
     
-    TODO later
-    */
+    @Test
+    public void testFindReusableSessionContentKeyOrCreateNewOneWithReuseSession(){
+        ParameterAndFormProtection content = new ParameterAndFormProtection(true);
+        
+        when(session.getAttribute(WebCastellumFilter.SESSION_REUSABLE_KEY_LIST_KEY)).thenReturn(new ArrayList(Arrays.asList("testKey")));
 
+        //correct key but wrong content
+        String result = ServerUtils.findReusableSessionContentKeyOrCreateNewOne(session, content, true, false);
+        assertNotEquals("testKey", result);
+        
+        
+        //key and content matches
+        when(session.getAttribute(WebCastellumFilter.INTERNAL_CONTENT_PREFIX+"testKey")).thenReturn(content);
+        result = ServerUtils.findReusableSessionContentKeyOrCreateNewOne(session, content, true, true);
+        
+        assertEquals("testKey", result);
+    }
+    
+    
     @Test
     public void testUrlEncode() throws Exception {
         assertNull(ServerUtils.urlEncode(null));
@@ -539,29 +570,78 @@ public class ServerUtilsTest {
     @Test
     public void testQuoteReplacement() {
         assertNull(ServerUtils.quoteReplacement(null));
-        //just catch the NPE
+        assertEquals("te\\\\\"st", ServerUtils.quoteReplacement("te\\\"st"));
+        assertEquals("te\\$t", ServerUtils.quoteReplacement("te$t"));
     }
 
+    @Test(expected = NullPointerException.class)
+    public void testGetAttributeNamesIncludingInternalWithoutSession(){
+        ServerUtils.getAttributeNamesIncludingInternal(null);
+    }
+    
     @Test
-    public void testGetAttributeNamesIncludingInternal() {
-        //TODO later
-    }
+    public void testGetAttributeNamesIncludingInternal(){
+        List list = Arrays.asList("attribute1", "attribute2");
+        when(session.getAttributeNames()).thenReturn(Collections.enumeration(list));
 
+        ServerUtils.getAttributeNamesIncludingInternal(session).asIterator().forEachRemaining(action -> {
+            assertTrue(list.contains(action));
+        });
+    }
+    
+    @Test(expected = NullPointerException.class)
+    public void testGetAttributeIncludingInternalWithoutSession() {
+        ServerUtils.getAttributeIncludingInternal(null,"");
+    }
+    
     @Test
     public void testGetAttributeIncludingInternal() {
-        //TODO later
+        when(session.getAttribute("testAttribute")).thenReturn("testValue");
+        assertEquals("testValue", ServerUtils.getAttributeIncludingInternal(session,"testAttribute"));
     }
 
     @Test
+    public void testConvertListOfPatternToArrayOfMatcherWithoutPatterns() {
+        assertNull(ServerUtils.convertListOfPatternToArrayOfMatcher(null));
+    }
+    
+    @Test
     public void testConvertListOfPatternToArrayOfMatcher() {
+        List patterns = Arrays.asList(
+                Pattern.compile("[A-Z]"), 
+                Pattern.compile("[0-9]"));
+        Matcher[] m = ServerUtils.convertListOfPatternToArrayOfMatcher(patterns);
+        
+        assertEquals(2, m.length);
+        assertEquals("[A-Z]", m[0].pattern().pattern());
+        assertEquals("[0-9]", m[1].pattern().pattern());
     }
 
     @Test
     public void testConcatenateArrays() {
+        String[] original = new String[]{"Kermit", "Gonzo", "Fozzie"};
+        String[] additional = new String[]{"Waldorf", "Statler"};
+        
+        assertArrayEquals(additional, ServerUtils.concatenateArrays(null, additional));
+        assertArrayEquals(additional, ServerUtils.concatenateArrays(new String[0], additional));
+        assertArrayEquals(original, ServerUtils.concatenateArrays(original, null));
+        assertArrayEquals(original, ServerUtils.concatenateArrays(original, new String[0]));
+        
+        String[] combined = ServerUtils.concatenateArrays(original, additional);
+        assertEquals(5, combined.length);
+        assertEquals("Fozzie", combined[2]);
+        assertEquals("Waldorf", combined[3]);
     }
 
     @Test
     public void testConvertIntegerListToIntArray() {
+        List intList = Arrays.asList(1, 2, 3, 4 ,5);
+        
+        assertNull(ServerUtils.convertIntegerListToIntArray(null));
+        int[] intArray = ServerUtils.convertIntegerListToIntArray(intList);
+        assertEquals(5, intArray.length);
+        assertEquals(1, intArray[0]);
+        assertEquals(5, intArray[4]);
     }
     
 }
