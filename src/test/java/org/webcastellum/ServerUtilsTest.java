@@ -461,7 +461,7 @@ public class ServerUtilsTest {
         assertEquals("/test", ServerUtils.extractResourceToBeAccessed("?", "test", "http://localhost/test", true));
         assertEquals("/test/index.html", ServerUtils.extractResourceToBeAccessed("", "test", "http://localhost/test/index.html", true));
         assertEquals("test/index.html", ServerUtils.extractResourceToBeAccessed("./index.html", "test", "http://localhost/test/", true));
-        assertEquals("test/index.html", ServerUtils.extractResourceToBeAccessed("test/", "test", "http://localhost/test/", true));
+        assertEquals("test/", ServerUtils.extractResourceToBeAccessed("test/", "test", "http://localhost/test/", true));
     }
 
     @Test
