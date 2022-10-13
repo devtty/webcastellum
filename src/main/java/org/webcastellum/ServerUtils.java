@@ -757,11 +757,11 @@ public final class ServerUtils {
             // now try to decode the URL-encoded string using UTF-8 (see http://en.wikipedia.org/wiki/Percent-encoding )
             input = URLDecoder.decode(input, "UTF-8");
         } catch (UnsupportedEncodingException e) {
-            System.err.println("UnsupportedEncodingException: "+e);
+            LOGGER.log(Level.SEVERE, "UnsupportedEncodingException: {0}", e.getMessage());
         } catch (IllegalArgumentException e) {
-            System.err.println("IllegalArgumentException: "+e);
+            LOGGER.log(Level.SEVERE, "IllegalArgumentException: {0}", e.getMessage());
         } catch (RuntimeException e) {
-            System.err.println("RuntimeException: "+e);
+            LOGGER.log(Level.SEVERE, "RuntimeException: "+e);
         }
         return input;
     }
@@ -769,9 +769,6 @@ public final class ServerUtils {
     private static final boolean isHexDigit(final char c) {
         return c=='0' || c=='1' || c=='2' || c=='3' || c=='4' || c=='5' || c=='6' || c=='7' || c=='8' || c=='9' || c=='A' || c=='B' || c=='C' || c=='D' || c=='E' || c=='F' || c=='a' || c=='b' || c=='c' || c=='d' || c=='e' || c=='f';
     }
-
-    
-    
     
     public static String removeNullBytes(final String value) {
         if (value == null) return value;
@@ -783,6 +780,7 @@ public final class ServerUtils {
         }
         return result.toString();
     }
+    
     public static String removeWhitespaces(final String value, final byte decodingPermutationLevel) {
         if (value == null) return value;
         final StringBuilder result = new StringBuilder(value.length());

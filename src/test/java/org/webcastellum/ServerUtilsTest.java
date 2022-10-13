@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import static java.util.Map.entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.junit.Assert;
@@ -14,6 +15,24 @@ import static org.junit.Assert.*;
 
 public class ServerUtilsTest {
     
+    private static final String PERMUTATION_TEST_STRING = "&Auml;a&szlig; Äaß "
+            + "Hello World? Hello%20World%3F Hello World& Hello+World%26"
+            + "Hello%20World%3F& Hello%20World%3F&amp; Hello%20World%3F&amp; Hello%20World%3F&amp;"
+            + "Hello%20World%3F&± Hello%20World%3F&amp;&plusmn;"
+            + "Hello%20World%3F&amp;± Hello%20World%3F&amp;&plusmn;"
+            + "Hello%20World%3F& Hello%20World%3F&amp;"
+            + "Hello%20World%3F&± Hello%20World%3F&amp;&plusmn;"
+            + "¼ %BC ¼ \u00bc \\XBC ¼ & \\XBC+&amp;"
+            + "Hello World?& Hello%20World%3F& a/_2%K72F0abcd a%2F_2%K72F0abcd"
+            + "a/_2%2KF0abcd a%2F_2%2KF0abcd"
+            + "test it tes\0t" + (char) 0x0 + " it"
+            + "Hello Wor\nl\td" + " Hello     World "
+            + "Hello /* comment */World/*second comment*/"
+            + "./test /test/. /test/./dir"
+            + "/test/dir /test//dir /test///dir //test//dir"
+            + "Hello <![CDATA[World]]>"
+            + "Hello \\World Hello \\\\World Hello \\\\\\World Hello \\\\World \\\\\\Test";
+
     public ServerUtilsTest() {
     }
 
@@ -275,20 +294,107 @@ public class ServerUtilsTest {
         assertEquals("Hello \\World \\Test", ServerUtils.removeBackslashes("Hello \\\\World \\\\\\Test"));
     }
 
-    /* later
     @Test
     public void testPermutateVariants_3args_1() {
+        Map map = Map.ofEntries(
+                entry("param1", new String[]{"alpha", "beta", "gamma"}),
+                entry("param2", new String[]{"c", "d"})
+        );
+        Map permutateVariants = ServerUtils.permutateVariants(map, true, (byte) 1);
+        permutateVariants.keySet().forEach(action -> {
+            System.out.println(action);
+        });
+        
+        //System.out.println((String[]) permutateVariants.get("param1"));
+        
+        //Permutation p = (String[]) permutateVariants.get("param1");
+        
+        Permutation[] p = (Permutation[]) permutateVariants.get("param1");
+        for(Permutation x : p){
+            x.getStandardPermutations().forEach(action -> {
+                System.out.println(action);
+            });
+        }
+                
+        
+        /*p.getStandardPermutations().forEach(action ->{
+            System.out.println(action);
+        });*/
     }
 
+    
     @Test
     public void testPermutateVariants_3args_2() {
+        Permutation permutation = ServerUtils.permutateVariants("asdf", true, (byte) 0);
+        
+        
     }
     
-
+    @Test(expected = IllegalArgumentException.class)
+    public void testPermutateVariantsWithNegativeLevel(){
+        ServerUtils.permutateVariants("", true, (byte) -1);
+    }
+    
+    
+    // The permutate test just count the results (so.. no real tests) 
+    @Test
+    public void testPermutateVariantsLevel0(){
+        Permutation variants = ServerUtils.permutateVariants(PERMUTATION_TEST_STRING, true, (byte) 0);
+        assertEquals(0, variants.getNonStandardPermutations().size());
+        assertEquals(1, variants.getStandardPermutations().size());
+        assertEquals(1, variants.size());
+    }
+    
+    @Test
+    public void testPermutateVariantsLevel1(){
+        Permutation variants = ServerUtils.permutateVariants(PERMUTATION_TEST_STRING, true, (byte) 1);
+        assertEquals(8, variants.getNonStandardPermutations().size());
+        assertEquals(3, variants.getStandardPermutations().size());
+        assertEquals(11, variants.size());
+    }
+    
+    @Test
+    public void testPermutateVariantsLevel2(){
+        Permutation variants = ServerUtils.permutateVariants(PERMUTATION_TEST_STRING, true, (byte) 2);
+        assertEquals(21, variants.getNonStandardPermutations().size());
+        assertEquals(3, variants.getStandardPermutations().size());
+        assertEquals(24, variants.size());
+    }
+    
+    @Test
+    public void testPermutateVariantsLevel3(){
+        Permutation variants = ServerUtils.permutateVariants(PERMUTATION_TEST_STRING, true, (byte) 3);
+        assertEquals(21, variants.getNonStandardPermutations().size());
+        assertEquals(3, variants.getStandardPermutations().size());
+        assertEquals(24, variants.size());
+    }
+    
+    @Test
+    public void testPermutateVariantsLevel4(){
+        Permutation variants = ServerUtils.permutateVariants(PERMUTATION_TEST_STRING, true, (byte) 4);
+        assertEquals(106, variants.getNonStandardPermutations().size());
+        assertEquals(3, variants.getStandardPermutations().size());
+        assertEquals(109, variants.size());
+    }
+    
     @Test
     public void testIsVariantMatching() {
+        Permutation permutation = new Permutation();
+        permutation.addStandardPermutation("hello");
+        permutation.addStandardPermutation("world");
+        permutation.addNonStandardPermutation("nonstandard");
+        
+        
+        Matcher emptyMatcherToReuse = Pattern.compile("").matcher("");
+        
+        assertFalse(ServerUtils.isVariantMatching(permutation, new WordDictionary("test"), emptyMatcherToReuse, true));
+        assertTrue(ServerUtils.isVariantMatching(permutation, new WordDictionary("hello"), emptyMatcherToReuse, true));
+        assertTrue(ServerUtils.isVariantMatching(permutation, new WordDictionary("world"), emptyMatcherToReuse, true));
+        assertTrue(ServerUtils.isVariantMatching(permutation, new WordDictionary("world"), emptyMatcherToReuse, false));
+        assertTrue(ServerUtils.isVariantMatching(permutation, new WordDictionary("nonstandard"), emptyMatcherToReuse, true));
+        assertFalse(ServerUtils.isVariantMatching(permutation, new WordDictionary("nonstandard"), emptyMatcherToReuse, false));
+        
     }
-    */
 
     @Test
     public void testEscapeSpecialCharactersHTML() {
@@ -350,6 +456,12 @@ public class ServerUtilsTest {
         assertEquals("index.html", ServerUtils.extractResourceToBeAccessed("http://localhost/test/index.html?query", "test", "http://localhost/test/", false));
         assertEquals("index.html", ServerUtils.extractResourceToBeAccessed("test/index.html?query", "test", "http://localhost/test/", false));
         assertEquals("index.html", ServerUtils.extractResourceToBeAccessed("./test/index.html?query", "test", "http://localhost/test/", false));
+        
+        assertEquals("/test", ServerUtils.extractResourceToBeAccessed("", "test", "http://localhost/test", true));
+        assertEquals("/test", ServerUtils.extractResourceToBeAccessed("?", "test", "http://localhost/test", true));
+        assertEquals("/test/index.html", ServerUtils.extractResourceToBeAccessed("", "test", "http://localhost/test/index.html", true));
+        assertEquals("test/index.html", ServerUtils.extractResourceToBeAccessed("./index.html", "test", "http://localhost/test/", true));
+        assertEquals("test/index.html", ServerUtils.extractResourceToBeAccessed("test/", "test", "http://localhost/test/", true));
     }
 
     @Test
@@ -366,8 +478,12 @@ public class ServerUtilsTest {
     public void testRemoveParameterFromQueryString() {
         assertNull(ServerUtils.removeParameterFromQueryString(null, "test"));
         assertEquals("test", ServerUtils.removeParameterFromQueryString("test", null));
+        assertEquals("", ServerUtils.removeParameterFromQueryString("param", "param"));
         assertEquals("", ServerUtils.removeParameterFromQueryString("param=test", "param"));
         assertEquals("param2=test2", ServerUtils.removeParameterFromQueryString("param1=test&param2=test2", "param1"));
+        assertEquals("param1=test", ServerUtils.removeParameterFromQueryString("param1=test&param2=test2", "param2"));
+        assertEquals("hello", ServerUtils.removeParameterFromQueryString("hello", "world"));
+        //assertEquals("param1=test", ServerUtils.removeParameterFromQueryString("param1=test&", "world"));
     }
 
     /*
