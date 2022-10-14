@@ -40,10 +40,6 @@ public class AttackHandlerTest {
     }
 
     @Test
-    public void testDestroy() {
-    }
-
-    @Test
     public void testGetBlockAttackingClientsThreshold() {
         assertEquals(2, attackHandler.getBlockAttackingClientsThreshold());
     }
