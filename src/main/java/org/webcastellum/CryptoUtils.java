@@ -296,21 +296,20 @@ public final class CryptoUtils {
         // Create an expandable byte array to hold the compressed data.
         // It is not necessary that the compressed data will be smaller than
         // the uncompressed data.
-        ByteArrayOutputStream bos = null;
-        try {
-            bos = new ByteArrayOutputStream(input.length);
+        try(ByteArrayOutputStream bos = new ByteArrayOutputStream(input.length)){
             // Compress the data
             byte[] buf = new byte[1024];
             while (!compressor.finished()) {
                 int count = compressor.deflate(buf);
                 bos.write(buf, 0, count);
             }
-        } finally {
-            if (bos != null) try { bos.close(); } catch (IOException ignored) {}
+            // Get the compressed data
+            return bos.toByteArray();
+        }catch(IOException ex){
         }
-        // Get the compressed data
-        return bos.toByteArray();
+        return null;
     }
+    
     public static byte[] decompress(final byte[] input) throws DataFormatException {
         final Inflater decompressor = new Inflater();
         decompressor.setInput(input);

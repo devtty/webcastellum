@@ -21,12 +21,6 @@ public final class CaptchaPointDefinition extends RequestDefinition {
         super(enabled, identification, description, customRequestMatcher);
     }
 
-    
-    
-    
-    
-    
-    
     public String getCaptchaFormHTML() {
         return captchaFormHTML;
     }
@@ -43,10 +37,6 @@ public final class CaptchaPointDefinition extends RequestDefinition {
     }
 
     
-    
-    
-    
-    
     public String getCaptchaPageContent() {
         return captchaPageContent;
     }
@@ -56,26 +46,26 @@ public final class CaptchaPointDefinition extends RequestDefinition {
     
     
     public synchronized String getHtmlContentLoaded() {
-        if (this.captchaPageContent == null) throw new IllegalStateException("captchaPageContent must be set first");
+        if (this.captchaPageContent == null) {
+            throw new IllegalStateException("captchaPageContent must be set first");
+        }
         if (this.htmlContentLoaded == null) {
             final InputStream input = WebCastellumFilter.class.getClassLoader().getResourceAsStream(this.captchaPageContent);
-            if (input == null) throw new IllegalStateException("Unable to locate a resource in classpath with name: "+this.captchaPageContent);
-            BufferedReader buffer = null;
-            try {
-                buffer = new BufferedReader( new InputStreamReader(input) );
+            if (input == null) {
+                throw new IllegalStateException("Unable to locate a resource in classpath with name: " + this.captchaPageContent);
+            }
+            try ( BufferedReader buffer = new BufferedReader(new InputStreamReader(input))) {
                 final StringBuilder content = new StringBuilder();
                 String line;
-                while ( (line=buffer.readLine()) != null ) {
+                while ((line = buffer.readLine()) != null) {
                     content.append(line).append("\n");
                 }
                 this.htmlContentLoaded = content.toString().trim();
-            } catch (Exception ex) {
-                throw new IllegalStateException("Unable to load content from the specified resource in classpath with name: "+this.captchaPageContent);
-            } finally {
-                if (buffer != null) try { buffer.close(); } catch (IOException ignored) {}
+            } catch (IOException ex) {
+                throw new IllegalStateException("Unable to load content from the specified resource in classpath with name: " + this.captchaPageContent);
             }
         }
         return this.htmlContentLoaded;
     }
-    
+
 }
