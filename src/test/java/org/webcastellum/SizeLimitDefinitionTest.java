@@ -38,7 +38,7 @@ public class SizeLimitDefinitionTest{
         assertEquals(Integer.MAX_VALUE, sld.getMaxTotalRequestParamSize());
         
         //constructor fields
-        assertTrue(expectedEnabled == sld.isEnabled());
+        assertEquals(expectedEnabled, sld.isEnabled());
         assertEquals("identification", sld.getIdentification());
         assertEquals("description", sld.getDescription());
         assertEquals(expectedPrefilter, sld.getServletPathOrRequestURIPrefilter());

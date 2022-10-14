@@ -54,7 +54,7 @@ public class DenialOfServiceLimitDefinitionTest {
     }
     
     private void assertProperties(DenialOfServiceLimitDefinition def, boolean expectedEnabled, WordDictionary expectedPrefilter, Pattern pattern){
-        assertTrue(expectedEnabled == def.isEnabled());
+        assertEquals(expectedEnabled, def.isEnabled());
         assertEquals("identification", def.getIdentification());
         assertEquals("description", def.getDescription());
         assertEquals(expectedPrefilter, def.getServletPathPrefilter());

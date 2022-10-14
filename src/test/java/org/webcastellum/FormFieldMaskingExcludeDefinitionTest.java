@@ -37,7 +37,7 @@ public class FormFieldMaskingExcludeDefinitionTest{
     }
     
     private void assertProperties(FormFieldMaskingExcludeDefinition def, boolean expectedEnabled, WordDictionary expectedPrefilter){
-        assertTrue(expectedEnabled == def.isEnabled());
+        assertEquals(expectedEnabled, def.isEnabled());
         assertEquals("identification", def.getIdentification());
         assertEquals("description", def.getDescription());
         assertEquals(expectedPrefilter, def.getServletPathOrRequestURIPrefilter());

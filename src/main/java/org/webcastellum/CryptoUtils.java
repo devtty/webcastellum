@@ -310,7 +310,7 @@ public final class CryptoUtils {
             // Get the compressed data
             return bos.toByteArray();
         }catch(IOException ex){
-            LOGGER.log(Level.WARNING, "(ignored) couldn't compress: {0}", ex.getMessage());
+            LOGGER.log(Level.WARNING, "(ignored) could not compress: {0}", ex.getMessage());
         }
         return new byte[0];
     }
@@ -326,7 +326,7 @@ public final class CryptoUtils {
             }
             return bos.toByteArray();
         } catch (IOException ex) { 
-            Logger.getLogger(CryptoUtils.class.getName()).log(Level.SEVERE, "(ignored) couldn't decrompess: {0}", ex.getMessage());
+            Logger.getLogger(CryptoUtils.class.getName()).log(Level.SEVERE, "(ignored) could not decrompess: {0}", ex.getMessage());
         }
         
         return new byte[0];

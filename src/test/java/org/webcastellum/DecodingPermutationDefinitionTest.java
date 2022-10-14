@@ -39,7 +39,7 @@ public class DecodingPermutationDefinitionTest{
     private void assertProperties(DecodingPermutationDefinition def, boolean expectedEnabled, WordDictionary expectedPrefilter){
         assertEquals(0, def.getLevel());
         
-        assertTrue(expectedEnabled == def.isEnabled());
+        assertEquals(expectedEnabled, def.isEnabled());
         assertEquals("identification", def.getIdentification());
         assertEquals("description", def.getDescription());
         assertEquals(expectedPrefilter, def.getServletPathOrRequestURIPrefilter());

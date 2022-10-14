@@ -37,7 +37,7 @@ public class TotalExcludeDefinitionTest{
     }
 
     private void assertProperties(TotalExcludeDefinition definition, boolean expectedEnabled, WordDictionary expectedPrefilter) {
-        assertTrue(expectedEnabled == definition.isEnabled());
+        assertEquals(expectedEnabled, definition.isEnabled());
         assertEquals("identification", definition.getIdentification());
         assertEquals("description", definition.getDescription());
         assertEquals(expectedPrefilter, definition.getServletPathOrRequestURIPrefilter());
