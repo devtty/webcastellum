@@ -100,7 +100,6 @@ public class ServerUtilsTest {
         //TODO refactor convertSimpleToObjectArray to stream usage
         Assert.assertArrayEquals(result, Arrays.stream(values).boxed().toArray(Integer[]::new));
         
-        
         values = null;
         assertNull(ServerUtils.convertSimpleToObjectArray(values));
     }
@@ -308,34 +307,6 @@ public class ServerUtilsTest {
         assertEquals("Hello \\World", ServerUtils.removeBackslashes("Hello \\\\World"));
         assertEquals("Hello \\World", ServerUtils.removeBackslashes("Hello \\\\\\World"));
         assertEquals("Hello \\World \\Test", ServerUtils.removeBackslashes("Hello \\\\World \\\\\\Test"));
-    }
-
-    @Test
-    public void testPermutateVariants_3args_1() {
-        Map map = Map.ofEntries(
-                entry("param1", new String[]{"alpha", "beta", "gamma"}),
-                entry("param2", new String[]{"c", "d"})
-        );
-        Map permutateVariants = ServerUtils.permutateVariants(map, true, (byte) 1);
-        permutateVariants.keySet().forEach(action -> {
-            System.out.println(action);
-        });
-        
-        //System.out.println((String[]) permutateVariants.get("param1"));
-        
-        //Permutation p = (String[]) permutateVariants.get("param1");
-        
-        Permutation[] p = (Permutation[]) permutateVariants.get("param1");
-        for(Permutation x : p){
-            x.getStandardPermutations().forEach(action -> {
-                System.out.println(action);
-            });
-        }
-                
-        
-        /*p.getStandardPermutations().forEach(action ->{
-            System.out.println(action);
-        });*/
     }
     
     @Test(expected = IllegalArgumentException.class)

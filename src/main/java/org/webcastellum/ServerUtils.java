@@ -738,8 +738,6 @@ public final class ServerUtils {
 
     // useful, since UTF-8 is also a variable-length encoding scheme
     public static final String decodeBrokenUTF8(String input) {
-        //if(input==null)
-        //    return null;
         try {
             // at first find all invalid UTF-8 encodings (i.e. replace %K7 or %7K or %KK with %25 since K is not a valid hex digit
             final int length = input.length();
@@ -761,7 +759,7 @@ public final class ServerUtils {
         } catch (IllegalArgumentException e) {
             LOGGER.log(Level.SEVERE, "IllegalArgumentException: {0}", e.getMessage());
         } catch (RuntimeException e) {
-            LOGGER.log(Level.SEVERE, "RuntimeException: "+e);
+            LOGGER.log(Level.SEVERE, "RuntimeException: {0}", e.getMessage());
         }
         return input;
     }
