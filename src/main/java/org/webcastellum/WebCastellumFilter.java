@@ -229,6 +229,7 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
     
     
     private static boolean isOldJavaEE13 = false;
+    private static final String PATTERN_BREAKING = "[\n\r\t]";
     
     private final ContentInjectionHelper contentInjectionHelper = new ContentInjectionHelper();
     
@@ -556,7 +557,7 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
                 {
                     final String expectedParameterAndFormProtectionKeyKey = (String) ServerUtils.getAttributeIncludingInternal(session,SESSION_PARAMETER_AND_FORM_PROTECTION_RANDOM_TOKEN_KEY_KEY);
                     if (expectedParameterAndFormProtectionKeyKey != null) {
-                        final String key = request.getParameter(expectedParameterAndFormProtectionKeyKey); // here the temporarily injected param is still in the request (not in the extracted request-param-map though, but that is by design and OK)
+                        final String key = request.getParameter(expectedParameterAndFormProtectionKeyKey.replaceAll(PATTERN_BREAKING, "")); // here the temporarily injected param is still in the request (not in the extracted request-param-map though, but that is by design and OK)
                         if (key == null && !isIncomingParameterAndFormProtectionExclude) {
                             // Session theft (client provided no matching param-and-form pointer token)
                             if (isEntryPoint) {
@@ -1489,11 +1490,7 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
         this.attackHandler.handleRegularRequest(request, requestDetails.clientAddress);
         return new AllowedFlagWithMessage(true);
     }
-    private static final String PATTERN_BREAKING = "[\n\r\t]";
     
-    
-    
-
     private AllowedFlagWithMessage selectboxCheckboxRadiobuttonProtection(final HttpSession session, final RequestDetails requestDetails, final RequestWrapper request, final ResponseWrapper response, final Map/*<String,List<String>>*/ fieldsName2AllowedValues, 
                                                             final boolean isProtectionEnabled, final boolean isMaskingEnabled, final String maskingPrefixSessionKey, final boolean isIncomingFieldProtectionExclude) throws StopFilterProcessingException, IOException {
         // Here we uncover and check the select/check/radiobox-protected values (anyway even when isIncomingSelect/Check/RadioboxFieldProtectionExclude is true):
