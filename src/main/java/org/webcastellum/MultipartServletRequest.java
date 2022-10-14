@@ -199,14 +199,14 @@ public final class MultipartServletRequest extends HttpServletRequestWrapper {
         LOGGER.log(Level.INFO, "==> in delegate: {0}", getRequest().getParameterMap().toString().replaceAll(PATTERN_BREAKING, "_"));        
         for (final Enumeration urlParamNames = getRequest().getParameterNames(); urlParamNames.hasMoreElements();) {
             final String urlParamName = (String) urlParamNames.nextElement();
-            LOGGER.log(Level.FINE, "---> URL PARAM IN MULTIPART FORM: {0}", urlParamName.replace(PATTERN_BREAKING, "_"));
+            LOGGER.log(Level.FINE, "---> URL PARAM IN MULTIPART FORM: {0}", urlParamName.replaceAll(PATTERN_BREAKING, "_"));
             final String[] values = getRequest().getParameterValues(urlParamName);
             if (values != null) {
                 for (String value : values) {
                     addToMapOfCollections(this.urlParametersOfRequest, urlParamName, value);
                     addToMapOfCollections(this.urlAndFormParametersOfRequestMerged, urlParamName, value);
                     hasUrlParamsOnFirstAttempt = true;
-                    LOGGER.log(Level.INFO, "           ---> with value: {0}", value.replace(PATTERN_BREAKING, "_"));
+                    LOGGER.log(Level.INFO, "           ---> with value: {0}", value.replaceAll(PATTERN_BREAKING, "_"));
                 }
             }
         }

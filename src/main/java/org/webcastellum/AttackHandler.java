@@ -361,8 +361,8 @@ public final class AttackHandler {
     static final String getAbsolutePathLoggingSafe(final File file) {
         String result = file.getAbsolutePath();
         // escape for FileHandler special characters (see docs of java.util.logging.FileHandler)
-        result = result.replaceAll("\\\\","/");
-        result = result.replaceAll("%","%%");
+        result = result.replace("\\\\","/");
+        result = result.replace("%","%%");
         return result;
     }
     
