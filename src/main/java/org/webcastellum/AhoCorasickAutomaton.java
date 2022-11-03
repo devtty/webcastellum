@@ -11,17 +11,16 @@ public final class AhoCorasickAutomaton {
 
 	
 	private final Trie trie;
-	private final Map/*<Integer, Node>*/ failureCache = new HashMap(), transitionCache = new HashMap();
-	private final List/*<Integer>*/ retrievalCacheNegatives = new ArrayList();
-
-	
+	private final Map<Integer, Node> failureCache;
+        private final Map<Integer, Node> transitionCache;
+	private final List<Integer> retrievalCacheNegatives;
 	
 	public AhoCorasickAutomaton(final Trie trie) {
-		this.trie = trie;
+            this.failureCache = new HashMap<>();
+            this.transitionCache = new HashMap<>();
+            this.retrievalCacheNegatives = new ArrayList<>();
+            this.trie = trie;
 	}
-	
-	
-	
 
 	public Node fail(final Node node) {
 		if (node == this.trie.getRootNode()) return node;
