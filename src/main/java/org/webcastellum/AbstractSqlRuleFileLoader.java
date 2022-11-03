@@ -76,8 +76,8 @@ public abstract class AbstractSqlRuleFileLoader extends AbstractRuleFileLoader {
                 if (connection != null) try { connection.close(); } catch (SQLException ignored) {}
             }
             
-            return (RuleFile[])rules.toArray(new RuleFile[0]);
-        } catch (Exception e) {
+            return rules.toArray(new RuleFile[0]);
+        } catch (SQLException | RuleLoadingException e) {
             throw new RuleLoadingException(e);
         }
     }

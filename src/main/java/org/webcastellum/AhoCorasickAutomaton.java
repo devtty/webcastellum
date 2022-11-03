@@ -26,7 +26,7 @@ public final class AhoCorasickAutomaton {
 		if (node == this.trie.getRootNode()) return node;
 		if (node.getParent() == this.trie.getRootNode()) return node.getParent();
 
-		Node result = (Node)this.failureCache.get(node.getID());
+		Node result = this.failureCache.get(node.getID());
 		if (result != null) return result;
 
 		if (node == this.trie.getRootNode()) {
@@ -57,7 +57,7 @@ public final class AhoCorasickAutomaton {
 	public Node transition(final Node node, final char character) {
 		final Integer combinedKeyCharacterAndID = new Integer(((node.getID().intValue() * 1024) + ((int) character)));
 
-		final Node cachedResult = (Node)this.transitionCache.get(combinedKeyCharacterAndID);
+		final Node cachedResult = this.transitionCache.get(combinedKeyCharacterAndID);
 		if (cachedResult != null) return cachedResult;
 
 		Node test = null;

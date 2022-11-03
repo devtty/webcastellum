@@ -58,7 +58,7 @@ public abstract class AbstractDefinition implements Serializable, Comparable<Abs
         // here we enforce a natural sort order that uses the "identification" of this request definition,
         // so that the user can name (identify) the files using numbers for example (00_xxx, 01_xxx, 02_xxxx) 
         // to have the sorting one desires....
-        final AbstractDefinition other = (AbstractDefinition) obj;
+        final AbstractDefinition other = obj;
         final String identLeft = this.identification;
         final String identRight = other.identification;
         if (identLeft != null) return identRight == null ? -1 : identLeft.compareTo(identRight);
