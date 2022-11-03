@@ -13,7 +13,7 @@ jobs:
     env:
       CATALINA_HOME: /home/runner/work/webcastellum/webcastellum/apache-tomcat-8.5.78
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
       - name: Set up JDK 11
@@ -34,7 +34,7 @@ jobs:
             mvn install:install-file -Dfile=jms-1.1.jar -DgroupId=javax.jms -DartifactId=jms -Dversion=1.1 -Dpackaging=jar
             mvn install:install-file -Dfile=mail-1.5.0-b01.jar -DgroupId=javax.mail -DartifactId=mail -Dversion=1.5.0-b01 -Dpackaging=jar
       - name: Cache Maven packages
-        uses: actions/cache@v1
+        uses: actions/cache@v3
         with:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
