@@ -247,24 +247,7 @@ public final class RequestWrapper extends HttpServletRequestWrapper {
         
     @Override
     public /*synchronized*/ HttpSession getSession() {
-        HttpSession session = super.getSession();
-        // check if null + check if session has changed meanwhile
-        if (session == null) return null;
-        assert session != null;
-        
-        if (this.currentSessionOfRequest == null) {
-            this.currentSessionOfRequest = fetchOrCreateSessionWrapper(session, false);
-        } 
-        if (!this.currentSessionOfRequest.isUsingDelegateSession(session)) {
-            // aha, change in session
-            if (this.transferProtectiveSessionContentToNewSessionsDefinedByApplication) {
-                // transfer the protective session content from an existing old session to the freshly created (by the application) new session
-                transferProtectiveSessionContent(this.currentSessionOfRequest, session);
-            }
-            this.currentSessionOfRequest = fetchOrCreateSessionWrapper(session, true);
-        }
-        assert this.currentSessionOfRequest != null;
-        return this.currentSessionOfRequest;
+        return getSession(true);
     }
     
     @Override

@@ -21,7 +21,17 @@ import java.util.regex.Pattern;
 public final class DatabaseRuleFileInserter {
 
     
-    private final String jdbcDriver, jdbcUrl, jdbcUser, jdbcPassword, table, columnPath, columnFilename, columnPropertyKey, columnPropertyValue, fileStorageBase, fileStoragePath;
+    private final String jdbcDriver;
+    private final String jdbcUrl;
+    private final String jdbcUser;
+    private final String jdbcPassword;
+    private final String table;
+    private final String columnPath;
+    private final String columnFilename;
+    private final String columnPropertyKey;
+    private final String columnPropertyValue;
+    private final String fileStorageBase;
+    private final String fileStoragePath;
     
     public DatabaseRuleFileInserter(final String jdbcDriver, final String jdbcUrl, final String jdbcUser, final String jdbcPassword, final String table, final String columnPath, final String columnFilename, final String columnPropertyKey, final String columnPropertyValue, final String fileStorageBase, final String fileStoragePath) {
         this.jdbcDriver = jdbcDriver;
@@ -83,16 +93,7 @@ public final class DatabaseRuleFileInserter {
                     }
                 }
                 connection.commit();
-            } catch (RuntimeException e) {
-                if (connection != null) try { connection.rollback(); } catch (SQLException ignored) {}
-                throw e;
-            } catch (FileNotFoundException e) {
-                if (connection != null) try { connection.rollback(); } catch (SQLException ignored) {}
-                throw e;
-            } catch (IOException e) {
-                if (connection != null) try { connection.rollback(); } catch (SQLException ignored) {}
-                throw e;
-            } catch (SQLException e) {
+            } catch (RuntimeException | IOException | SQLException e) {
                 if (connection != null) try { connection.rollback(); } catch (SQLException ignored) {}
                 throw e;
             } finally {
