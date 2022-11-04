@@ -7,29 +7,21 @@ import java.util.List;
 import java.util.Random;
 
 public final class HoneylinkUtils {
-
-	
 	
 	// TODO: aus WC-Konfig holen
 	private static final boolean MASK_AMPERSANDS = false;
 	
-	
-	
 	private static final String[] HEX = {"0","1","2","3","4","5","6","7","8","9","A","B","C","D","E","F","G","H"};
 	private static final String[] FREQUENT_LETTERS = {"A","B","C","D","E","F","G","H", "I", "J", "K", "L", "M", "N", "O", "P", "R", "S", "T", "U", "W"};
 	
-	
 	// hacker-interesting names to attract hackers and guide them into the honeypot via honeylinks
-
 	
 	// TODO: konfigurabel
 	private static final int WORD_COUNT_MIN = 3;
 	private static final int WORD_COUNT_MAX = 4;
 	
-	
-	
 	// TODO: per Konfig-Eintrag kommagetrennte Liste setzen lassen
-	private static final List WORDS = Arrays.asList(new String[]{ // ACHTUNG: hier sicherstellen, dass der erste Buchstabe immer uppercase ist
+	private static final List<String> WORDS = Arrays.asList( // ACHTUNG: hier sicherstellen, dass der erste Buchstabe immer uppercase ist
 		"Gate", "Access", "Row", "Deny", "Num", "Special", "Key", "List", "Show", "Admin",
 		"Lock", "User", "View", "Edit", "Wizard", "Copy", "Search", "Lookup", 
 		"Config", "Sql", "Query", "Display", "Clone", "Mail", "Form", "Post", "Unify",
@@ -47,7 +39,7 @@ public final class HoneylinkUtils {
 		"Protocol", "Crypt", "Dictionary", "Register", "Migration", "Import", "Export", "Box", "Bundle", "Resource",
 		"Properties", "Dependency", "Analyze", "Process", "Report", "Summary", "Webservice", "Controller",
 		"Dispatcher", "Account"
-	});
+	);
 	
 
 	// TODO: per Konfig-Eintrag kommagetrennte Liste setzen lassen
@@ -85,15 +77,10 @@ public final class HoneylinkUtils {
         // use a separate random object to avoid exposing data based on other WebCastellum random seeds directly to users
 	private static final Random HONEY_RANDOM = new Random(); // using the faster "Random" here since it is not security-relevant
         
-        
-        
-        
         public static final short nextTagPartCounterTarget(Random random) {
             if (random == null) random = HONEY_RANDOM; // in public methods random can be null, meaning that a non-user-seeded random should be used
             return (short)(61 + random.nextInt(121)); // TODO: die beiden Zahlen zur Angabe der Einfuegewahrscheinlichkeit eines Honeylinks konfigurierbar machen...
         }
-    
-
 	
 	public static String generateHoneylink(Random random, final String prefix, final String suffix, final boolean isWithinTable) {
                 if (random == null) random = HONEY_RANDOM; // in public methods random can be null, meaning that a non-user-seeded random should be used
@@ -148,7 +135,8 @@ public final class HoneylinkUtils {
 		if (length < 3 || length > 300) return false;
 		if (!Character.isUpperCase(filename.charAt(0))) return false; // da der erste Buchstabe immer Uppercase ist
 		final StringBuilder word = new StringBuilder();
-		char c; boolean upper;
+		char c;
+                boolean upper;
 		for (int i=0; i<length; i++) {
 			c = filename.charAt(i);
 			if (!Character.isLetter(c)) break;
@@ -161,13 +149,7 @@ public final class HoneylinkUtils {
 		}
 		return true;
 	}
-	
-        
-        
-        
-
-        
-        
+	        
 	private static final String generateTitle(final Random random) {
 		return TITLE_PARTS[random.nextInt(TITLE_PARTS.length)];
 	}
@@ -176,7 +158,8 @@ public final class HoneylinkUtils {
 		final StringBuilder word = new StringBuilder();
 		final int wordCount = WORD_COUNT_MIN + random.nextInt(1+(WORD_COUNT_MAX-WORD_COUNT_MIN));
 		for (int i=0; i<wordCount; i++) {
-			String part; int tries = 0;
+			String part; 
+                        int tries = 0;
 			// dedupe
 			do part = (String) WORDS.get(random.nextInt(WORDS.size()));
 			while (word.indexOf(part) != -1 && tries++ < 50);
