@@ -8,22 +8,51 @@ import static org.junit.Assert.*;
 
 public class HoneylinkUtilsTest {
     
-    public HoneylinkUtilsTest() {
-    }
-
+    private static final int ITERATIONS = 5000;
+    
     @Test
-    public void testGenerateHoneylink() {
+    public void testGenerateHoneyLinkWithRandom(){
+        Random random = new java.util.Random();
+        testGenerateHoneylink(random, "prefix", "suffix", false);
+    }
+    
+    @Test
+    public void testGenerateHoneyLinkWithoutPrefix(){
+        testGenerateHoneylink(null, null, "suffix", false);
+    }
+    
+    @Test
+    public void testGenerateHoneyLinkWithoutSuffix(){
+        testGenerateHoneylink(null, "prefix", null, false);
+    }
+    
+    @Test
+    public void testGenerateHoneyLinkWithinTable(){
+        testGenerateHoneylink(null, "prefix", "suffix", true);
+    }
+    
+    private void testGenerateHoneylink(Random random, String prefix, String suffix, boolean withinTable) {
         String honeyLink = null;
         Set<String> links = new HashSet<>();
-        for(int i=0;i<10;i++){
-            honeyLink = HoneylinkUtils.generateHoneylink(null, "prefix", "suffix", false);
-            assertTrue(honeyLink.contains("prefix"));
-            assertTrue(honeyLink.contains("suffix"));
+        for(int i=0;i<ITERATIONS;i++){
+            honeyLink = HoneylinkUtils.generateHoneylink(random, prefix, suffix, withinTable);
+            if(prefix != null){
+                assertTrue(honeyLink.contains(prefix));
+            }
+            if(suffix != null){
+                assertTrue(honeyLink.contains("suffix"));
+            }
             links.add(honeyLink);
-            System.out.println(honeyLink);
+            assertTrue(honeyLink.startsWith("<!--"));
+            assertTrue(honeyLink.endsWith("-->"));
+            
+            if(withinTable){
+                assertTrue(honeyLink.contains("<td>"));
+                assertTrue(honeyLink.contains("</td>"));
+            }
         }
         
-        assertEquals(10, links.size());
+        assertEquals(ITERATIONS, links.size());
     }
 
     @Test
