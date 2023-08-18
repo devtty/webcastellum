@@ -9,6 +9,10 @@
       <param-value>Testpplication</param-value>
     </init-param>
     <init-param>
+        <param-name>ConfigurationLoader</param-name>
+        <param-value>RemoteConfigurationLoader</param-value>
+    </init-param>
+    <init-param>
       <param-name>LogVerboseForDevelopmentMode</param-name>
       <param-value>true</param-value>
     </init-param>
@@ -30,7 +34,12 @@
     </init-param>
     <init-param>
       <param-name>DefaultAttackLoggerDirectory</param-name>
-      <param-value>/home/runner/work/webcastellum/webcastellum/apache-tomcat-8.5.78/logs</param-value>
+      <!--<param-value>/home/runner/work/webcastellum/webcastellum/apache-tomcat-8.5.78/logs</param-value>-->
+      <param-value>/home/user/temp</param-value>
+    </init-param>
+    <init-param>
+        <param-name>LearningModeAggregationDirectory</param-name>
+        <param-value>/home/user/temp</param-value>
     </init-param>
 
 
