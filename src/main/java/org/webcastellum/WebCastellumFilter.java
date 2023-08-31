@@ -19,6 +19,15 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import weka.classifiers.Classifier;
+import weka.classifiers.Evaluation;
+import weka.classifiers.trees.J48;
+import static weka.core.Attribute.NUMERIC;
+import weka.core.DenseInstance;
+import weka.core.Instance;
+import weka.core.Instances;
+import weka.core.converters.ConverterUtils.DataSource;
+import weka.filters.unsupervised.attribute.Remove;
 
 
 
@@ -296,6 +305,8 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
     private FormFieldMaskingExcludeDefinitionContainer formFieldMaskingExcludeDefinitions;
 
 
+    private Classifier classifier;
+    private Instances traindata;
 
     
     /*
@@ -1679,6 +1690,20 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
                 }
             }
         }
+        
+        try{
+            Instance requestInstance = new DenseInstance(3);
+            requestInstance.setValue(1, request.getMethod());
+            requestInstance.setValue(2, request.getRequestURI());
+            Evaluation eval = new Evaluation(this.traindata);
+            double prediction = eval.evaluateModelOnce(this.classifier, requestInstance);
+            if(prediction < 1.0){
+                //handle response
+            }
+        }catch(Exception e){
+            logLocal("Evaluation error");
+        }
+        
         if (this.debug) logLocal("WebCastellum:doAfterProcessing ================================== end");
     }
     
@@ -4559,6 +4584,29 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
             if (this.debug) logLocal("Transparent forwarding: "+this.transparentForwarding);
         }
 
+        try{
+            DataSource source = new DataSource("csic_2010_norm.csv");
+            Instances dataset = source.getDataSet();
+        
+            dataset.setClassIndex(dataset.numAttributes() - 1);
+        
+            Classifier j48 = new J48();
+            dataset.deleteAttributeType(NUMERIC);
+        
+            //Entferne alle Attribute ausser Methode und URL-Pfad
+            Remove filter = new Remove();
+            filter.setAttributeIndices("3,4,5,6,7,8,9,10,11,12,13,14,15,16,17");
+            filter.setInputFormat(dataset);
+        
+            Instances filtered = weka.filters.Filter.useFilter(dataset, filter);
+            filtered.setClassIndex(filtered.numAttributes() - 1);
+            j48.buildClassifier(filtered);
+        
+            this.traindata = filtered;
+            this.classifier = j48;
+        }catch(Exception e){
+            logLocal("Couldn't init traindata");
+        }
         
         // INIT JMS IF REQUIRED TO DO SO
         if (this.jmsUsed) {
