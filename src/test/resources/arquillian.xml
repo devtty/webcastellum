@@ -5,7 +5,8 @@
         <configuration>
 <!--	  <property name="catalinaHome">target/tomcat</property>-->
 	  <property name="user">arquillian</property>
-	   <property name="pass">arquillian</property>
+          <property name="pass">arquillian</property>
+	  <property name="javaVmArguments">--add-exports=java.base/sun.nio.ch=ALL-UNNAMED --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.lang.reflect=ALL-UNNAMED --add-opens=java.base/java.io=ALL-UNNAMED --add-exports=jdk.unsupported/sun.misc=ALL-UNNAMED</property><!-- clean jvmArgs due to MaxPermSize fails-->
         </configuration>
 <!--        <protocol type="Servlet 3.0">
             <property name="host">test.example.com</property>
