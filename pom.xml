@@ -379,7 +379,7 @@
 		<artifactId>maven-surefire-plugin</artifactId>
 		<version>3.2.3</version>
 		<configuration>
-                  <argLine>--add-opens=java.base/java.lang=ALL-UNNAMED</argLine>
+                  <argLine>@{argLine} --add-opens=java.base/java.lang=ALL-UNNAMED</argLine>
 		</configuration>
 	      </plugin>
 	    </plugins>
