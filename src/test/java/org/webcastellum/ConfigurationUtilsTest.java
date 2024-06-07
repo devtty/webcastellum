@@ -71,8 +71,8 @@ public class ConfigurationUtilsTest {
         when(filterConfig.getInitParameter("test1")).thenReturn("testcomplete");
         when(filterConfig.getInitParameter("test2")).thenReturn(" testcomplete ");
         
-        assertEquals(ConfigurationUtils.extractMandatoryConfigValue(configurationManager, "test1"), "testcomplete");
-        assertEquals(ConfigurationUtils.extractMandatoryConfigValue(configurationManager, "test2"), "testcomplete");
+        assertEquals("testcomplete", ConfigurationUtils.extractMandatoryConfigValue(configurationManager, "test1"));
+        assertEquals("testcomplete", ConfigurationUtils.extractMandatoryConfigValue(configurationManager, "test2"));
     }
     
 
@@ -92,9 +92,9 @@ public class ConfigurationUtilsTest {
         when(filterConfig.getInitParameter("test2")).thenReturn("testcomplete");
         when(filterConfig.getInitParameter("test3")).thenReturn(" testcomplete ");
         
-        assertEquals(ConfigurationUtils.extractOptionalConfigValue(configurationManager, "test1", "replacednull"), "replacednull");
-        assertEquals(ConfigurationUtils.extractOptionalConfigValue(configurationManager, "test2", "default"), "testcomplete");
-        assertEquals(ConfigurationUtils.extractOptionalConfigValue(configurationManager, "test3", "default"), "testcomplete");
+        assertEquals("replacednull", ConfigurationUtils.extractOptionalConfigValue(configurationManager, "test1", "replacednull"));
+        assertEquals("testcomplete", ConfigurationUtils.extractOptionalConfigValue(configurationManager, "test2", "default"));
+        assertEquals("testcomplete", ConfigurationUtils.extractOptionalConfigValue(configurationManager, "test3", "default"));
                 
     }
 

@@ -23,19 +23,19 @@ public class GeoLocatingCacheTest {
     }
     
     @Test
-    public void testGetCountryCodeWithNull() throws GeoLocatingException {
+    public void testGetCountryCodeWithNull(){
         GeoLocatingCache cache =  new GeoLocatingCache(locator, 3*60*1000L);
         assertNull(cache.getCountryCode(null));
     }
     
     @Test
-    public void testGetCountryCodeWithoutLocator() throws GeoLocatingException {
+    public void testGetCountryCodeWithoutLocator(){
         GeoLocatingCache cache =  new GeoLocatingCache(null, 3*60*1000L);
         assertNull(cache.getCountryCode(IP_ADDRESS));
     }
     
     @Test
-    public void testGetCountryCodeWithDisabledLocator() throws GeoLocatingException {
+    public void testGetCountryCodeWithDisabledLocator(){
         when(locator.isEnabled()).thenReturn(false);
         
         GeoLocatingCache cache =  new GeoLocatingCache(null, 3*60*1000L);

@@ -26,7 +26,7 @@ public class ConfigurationManagerTest {
         when(filterConfig.getInitParameter("test")).thenReturn("testcomplete");
         try {
             ConfigurationManager manager = new ConfigurationManager(filterConfig);
-            assertEquals(manager.getConfigurationValue("test"), "testcomplete");
+            assertEquals("testcomplete", manager.getConfigurationValue("test"));
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | FilterConfigurationException ex) {
             fail(ex.getMessage());
         }
