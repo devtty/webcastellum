@@ -69,15 +69,22 @@ public class ServerUtilsTest {
     public void testParseContentDisposition() {
         Map resulta = ServerUtils.parseContentDisposition("Content-Disposition: form-data; name=\"field_value\"; filename=\"file_name.html\"");
         Map resultb = ServerUtils.parseContentDisposition("Content-Disposition: form-data; name=field_value; filename=file_name.html");
+        Map resultc = ServerUtils.parseContentDisposition("Content-Disposition: form-data; name=\"field_value\"; filename=\"\"");
         
         assertTrue(resulta.containsKey("filename"));
         assertTrue(resulta.containsKey("name"));
         assertEquals("file_name.html", resulta.get("filename"));
         assertEquals("field_value", resulta.get("name"));
+        
         assertTrue(resultb.containsKey("filename"));
         assertTrue(resultb.containsKey("name"));
         assertEquals("file_name.html", resultb.get("filename"));
         assertEquals("field_value", resultb.get("name"));
+        
+        assertTrue(resultc.containsKey("filename"));
+        assertTrue(resultc.containsKey("name"));
+        assertEquals("", resultc.get("filename"));
+        assertEquals("field_value", resultc.get("name"));
     }
 
     @Test
