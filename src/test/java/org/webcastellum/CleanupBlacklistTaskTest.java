@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
-import junit.framework.Assert;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -28,7 +27,7 @@ public class CleanupBlacklistTaskTest {
     }
     
     @Test
-    public void testTimer() throws InterruptedException {
+    public void testTimer(){
 
         LocalDateTime twoSecondsLater = LocalDateTime.now().plusSeconds(2);
         Date twoSecondsLaterAsDate = Date.from(twoSecondsLater.atZone(ZoneId.systemDefault()).toInstant());
@@ -43,11 +42,10 @@ public class CleanupBlacklistTaskTest {
         new Timer().schedule(task, twoSecondsLaterAsDate);
         
         while(LocalDateTime.now().isBefore(twoSecondsLater)){
-            assertTrue(blacklist.size()==3);
+            assertEquals(3,blacklist.size());
         }
-        
-        System.out.println("sadf" + blacklist.size());
-        assertTrue(blacklist.size()==1);
+     
+        assertEquals(1,blacklist.size());
         assertTrue(blacklist.containsKey("168.192.178.3"));
     }
 

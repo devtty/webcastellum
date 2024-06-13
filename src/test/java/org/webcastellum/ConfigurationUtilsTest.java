@@ -117,9 +117,5 @@ public class ConfigurationUtilsTest {
         
         assertTrue(exceptionThrown);
     }
-
-    @Test
-    public void testCreateConfigurationManager() throws Exception {
-    }
     
 }
