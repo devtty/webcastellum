@@ -43,7 +43,6 @@ public class DefaultGeoLocatorTest {
     }
 
     @Test
-    @Ignore
     public void testGetCountryCode() throws Exception {
         String ip = "212.85.96.95";
         DefaultGeoLocator locator = new DefaultGeoLocator();
