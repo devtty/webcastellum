@@ -27,7 +27,7 @@ public class CleanupBlacklistTaskTest {
     }
     
     @Test
-    public void testTimer(){
+    public void testTimer() throws InterruptedException{
 
         LocalDateTime twoSecondsLater = LocalDateTime.now().plusSeconds(2);
         Date twoSecondsLaterAsDate = Date.from(twoSecondsLater.atZone(ZoneId.systemDefault()).toInstant());
@@ -43,6 +43,7 @@ public class CleanupBlacklistTaskTest {
         
         while(LocalDateTime.now().isBefore(twoSecondsLater)){
             assertEquals(3,blacklist.size());
+            Thread.sleep(500);
         }
      
         assertEquals(1,blacklist.size());
