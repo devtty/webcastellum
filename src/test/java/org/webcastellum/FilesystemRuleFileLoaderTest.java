@@ -92,7 +92,14 @@ public class FilesystemRuleFileLoaderTest {
         //passes if rule files in src dir could be read
         //test may fail if rules are changed
         assertTrue(result.length > 50);
-        assertTrue(result[0].getName().contains("DirectoryTraversal-Direct"));
+        
+        boolean directoryTraversal = false;
+        for(RuleFile f : result){
+            if(f.getName().contains("DirectoryTraversal-Direct"))
+                directoryTraversal=true;
+        }
+
+        assertTrue(directoryTraversal);
     }
     
 }
