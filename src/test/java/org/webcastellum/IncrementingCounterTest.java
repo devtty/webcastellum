@@ -4,6 +4,19 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class IncrementingCounterTest {
+
+    @Test
+    public void copyConstructor(){
+        IncrementingCounter a = new IncrementingCounter(1234567);
+        a.increment();
+        a.setResetPeriodMillis(6000L);
+        IncrementingCounter copy = new IncrementingCounter(a);
+        
+        assertEquals(2, copy.getCounter());
+        assertEquals(2, copy.getDelta());
+        assertEquals(6000L, copy.getResetPeriodMillis());
+        assertNotSame(copy, a);
+    }
     
     @Test
     public void testClone() throws Exception {
