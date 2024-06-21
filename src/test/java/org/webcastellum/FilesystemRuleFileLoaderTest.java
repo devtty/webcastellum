@@ -19,10 +19,11 @@ public class FilesystemRuleFileLoaderTest {
         filterConfig = Mockito.mock(FilterConfig.class);
     }
     
-    @Test(expected = NullPointerException.class)
+    @Test
     public void testSetFilterConfigWithoutConfig() throws Exception {
         FilesystemRuleFileLoader instance = new FilesystemRuleFileLoader();
-        instance.setFilterConfig(null);
+        NullPointerException e = assertThrows(NullPointerException.class, () -> instance.setFilterConfig(null));
+        assertEquals("filterConfig must not be null", e.getMessage());
     }
     
     @Test
