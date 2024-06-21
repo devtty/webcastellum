@@ -1,8 +1,7 @@
 package org.webcastellum;
 
 import javax.servlet.FilterConfig;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import org.junit.Test;
 import org.junit.Before;
 import org.mockito.Mockito;
@@ -32,9 +31,10 @@ public class ConfigurationManagerTest {
         }
     }
         
-    @Test(expected = NullPointerException.class)
+    @Test
     public void testConfigurationManagerWithoutLoader() throws FilterConfigurationException{
-        ConfigurationManager manager = new ConfigurationManager(filterConfig, (ConfigurationLoader) null);
+        NullPointerException e = assertThrows(NullPointerException.class, () -> new ConfigurationManager(filterConfig, (ConfigurationLoader) null));
+        assertEquals("configurationLoader must not be null", e.getMessage());
     }
     
 }

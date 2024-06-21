@@ -51,7 +51,7 @@ public final class FilesystemRuleFileLoader extends AbstractFilebasedRuleFileLoa
                     }
                 }
             }
-            return (RuleFile[])rules.toArray(RuleFile[]::new);
+            return rules.toArray(RuleFile[]::new);
         } catch (Exception e) {
             throw new RuleLoadingException(e);
         }

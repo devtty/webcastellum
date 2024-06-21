@@ -33,7 +33,7 @@ public class FilesystemRuleFileLoaderTest {
     }
     
     @Test
-    public void testSetFilterConfigWithInitParamNull() throws FilterConfigurationException{
+    public void testSetFilterConfigWithInitParamNull(){
         when(filterConfig.getInitParameter(FilesystemRuleFileLoader.PARAM_RULE_FILES_BASE_PATH)).thenReturn(null);
         FilesystemRuleFileLoader instance = new FilesystemRuleFileLoader();
         FilterConfigurationException e = assertThrows(FilterConfigurationException.class, () -> instance.setFilterConfig(filterConfig));
