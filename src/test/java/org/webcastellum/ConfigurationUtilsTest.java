@@ -58,7 +58,7 @@ public class ConfigurationUtilsTest {
         }
         
         try {
-            assertEquals(ConfigurationUtils.extractMandatoryConfigValue(configurationManager, "test1", Pattern.compile("testcomplete")), "testcomplete");
+            assertEquals("testcomplete", ConfigurationUtils.extractMandatoryConfigValue(configurationManager, "test1", Pattern.compile("testcomplete")));
         } catch (FilterConfigurationException ex) {
             fail(ex.getMessage());
         }

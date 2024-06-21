@@ -25,58 +25,38 @@ public class FilesystemRuleFileLoaderTest {
         instance.setFilterConfig(null);
     }
     
-    @Test(expected = FilterConfigurationException.class)
+    @Test
     public void testSetFilterConfigWithoutInitParam() throws FilterConfigurationException{
-        try{
-            FilesystemRuleFileLoader instance = new FilesystemRuleFileLoader();
-            instance.setFilterConfig(filterConfig);
-        }catch(RuntimeException e){
-            assertEquals("Missing mandatory filter init-param: RulesFilesBasePath", e.getMessage());
-            throw e;
-        }
-        fail("FilterConfigurationException not thrown");
+        FilesystemRuleFileLoader instance = new FilesystemRuleFileLoader();
+        FilterConfigurationException e = assertThrows(FilterConfigurationException.class, () -> instance.setFilterConfig(filterConfig));
+        assertEquals("Missing mandatory filter init-param: RuleFilesBasePath", e.getMessage());
     }
     
-    @Test(expected = FilterConfigurationException.class)
+    @Test
     public void testSetFilterConfigWithInitParamNull() throws FilterConfigurationException{
-        when(filterConfig.getInitParameter("RuleFilesBasePath")).thenReturn(null);
-        try{
-            FilesystemRuleFileLoader instance = new FilesystemRuleFileLoader();
-            instance.setFilterConfig(filterConfig);
-        }catch(RuntimeException e){
-            assertEquals("Missing mandatory filter init-param: RuleFilesBasePath", e.getMessage()); //TODO Rule(s)FilesBasePath see WithoutInitParam?
-            throw e;
-        }
-        fail("FilterConfigurationException not thrown");
+        when(filterConfig.getInitParameter(FilesystemRuleFileLoader.PARAM_RULE_FILES_BASE_PATH)).thenReturn(null);
+        FilesystemRuleFileLoader instance = new FilesystemRuleFileLoader();
+        FilterConfigurationException e = assertThrows(FilterConfigurationException.class, () -> instance.setFilterConfig(filterConfig));
+        assertEquals("Missing mandatory filter init-param: RuleFilesBasePath", e.getMessage());
     }
     
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void testLoadRuleFilesWithoutPath() throws FilterConfigurationException, RuleLoadingException{
         when(filterConfig.getInitParameter(FilesystemRuleFileLoader.PARAM_RULE_FILES_BASE_PATH)).thenReturn("./wrongdir");
-        try{
-            FilesystemRuleFileLoader instance = new FilesystemRuleFileLoader();
-            instance.setFilterConfig(filterConfig);
-            instance.loadRuleFiles();
-        }catch(RuntimeException e){
-            assertEquals("Path must be set before loading rules files", e.getMessage());
-            throw e;
-        }
-        fail("IllegalStateException not thrown");
+        FilesystemRuleFileLoader instance = new FilesystemRuleFileLoader();
+        instance.setFilterConfig(filterConfig);
+        IllegalStateException e = assertThrows(IllegalStateException.class, () -> instance.loadRuleFiles());
+        assertEquals("Path must be set before loading rules files", e.getMessage());
     }
     
-    @Test(expected = RuleLoadingException.class)
+    @Test
     public void testLoadRuleFilesWrongDir() throws FilterConfigurationException, RuleLoadingException{
         when(filterConfig.getInitParameter(FilesystemRuleFileLoader.PARAM_RULE_FILES_BASE_PATH)).thenReturn("./wrongdir");
-        try{
-            FilesystemRuleFileLoader instance = new FilesystemRuleFileLoader();
-            instance.setFilterConfig(filterConfig);
-            instance.setPath("test");
-            instance.loadRuleFiles();
-        } catch (RuleLoadingException e) { 
-            assertTrue(e.getMessage().contains("Directory does not exist"));
-            throw e;
-        }
-        fail("RuleLoadingException not thrown");
+        FilesystemRuleFileLoader instance = new FilesystemRuleFileLoader();
+        instance.setFilterConfig(filterConfig);
+        instance.setPath("test");
+        RuleLoadingException e = assertThrows(RuleLoadingException.class, () -> instance.loadRuleFiles());
+        assertTrue(e.getMessage().contains("Directory does not exist"));
     }
 
     @Test
