@@ -26,7 +26,7 @@ public class FilesystemRuleFileLoaderTest {
     }
     
     @Test
-    public void testSetFilterConfigWithoutInitParam() throws FilterConfigurationException{
+    public void testSetFilterConfigWithoutInitParam(){
         FilesystemRuleFileLoader instance = new FilesystemRuleFileLoader();
         FilterConfigurationException e = assertThrows(FilterConfigurationException.class, () -> instance.setFilterConfig(filterConfig));
         assertEquals("Missing mandatory filter init-param: RuleFilesBasePath", e.getMessage());
@@ -41,7 +41,7 @@ public class FilesystemRuleFileLoaderTest {
     }
     
     @Test
-    public void testLoadRuleFilesWithoutPath() throws FilterConfigurationException, RuleLoadingException{
+    public void testLoadRuleFilesWithoutPath() throws FilterConfigurationException{
         when(filterConfig.getInitParameter(FilesystemRuleFileLoader.PARAM_RULE_FILES_BASE_PATH)).thenReturn("./wrongdir");
         FilesystemRuleFileLoader instance = new FilesystemRuleFileLoader();
         instance.setFilterConfig(filterConfig);
@@ -50,7 +50,7 @@ public class FilesystemRuleFileLoaderTest {
     }
     
     @Test
-    public void testLoadRuleFilesWrongDir() throws FilterConfigurationException, RuleLoadingException{
+    public void testLoadRuleFilesWrongDir() throws FilterConfigurationException{
         when(filterConfig.getInitParameter(FilesystemRuleFileLoader.PARAM_RULE_FILES_BASE_PATH)).thenReturn("./wrongdir");
         FilesystemRuleFileLoader instance = new FilesystemRuleFileLoader();
         instance.setFilterConfig(filterConfig);
@@ -82,4 +82,40 @@ public class FilesystemRuleFileLoaderTest {
         assertTrue(directoryTraversal);
     }
     
+    @Test
+    public void testIsMatchingSuffixWithDefaultSuffix() throws FilterConfigurationException{
+        when(filterConfig.getInitParameter(FilesystemRuleFileLoader.PARAM_RULE_FILES_BASE_PATH)).thenReturn("src/main/config/rules/");
+        
+        FilesystemRuleFileLoader instance = new FilesystemRuleFileLoader();
+        instance.setFilterConfig(filterConfig);
+        
+        assertTrue(instance.isMatchingSuffix("test.wcr"));
+    }
+    
+    @Test
+    public void testIsMatchingSuffixWithCustomSuffix() throws FilterConfigurationException{
+        when(filterConfig.getInitParameter(FilesystemRuleFileLoader.PARAM_RULE_FILES_BASE_PATH)).thenReturn("src/main/config/rules/");
+        when(filterConfig.getInitParameter(FilesystemRuleFileLoader.PARAM_RULE_FILES_SUFFIX)).thenReturn("rule");
+        
+        FilesystemRuleFileLoader instance = new FilesystemRuleFileLoader();
+        instance.setFilterConfig(filterConfig);
+        
+        assertTrue(instance.isMatchingSuffix("test.rule"));
+    }
+    
+    @Test
+    public void testIsMatchingSuffixWithNull() throws FilterConfigurationException{
+        when(filterConfig.getInitParameter(FilesystemRuleFileLoader.PARAM_RULE_FILES_BASE_PATH)).thenReturn("src/main/config/rules/");
+        FilesystemRuleFileLoader instance = new FilesystemRuleFileLoader();
+        instance.setFilterConfig(filterConfig);
+        assertFalse(instance.isMatchingSuffix(null));
+    }
+    
+    @Test
+    public void testIsMatchingSuffixWithoutSuffix() throws FilterConfigurationException{
+        when(filterConfig.getInitParameter(FilesystemRuleFileLoader.PARAM_RULE_FILES_BASE_PATH)).thenReturn("src/main/config/rules/");
+        FilesystemRuleFileLoader instance = new FilesystemRuleFileLoader();
+        instance.setFilterConfig(filterConfig);
+        assertFalse(instance.isMatchingSuffix("test"));
+    }
 }
