@@ -26,5 +26,4 @@ public class IdGeneratorUtilsTest {
         assertEquals(100, s.size());
     }
         
-    
 }

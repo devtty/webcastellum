@@ -117,7 +117,7 @@ public final class GeoLocatingCache {
             if (looserCount <= 0) {
                 return; // = nothing to remove
             }
-            final SortedSet<GeoLocation> geoLocationsSortedByAge = new TreeSet(LAST_ACCESS_COMPARATOR);
+            final SortedSet<GeoLocation> geoLocationsSortedByAge = new TreeSet<>(LAST_ACCESS_COMPARATOR);
             geoLocationsSortedByAge.addAll(this.geoLocations.values());
             int i = 0;
             for (final Iterator iter = geoLocationsSortedByAge.iterator(); iter.hasNext();) {

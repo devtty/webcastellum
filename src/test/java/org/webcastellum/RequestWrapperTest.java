@@ -80,6 +80,12 @@ public class RequestWrapperTest {
         //secret_key & secret_paf shouldn't appear in query string
         assertEquals("/test?param1=value1", wrapper.getQueryString());
     }
+    
+    @Test
+    public void testQueryStringTransparentQueryStringIsFalse(){
+        RequestWrapper wrapper = new RequestWrapper(request, helper, sessionCreationTracker,  "123.456.789.000", false, false, true);
+        assertEquals("/test?param1=value1&secret_key=token", wrapper.getQueryString());
+    }
 
     @Test
     public void testGetAttribute() {

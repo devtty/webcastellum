@@ -5,7 +5,9 @@ import java.util.regex.Pattern;
 public final class ContentModificationExcludeDefinition extends SimpleDefinition {
     private static final long serialVersionUID = 1L;
 
-    private boolean excludeOutgoingResponsesFromModification, excludeIncomingLinksFromModification, excludeIncomingLinksFromModificationEvenWhenFullPathRemovalEnabled;
+    private boolean excludeOutgoingResponsesFromModification;
+    private boolean excludeIncomingLinksFromModification;
+    private boolean excludeIncomingLinksFromModificationEvenWhenFullPathRemovalEnabled;
 
     public ContentModificationExcludeDefinition(final boolean enabled, final String identification, final String description, final WordDictionary servletPathOrRequestURIPrefilter, final Pattern servletPathOrRequestURIPattern) {
         super(enabled, identification, description, servletPathOrRequestURIPrefilter, servletPathOrRequestURIPattern);
@@ -15,6 +17,7 @@ public final class ContentModificationExcludeDefinition extends SimpleDefinition
     public boolean isExcludeOutgoingResponsesFromModification() {
         return excludeOutgoingResponsesFromModification;
     }
+    
     public void setExcludeOutgoingResponsesFromModification(boolean excludeOutgoingResponsesFromModification) {
         this.excludeOutgoingResponsesFromModification = excludeOutgoingResponsesFromModification;
     }

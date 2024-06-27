@@ -11,22 +11,22 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      CATALINA_HOME: /home/runner/work/webcastellum/webcastellum/apache-tomcat-8.5.78
+      CATALINA_HOME: /home/runner/work/webcastellum/webcastellum/apache-tomcat-8.5.100
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - name: Set up JDK 17
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
       - name: install tomcat
         run: |
-            wget https://archive.apache.org/dist/tomcat/tomcat-8/v8.5.78/bin/apache-tomcat-8.5.78.tar.gz
+            wget https://archive.apache.org/dist/tomcat/tomcat-8/v8.5.100/bin/apache-tomcat-8.5.100.tar.gz
             mkdir tomcat
-            tar zxf apache-tomcat-8.5.78.tar.gz
-            sed -i '/<\/tomcat-users>/ i\<user username="arquillian" password="arquillian" roles="manager-script"/>' apache-tomcat-8.5.78/conf/tomcat-users.xml
+            tar zxf apache-tomcat-8.5.100.tar.gz
+            sed -i '/<\/tomcat-users>/ i\<user username="arquillian" password="arquillian" roles="manager-script"/>' apache-tomcat-8.5.100/conf/tomcat-users.xml
       - name: additional dependencies
         run: |
             wget https://repository.jboss.org/nexus/content/groups/public/javax/jms/jms/1.1/jms-1.1.jar
@@ -34,7 +34,7 @@ jobs:
             mvn install:install-file -Dfile=jms-1.1.jar -DgroupId=javax.jms -DartifactId=jms -Dversion=1.1 -Dpackaging=jar
             mvn install:install-file -Dfile=mail-1.5.0-b01.jar -DgroupId=javax.mail -DartifactId=mail -Dversion=1.5.0-b01 -Dpackaging=jar
       - name: Cache Maven packages
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
