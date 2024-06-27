@@ -22,10 +22,6 @@ import org.junit.Ignore;
 import org.mockito.Mockito;
 import static org.mockito.Mockito.when;
 
-/**
- *
- * @author user
- */
 public class RequestUtilsTest {
 
     HttpSession session;
