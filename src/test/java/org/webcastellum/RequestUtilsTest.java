@@ -28,9 +28,6 @@ public class RequestUtilsTest {
     HttpServletRequest request;
     CryptoKeyAndSalt key;
     
-    public RequestUtilsTest() {
-    }
-    
     @Before
     public void setUp(){
         session = Mockito.mock(HttpSession.class);

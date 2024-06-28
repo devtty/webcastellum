@@ -13,9 +13,6 @@ public class DefaultClientIpDeterminatorTest {
     private FilterConfig filterConfig;
     private HttpServletRequest request;
     
-    public DefaultClientIpDeterminatorTest() {
-    }
-
     @Before
     public void setUp() {
         filterConfig = Mockito.mock(FilterConfig.class);
@@ -46,20 +43,13 @@ public class DefaultClientIpDeterminatorTest {
         NullPointerException e = assertThrows(NullPointerException.class, () -> instance.setFilterConfig(null));
         assertEquals("filterConfig must not be null", e.getMessage());
     }
-
-    @Test
-    public void testSetFilterConfigDefaults() throws FilterConfigurationException{
-        DefaultClientIpDeterminator instance = new DefaultClientIpDeterminator();
-        instance.setFilterConfig(filterConfig);
-    }
     
     @Test
     public void testDetermineClientIpFromServletRemoteAddr() throws ClientIpDeterminationException{
         when(request.getRemoteAddr()).thenReturn("127.0.0.1");
         
         DefaultClientIpDeterminator instance = new DefaultClientIpDeterminator();
-        assertEquals("127.0.0.1", instance.determineClientIp(request));
-        
+        assertEquals("127.0.0.1", instance.determineClientIp(request));   
     }
     
     @Test

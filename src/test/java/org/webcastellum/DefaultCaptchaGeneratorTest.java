@@ -11,9 +11,6 @@ public class DefaultCaptchaGeneratorTest {
     
     private FilterConfig filterConfig;
     
-    public DefaultCaptchaGeneratorTest() {
-    }
-    
     @Before
     public void setUp(){
         filterConfig = Mockito.mock(FilterConfig.class);
@@ -78,7 +75,7 @@ public class DefaultCaptchaGeneratorTest {
     }
     
     @Test
-    public void testGenerateCaptchaComplexity_6() throws FilterConfigurationException, CaptchaGenerationException {
+    public void testGenerateCaptchaComplexity_6(){
         when(filterConfig.getInitParameter(DefaultCaptchaGenerator.PARAM_COMPLEXITY)).thenReturn("6");
         DefaultCaptchaGenerator instance = new DefaultCaptchaGenerator();
         FilterConfigurationException e = assertThrows(FilterConfigurationException.class, () -> instance.setFilterConfig(filterConfig));
@@ -86,7 +83,7 @@ public class DefaultCaptchaGeneratorTest {
     }
     
     @Test
-    public void testGenerateCaptchaWithNegativeWidth() throws FilterConfigurationException, CaptchaGenerationException {
+    public void testGenerateCaptchaWithNegativeWidth(){
         when(filterConfig.getInitParameter(DefaultCaptchaGenerator.PARAM_IMAGE_WIDTH)).thenReturn("-240");
         DefaultCaptchaGenerator instance = new DefaultCaptchaGenerator();
         FilterConfigurationException e = assertThrows(FilterConfigurationException.class, () -> instance.setFilterConfig(filterConfig));
@@ -94,7 +91,7 @@ public class DefaultCaptchaGeneratorTest {
     }
     
     @Test
-    public void testGenerateCaptchaWithNegativeHeight() throws FilterConfigurationException, CaptchaGenerationException {
+    public void testGenerateCaptchaWithNegativeHeight(){
         when(filterConfig.getInitParameter(DefaultCaptchaGenerator.PARAM_IMAGE_HEIGHT)).thenReturn("-60");
         DefaultCaptchaGenerator instance = new DefaultCaptchaGenerator();
         FilterConfigurationException e = assertThrows(FilterConfigurationException.class, () -> instance.setFilterConfig(filterConfig));
@@ -102,7 +99,7 @@ public class DefaultCaptchaGeneratorTest {
     }
     
     @Test
-    public void testGenerateCaptchaWithNegativeLength() throws FilterConfigurationException, CaptchaGenerationException {
+    public void testGenerateCaptchaWithNegativeLength(){
         when(filterConfig.getInitParameter(DefaultCaptchaGenerator.PARAM_LENGTH)).thenReturn("-6");
         DefaultCaptchaGenerator instance = new DefaultCaptchaGenerator();
         FilterConfigurationException e = assertThrows(FilterConfigurationException.class, () -> instance.setFilterConfig(filterConfig));
@@ -110,7 +107,7 @@ public class DefaultCaptchaGeneratorTest {
     }
     
     @Test
-    public void testGenerateCaptchaWithNotParsableWidth() throws FilterConfigurationException, CaptchaGenerationException {
+    public void testGenerateCaptchaWithNotParsableWidth(){
         when(filterConfig.getInitParameter(DefaultCaptchaGenerator.PARAM_IMAGE_WIDTH)).thenReturn("test");
         DefaultCaptchaGenerator instance = new DefaultCaptchaGenerator();
         FilterConfigurationException e = assertThrows(FilterConfigurationException.class, () -> instance.setFilterConfig(filterConfig));
@@ -118,7 +115,7 @@ public class DefaultCaptchaGeneratorTest {
     }
     
     @Test
-    public void testGenerateCaptchaWithNotParsableHeight() throws FilterConfigurationException, CaptchaGenerationException {
+    public void testGenerateCaptchaWithNotParsableHeight(){
         when(filterConfig.getInitParameter(DefaultCaptchaGenerator.PARAM_IMAGE_HEIGHT)).thenReturn("test");
         DefaultCaptchaGenerator instance = new DefaultCaptchaGenerator();
         FilterConfigurationException e = assertThrows(FilterConfigurationException.class, () -> instance.setFilterConfig(filterConfig));
@@ -126,7 +123,7 @@ public class DefaultCaptchaGeneratorTest {
     }
     
     @Test
-    public void testGenerateCaptchaWithNotParsableLength() throws FilterConfigurationException, CaptchaGenerationException {
+    public void testGenerateCaptchaWithNotParsableLength(){
         when(filterConfig.getInitParameter(DefaultCaptchaGenerator.PARAM_LENGTH)).thenReturn("test");
         DefaultCaptchaGenerator instance = new DefaultCaptchaGenerator();
         FilterConfigurationException e = assertThrows(FilterConfigurationException.class, () -> instance.setFilterConfig(filterConfig));

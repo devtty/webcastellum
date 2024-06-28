@@ -18,7 +18,7 @@ public class ClientBlacklist {
 //    private static final long CLEANUP_INTERVAL_MILLIS = 8*60*1000;
 
         
-    private final Map/*<String,Long>*/ blockedClients = Collections.synchronizedMap(new HashMap());
+    private final Map<String,Long> blockedClients = Collections.synchronizedMap(new HashMap());
 
     private final long blockPeriodMillis;
     
@@ -32,7 +32,7 @@ public class ClientBlacklist {
     }
     
     private void initTimers(final long cleanupIntervalMillis) {
-        this.cleanupTimer = new Timer(/*"ClientBlacklist-cleanup", */true); // TODO Java5: name parameter in Time constructor is only available in Java5
+        this.cleanupTimer = new Timer("ClientBlacklist-cleanup", true);
         this.task = new CleanupBlacklistTask("ClientBlacklist",this.blockedClients);
         this.cleanupTimer.scheduleAtFixedRate(task, CryptoUtils.generateRandomNumber(false,60000,300000), cleanupIntervalMillis);
     }
@@ -54,9 +54,9 @@ public class ClientBlacklist {
     public boolean isBlacklisted(final String ip) {
         if (!this.blockedClients.containsKey(ip)) return false;
         synchronized (this.blockedClients) {
-            final Long blockedUntilMillis = (Long) this.blockedClients.get(ip);
+            final Long blockedUntilMillis = this.blockedClients.get(ip);
             if (blockedUntilMillis == null) return false;
-            if (System.currentTimeMillis() < blockedUntilMillis.longValue()) {
+            if (System.currentTimeMillis() < blockedUntilMillis) {
 //                if (DEBUG) System.out.println("Client is still blacklisted: "+ip);
                 return true;
             }
@@ -69,7 +69,7 @@ public class ClientBlacklist {
 
     public void blacklistClient(final String ip) {
         if (this.cleanupTimer != null) {
-            final Long blockedUntilMillis = new Long( System.currentTimeMillis() + this.blockPeriodMillis );
+            final Long blockedUntilMillis = Long.valueOf(System.currentTimeMillis() + this.blockPeriodMillis);
             this.blockedClients.put(ip, blockedUntilMillis);
 //            if (DEBUG) System.out.println("Client is now blacklisted: "+ip);
         }
