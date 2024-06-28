@@ -66,38 +66,34 @@ public final class DefaultCaptchaGenerator implements CaptchaGenerator {
             final String value = ConfigurationUtils.extractOptionalConfigValue(configManager, PARAM_COMPLEXITY, "3");
             try {
                 final byte complexity = Byte.parseByte(value);
-                if (this.height <= 0) throw new FilterConfigurationException("Complexity must be positive");
+                
+                this.rasterBefore = true;
                 switch (complexity) {
                     case 1:
-                        this.rasterBefore = true;
                         this.rasterAfter = false;
                         this.closeness = 3;
                         this.linesBefore = 1;
                         this.linesAfter = 1;
                         break;
                     case 2:
-                        this.rasterBefore = true;
                         this.rasterAfter = false;
                         this.closeness = 4;
                         this.linesBefore = 2;
                         this.linesAfter = 2;
                         break;
                     case 3:
-                        this.rasterBefore = true;
                         this.rasterAfter = false;
                         this.closeness = 5;
                         this.linesBefore = 3;
                         this.linesAfter = 3;
                         break;
                     case 4:
-                        this.rasterBefore = true;
                         this.rasterAfter = true;
                         this.closeness = 6;
                         this.linesBefore = 4;
                         this.linesAfter = 4;
                         break;
                     case 5:
-                        this.rasterBefore = true;
                         this.rasterAfter = true;
                         this.closeness = 7;
                         this.linesBefore = 5;
