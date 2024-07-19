@@ -462,7 +462,7 @@ public final class ServerUtils {
         if (values == null) return null;
         final int[] result = new int[values.length];
         for (int i=0; i<values.length; i++) {
-            result[i] = values[i].intValue();
+            result[i] = values[i];
         }
         return result;
     }
@@ -636,27 +636,7 @@ public final class ServerUtils {
     
     public static String decodeBrokenValueExceptUrlEncoding(String value) {
         if (value == null) return null;
-        { // Special character mappings
-            final Matcher matcher = PATTERN_SPECIAL_CHAR.matcher(value); // TODO: reuse matcher per request
-            final StringBuilder result = new StringBuilder( value.length() );
-            int pos = 0;
-            
-            String mapping;
-            String specialCharacter;
-            
-            while (matcher.find()) {
-                result.append( value.substring(pos,matcher.start()) );
-                pos = matcher.end();
-                mapping = matcher.group();
-                specialCharacter = SPECIAL_CHAR_MAPPINGS.get(mapping);
-                if (specialCharacter != null)
-                    result.append(specialCharacter);
-                else
-                    result.append(mapping);
-            }
-            if (pos < value.length()) result.append( value.substring(pos) );
-            value = result.toString();
-        }
+        value = handleSpecialCharacterMapping(value);
         { // Charset encodings - except URL encodings
             final Matcher matcher = PATTERN_ENCODED_CHAR_EXCEPT_URL_ENCODING.matcher(value); // TODO: reuse matcher per request
             final StringBuilder result = new StringBuilder( value.length() );
@@ -691,27 +671,11 @@ public final class ServerUtils {
         }
         return value;
     }
+    
     public static String decodeBrokenValue(String value) {
         if (value == null) return null;
-        { // Special character mappings
-            final Matcher matcher = PATTERN_SPECIAL_CHAR.matcher(value);// TODO: reuse matcher per request
-            final StringBuilder result = new StringBuilder( value.length() );
-            int pos = 0;
-            
-            String mapping;
-            String specialCharacter;
-            
-            while (matcher.find()) {
-                result.append( value.substring(pos,matcher.start()) );
-                pos = matcher.end();
-                mapping = matcher.group();
-                specialCharacter = SPECIAL_CHAR_MAPPINGS.get(mapping);
-                if (specialCharacter != null) result.append(specialCharacter);
-                else result.append(mapping);
-            }
-            if (pos < value.length()) result.append( value.substring(pos) );
-            value = result.toString();
-        }
+        value = handleSpecialCharacterMapping(value); // Special character mappings
+        // TODO: reuse matcher per request
         { // Charset encodings
             final Matcher matcher = PATTERN_ENCODED_CHAR.matcher(value);
             final StringBuilder result = new StringBuilder( value.length() );
@@ -1402,11 +1366,33 @@ public final class ServerUtils {
         int i=0;
         for (final Iterator iter = listOfIntegers.iterator(); iter.hasNext();) {
             final Integer element = (Integer) iter.next();
-            result[i++] = element.intValue();
+            result[i++] = element;
         }
         return result;
     }
     
+    private static String handleSpecialCharacterMapping(String value) {
+        // Special character mappings
+        final Matcher matcher = PATTERN_SPECIAL_CHAR.matcher(value); // TODO: reuse matcher per request
+        final StringBuilder result = new StringBuilder( value.length() );
+        int pos = 0;
+        String mapping;
+        String specialCharacter;
+        while (matcher.find()) {
+            result.append( value.substring(pos,matcher.start()) );
+            pos = matcher.end();
+            mapping = matcher.group();
+            specialCharacter = SPECIAL_CHAR_MAPPINGS.get(mapping);
+            if (specialCharacter != null)
+                result.append(specialCharacter);
+            else
+                result.append(mapping);
+        }
+        if (pos < value.length()) result.append( value.substring(pos) );
+        value = result.toString();
+        return value;
+    }
+        
     private static void printTuningTiming(){
         printTuningTiming(null);
     }
