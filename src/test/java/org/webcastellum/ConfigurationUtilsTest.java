@@ -47,23 +47,13 @@ public class ConfigurationUtilsTest {
     }
     
     @Test
-    public void testExtractMandatoryConfigValueWithPattern(){
+    public void testExtractMandatoryConfigValueWithPattern() throws FilterConfigurationException{
         when(filterConfig.getInitParameter("test1")).thenReturn("testcomplete");
         
-        boolean exceptionThrown = false;
-        try {
-            ConfigurationUtils.extractMandatoryConfigValue(configurationManager, "test1", Pattern.compile("regextest"));
-        } catch (FilterConfigurationException ex) {
-            exceptionThrown = true;
-        }
+        FilterConfigurationException e = assertThrows(FilterConfigurationException.class, () -> ConfigurationUtils.extractMandatoryConfigValue(configurationManager, "test1", Pattern.compile("regextest")));
         
-        try {
-            assertEquals("testcomplete", ConfigurationUtils.extractMandatoryConfigValue(configurationManager, "test1", Pattern.compile("testcomplete")));
-        } catch (FilterConfigurationException ex) {
-            fail(ex.getMessage());
-        }
-        
-        assertTrue(exceptionThrown);
+        assertEquals("Filter init-param does not validate against syntax pattern (regextest): test1", e.getMessage());
+        assertEquals("testcomplete", ConfigurationUtils.extractMandatoryConfigValue(configurationManager, "test1", Pattern.compile("testcomplete")));
     }
     
     @Test
@@ -75,6 +65,17 @@ public class ConfigurationUtilsTest {
         assertEquals("testcomplete", ConfigurationUtils.extractMandatoryConfigValue(configurationManager, "test2"));
     }
     
+    @Test
+    public void testExtractMandatoryConfigValue_WithFilterConfig() throws FilterConfigurationException{
+        when(filterConfig.getInitParameter("test1")).thenReturn("testcomplete");
+        assertEquals("testcomplete", ConfigurationUtils.extractMandatoryConfigValue(filterConfig, "test1"));
+    }
+    
+    @Test
+    public void testExtractMandatoryConfigValue_WithFilterConfigNull() throws FilterConfigurationException{
+        when(filterConfig.getInitParameter("test1")).thenReturn("testcomplete");
+        assertEquals("testcomplete", ConfigurationUtils.extractMandatoryConfigValue(filterConfig, "test1", Pattern.compile("testcomplete")));
+    }
 
     @Test(expected = NullPointerException.class)
     public void testExtractOptionalConfigValueWithoutFilterConfig() throws FilterConfigurationException{

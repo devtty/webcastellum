@@ -111,7 +111,7 @@ public final class DatabaseRuleFileInserter {
             System.err.println("Provide the following arguments: jdbcDriver jdbcUrl jdbcUser jdbcPassword table columnPath columnFilename columnPropertyKey columnPropertyValue fileStorageBase fileStoragePath");
             System.exit(-1);
         }
-        final Pattern allowedDatabaseCharacters = Pattern.compile(DatabaseRuleFileLoader.VALID_DATABASE_SYNTAX);
+        final Pattern allowedDatabaseCharacters = Pattern.compile(AbstractSqlRuleFileLoader.VALID_DATABASE_SYNTAX);
         final String jdbcDriver = args[0];
         final String jdbcUrl = args[1];
         final String jdbcUser = args[2];

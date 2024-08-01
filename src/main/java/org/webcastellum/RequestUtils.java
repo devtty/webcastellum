@@ -432,7 +432,7 @@ public final class RequestUtils {
             
             queryString = queryString.substring(0,start) + queryString.substring(end);
             
-            LOGGER.log(Level.FINE, "Result: "+queryString);
+            LOGGER.log(Level.FINE, "Result: {0}", queryString);
             
         }
         return queryString;

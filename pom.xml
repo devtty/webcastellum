@@ -234,7 +234,7 @@
                 <inherited>true</inherited>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.6.3</version>
+                <version>3.8.0</version>
                 <executions>
                     <execution>
                         <id>attach-javadocs</id>
@@ -260,7 +260,10 @@
             <plugin>
                <groupId>org.owasp</groupId>
                <artifactId>dependency-check-maven</artifactId>
-               <version>9.2.0</version>
+               <version>10.0.3</version>
+               <configuration>
+                   <nvdApiKey>${env.NVDAPIKEY}</nvdApiKey>
+               </configuration>
                <executions>
 		 <execution><goals><goal>check</goal></goals></execution>
                </executions>
