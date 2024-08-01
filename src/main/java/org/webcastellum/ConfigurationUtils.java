@@ -8,13 +8,12 @@ public final class ConfigurationUtils {
 
     private ConfigurationUtils() {}
 
-
-
     // TODO: identische Bestandteile der Methoden in eine eigen private Methode refactoren
 
     public static final String extractMandatoryConfigValue(final ConfigurationManager configurationManager, final String key) throws FilterConfigurationException {
         return extractMandatoryConfigValue(configurationManager, key, null);
     }
+
     public static final String extractMandatoryConfigValue(final ConfigurationManager configurationManager, final String key, final Pattern syntaxPattern) throws FilterConfigurationException {
         if (configurationManager == null) throw new NullPointerException("configurationManager must not be null");
         String value = configurationManager.getConfigurationValue(key);
@@ -27,6 +26,7 @@ public final class ConfigurationUtils {
     public static final String extractOptionalConfigValue(final ConfigurationManager configurationManager, final String key, final String defaultValue) throws FilterConfigurationException {
         return extractOptionalConfigValue(configurationManager, key, defaultValue, null);
     }
+
     public static final String extractOptionalConfigValue(final ConfigurationManager configurationManager, final String key, final String defaultValue, final Pattern syntaxPattern) throws FilterConfigurationException {
         if (configurationManager == null) throw new NullPointerException("configurationManager must not be null");
         String value = configurationManager.getConfigurationValue(key);
@@ -35,14 +35,11 @@ public final class ConfigurationUtils {
         checkSyntax(key, syntaxPattern, value);
         return value;
     }
-
-
-
-
     
     public static final String extractMandatoryConfigValue(final FilterConfig filterConfig, final String key) throws FilterConfigurationException {
         return extractMandatoryConfigValue(filterConfig, key, null);
     }
+
     public static final String extractMandatoryConfigValue(final FilterConfig filterConfig, final String key, final Pattern syntaxPattern) throws FilterConfigurationException {
         if (filterConfig == null) throw new NullPointerException("filterConfig must not be null");
         String value = filterConfig.getInitParameter(key);
@@ -55,6 +52,7 @@ public final class ConfigurationUtils {
     public static final String extractOptionalConfigValue(final FilterConfig filterConfig, final String key, final String defaultValue) throws FilterConfigurationException {
         return extractOptionalConfigValue(filterConfig, key, defaultValue, null);
     }
+
     public static final String extractOptionalConfigValue(final FilterConfig filterConfig, final String key, final String defaultValue, final Pattern syntaxPattern) throws FilterConfigurationException {
         if (filterConfig == null) throw new NullPointerException("filterConfig must not be null");
         String value = filterConfig.getInitParameter(key);
@@ -63,8 +61,6 @@ public final class ConfigurationUtils {
         checkSyntax(key, syntaxPattern, value);
         return value;
     }
-
-    
     
     public static void checkSyntax(final String key, final Pattern syntaxPattern, final String value) throws FilterConfigurationException {
         if (syntaxPattern != null) {
@@ -73,9 +69,6 @@ public final class ConfigurationUtils {
             if (!matcher.matches()) throw new FilterConfigurationException("Filter init-param does not validate against syntax pattern ("+syntaxPattern+"): "+key);
         }
     }
-
-
-
 
     public static ConfigurationManager createConfigurationManager(final FilterConfig filterConfig) throws FilterConfigurationException {
         final ConfigurationManager configManager;
@@ -87,6 +80,5 @@ public final class ConfigurationUtils {
         assert configManager != null;
         return configManager;
     }
-
     
 }
