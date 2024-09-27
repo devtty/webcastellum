@@ -76,3 +76,16 @@ IMPORTANT: Filter must be defined before any other filters
       -->
     </filter>
 ----
+
+.. Filter-Mappings Definition for dispatcher modes request, include and forward
+
+[source,xml]
+----
+       <filter-mapping>
+           <filter-name>WebCastellum</filter-name>
+           <url-pattern>/*</url-pattern>
+           <dispatcher>REQUEST</dispatcher>
+           <dispatcher>INCLUDE</dispatcher>
+           <dispatcher>FORWARD</dispatcher>
+       </filter-mapping>
+----
