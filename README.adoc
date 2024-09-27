@@ -12,5 +12,30 @@ Java-based Open Source WAF (Web Application Firewall) to include inside a web ap
 This quickstart readme contains the minimum steps required to integrate the WebCastellum Web Application Firewall 
 into the WAR archive of a web application. Further information on the installation as well as detailed instructions 
 for activating and customizing the numerous protection functions offered can be found in the https://github.com/devtty/webcastellum/wiki/files/WebCastellumGuideEnglish.pdf[WebCastellum 
-Reference Guide] . Further information can be found at http://www.WebCastellum.org and in the WebCastellum Forum
-at http://forum.WebCastellum.org
+Reference Guide] .
+// Further information can be found at http://www.WebCastellum.org and in the WebCastellum Forum at http://forum.WebCastellum.org
+
+=== Basic installation and configuration of WebCastellum
+
+. unpack the WAR archive of the web application
+
+. copy the webcastellum.jar into the WEB-INF/lib directory
+
+. adaptation of the web.xml:
+
+.. Definition of a new servlet filter
+
+IMPORTANT: Filter must be defined before any other filters
+
+[source,xml]
+----
+  <filter>
+    <filter-name>WebCastellum</filter-name>
+    <filter-class>org.webcastellum.WebCastellumFilter</filter-class>
+    <init-param>
+      <param-name>ApplicationName</param-name>
+      <!-- Name of the application (relevant for logging) -->
+      <param-value>MyApplication</param-value>
+    </init-param>
+          
+----
