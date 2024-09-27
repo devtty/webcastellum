@@ -89,3 +89,9 @@ IMPORTANT: Filter must be defined before any other filters
            <dispatcher>FORWARD</dispatcher>
        </filter-mapping>
 ----
+
+IMPORTANT: If other servlet filters are configured in the web.xml of the application, WebCastellum is usually configured as the “first” filter, i.e. as the filter that the request passes through first. 
+All other filters must always be run afterwards. One exception, however, are special compression filters. These are (if available) exceptionally configured before WebCastellum in the web.xml, so that the responses are compression of the responses takes place after they are transferred to WebCastellum are transferred.  
+
+It should also be noted that for all other filters of the application (if it has any) the dispatcher setting in the filter mapping is also extended to “FORWARD” in addition to “REQUEST” so that the WebCastellum functions take effect accordingly. Especially when use of URL encryption, it is important that the filters of the application are also set to “FORWARD” are also set.
+
