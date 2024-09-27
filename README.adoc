@@ -100,8 +100,57 @@ It should also be noted that for all other filters of the application (if it has
 The individual security features in the web.xml can be activated bit by bit as part of the further protection. The following consecutive security features are particularly suitable for demonstrating the increasing level of protection. The following configuration settings exist for this purpose.
 Configuration settings, which can be set to “true” in web.xml, for example:
 
-==== "SecretTokenLinkInjection"
+==== SecretTokenLinkInjection
 
 When this security feature is activated, randomly generated tokens are injected into links and forms and cross-checked (e.g. for further
 protection against CSRF attacks).
+
+==== QueryStringEncryption
+
+When this security feature is activated, the query strings of the links are also encrypted and thus protected against manipulation (for further protection against CSRF attacks and manipulation in general, among other things).
+
+==== ExtraEncryptedMediumPathRemoval
+
+When this security feature is activated, the filenames of the links are also replaced by random values (among other things to mislead malicious scanners and crawlers)
+
+==== ParameterAndFormProtection
+
+If this security feature is activated, the URL and especially the form parameters are also protected against manipulation (e.g. removal or addition of parameters).
+
+==== ExtraDisabledFormFieldProtection
+
+If this security feature is activated, form fields that are set as disabled are also protected against overwriting (for further protection against manipulation of disabled form fields).
+
+==== ExtraHiddenFormFieldProtection
+
+When this security feature is activated, hidden form fields are also removed and re-inserted in the subsequent request (for further protection against manipulation of hidden form fields).
+
+==== ExtraSelectboxProtection
+
+If this security feature is activated, the selectbox values are also checked against the permissible values in the follow-up request (for further protection against privilege escalation, among other things).
+
+==== ExtraCheckboxProtection
+
+If this security feature is activated, the checkbox values are also checked against the permissible values in the follow-up request (for further protection against privilege escalation, among other things).
+
+==== ExtraRadiobuttonProtection
+
+When this security feature is activated, the radio button values are also checked against the permissible values in the follow-up request (for further protection against privilege escalation, among other things).
+
+==== ExtraSelectboxValueMasking
+
+When this security feature is activated, the selectbox values are also replaced by a combination of random token and numerical value and then exchanged for the original value in the subsequent request (to avoid information disclosure, which would be the case if primary keys were disclosed, for example, and to provide further protection against CSRF attacks).
+
+==== ExtraCheckboxValueMasking
+
+When this security feature is activated, the checkbox values are also replaced by a combination of random token and numerical value and then exchanged for the original value in the subsequent request (e.g. to avoid information disclosure, which would be the case if primary keys were disclosed, and to further protect against CSRF attacks).
+
+==== ExtraRadiobuttonValueMasking
+
+When this security feature is activated, the radio button values are also replaced by a combination of random token and numerical value and then exchanged for the original value in the subsequent request (e.g. to Readme WebCastellum Demo Application Page 3 of 4 avoid information disclosure, which would be the case if primary keys were disclosed, and to further protect against CSRF attacks).
+
+Further configuration options can be found in the WebCastellum Reference Guide.
+
+=== Helpful Hints
+
 
