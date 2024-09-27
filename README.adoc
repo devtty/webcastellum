@@ -38,5 +38,41 @@ IMPORTANT: Filter must be defined before any other filters
       <!-- Name of the application (relevant for logging) -->
       <param-value>MyApplication</param-value>
     </init-param>
-          
+      <init-param>
+        <param-name>RedirectWelcomePage</param-name>
+        <!-- Redirect target (absolutely defined) to the login screen of the application to be protected -->
+        <param-value>/MyApplication/</param-value>
+      </init-param>
+      <init-param>
+         <param-name>CharacterEncoding</param-name>
+         <!-- The most common encodings are ISO-8859-1 or UTF-8 depending on the web application to be protected -->
+         <param-value>ISO-8859-1</param-value>
+      </init-param>
+      <init-param>
+          <param-name>AttackLogDirectory</param-name>
+          <!-- Logging folder (either relative to the JVM root or absolutely definable) -->
+          <param-value>logs</param-value>
+      </init-param>
+      <init-param>
+          <param-name>DefaultProductionModeCheckerValue</param-name>
+          <!-- Please set to “true” if productive use is to take place, so that no detailed information texts are displayed in the event of attacks are displayed, as is the case in development mode. -->
+          <param-value>false</param-value>
+      </init-param>
+      <init-param>
+          <param-name>TransparentForwarding</param-name>
+          <!-- Depending on the web framework used, set to “true” or “false” (see below). -->
+          <param-value>false</param-value>
+      </init-param>
+      <init-param>
+           <param-name>TransparentQueryString</param-name>
+           <param-value>false</param-value>
+      </init-param>
+      <!-- 
+                    ...
+                    ...
+                    ...
+                    The other numerous protection functions (e.g. URL encryption) and their configuration parameters 
+                    for the web.xml can be found in the WebCastellum Reference Guide.
+      -->
+    </filter>
 ----
