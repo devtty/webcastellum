@@ -4,3 +4,13 @@
 image:https://github.com/devtty/webcastellum/workflows/Java%20CI/badge.svg?branch=main[link={ci}]
 image:https://sonarcloud.io/api/project_badges/measure?project=devtty_webcastellum&metric=alert_status["Quality Gate Status", link={sonar}]
 image:https://img.shields.io/ossf-scorecard/github.com/devtty/webcastellum?label=openssf%20scorecard&style=flat[]
+
+== WebCastellum
+
+Java-based Open Source WAF (Web Application Firewall) to include inside a web application in order to protect it against attacks like SQL Injection, Cross-Site Scripting (XSS), Cross-Site Request Forgery (CSRF), Parameter Manipulation and many more.
+
+This quickstart readme contains the minimum steps required to integrate the WebCastellum Web Application Firewall 
+into the WAR archive of a web application. Further information on the installation as well as detailed instructions 
+for activating and customizing the numerous protection functions offered can be found in the https://github.com/devtty/webcastellum/wiki/files/WebCastellumGuideEnglish.pdf[WebCastellum 
+Reference Guide] . Further information can be found at http://www.WebCastellum.org and in the WebCastellum Forum
+at http://forum.WebCastellum.org
