@@ -95,3 +95,13 @@ All other filters must always be run afterwards. One exception, however, are spe
 
 It should also be noted that for all other filters of the application (if it has any) the dispatcher setting in the filter mapping is also extended to “FORWARD” in addition to “REQUEST” so that the WebCastellum functions take effect accordingly. Especially when use of URL encryption, it is important that the filters of the application are also set to “FORWARD” are also set.
 
+=== Examples of configuration options
+
+The individual security features in the web.xml can be activated bit by bit as part of the further protection. The following consecutive security features are particularly suitable for demonstrating the increasing level of protection. The following configuration settings exist for this purpose.
+Configuration settings, which can be set to “true” in web.xml, for example:
+
+==== "SecretTokenLinkInjection"
+
+When this security feature is activated, randomly generated tokens are injected into links and forms and cross-checked (e.g. for further
+protection against CSRF attacks).
+
