@@ -153,4 +153,20 @@ Further configuration options can be found in the WebCastellum Reference Guide.
 
 === Helpful Hints
 
+The supplied rule files are located by default in the Java archive webcastellum.jar in the rules.zip file. The individual protection functions must be activated selectively in web.xml.
+
+The basic configuration “development mode” provides a message that is presented to the user in the event of an attempted attack, which is helpful for development purposes. In a real deployment, the configuration would set a status code (e.g. HTTP 403 forbidden or HTTP 200 OK to confuse the vulnerability scanner with false positives) in the web.xml in response to an attack attempt instead of the message.
+
+The attack logs are stored in the folder that is set for the configuration value “AttackLogDirectory”. If a relative path is specified here instead of an absolute one, the start path of the Java process of the application server is assumed. A non-existent logging folder is not created automatically, but in such a case a corresponding message is displayed on the console (stdout or stderr). The web application is not started in the event of configuration errors. Instead, a corresponding exception indicating the configuration error is issued, exception indicating the configuration error.
+
+For the use of WebCastellum outside of a JavaEE container (e.g. in a pure web container), it must be ensured that the javax.mail package is available in addition to the inclusion of webcastellum.jar in the class path of the application. This can be done by including the JAR files (e.g. mail-api.jar and activation-api.jar) from the JavaEE stack in the class path of the web container or the web application. When used in a JavaEE container, no further inclusion of JAR files is necessary, as the JavaEE stack already contains all the necessary libraries. The JAR files for the javax.mail and javax.activation package can be downloaded here:
+
+. http://java.sun.com/products/javamail/downloads/index.html
+. http://java.sun.com/javase/technologies/desktop/javabeans/jaf/index.jsp
+
+For applications with multipart forms (file uploads), the rule file “multipart-size-limits/01_Oversized-Uploads.wcr” must be adapted so that multipart forms are permitted. See the enclosed ReferenceGuide on the subject of adapting rule files.
+
+The configuration parameter “TransparentForwarding” may need to be set to “true” or “false” (depending on the web framework used) if there are problems with links or form actions when using URL encryption. For example, the web framework “Apache Wicket” requires “true” and Spring Web-Flow based applications require “false”.
+
+The optional configuration parameter “ConfigurationLoader” defines the class name of an implementation of the interface “org.webcastellum.ConfigurationLoader”, which can be used to load configuration values. The default implementation reads the configuration data from the web.xml file. Alternatively, there are also implementations for reading from properties files.
 
