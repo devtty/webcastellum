@@ -1,3 +1,4 @@
+:icons: font
 :ci: https://github.com/devtty/webcastellum/actions?query=workflow%3A%22Java+CI%22
 :sonar: https://sonarcloud.io/dashboard?id=devtty_webcastellum
 
