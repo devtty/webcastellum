@@ -170,3 +170,74 @@ The configuration parameter “TransparentForwarding” may need to be set to �
 
 The optional configuration parameter “ConfigurationLoader” defines the class name of an implementation of the interface “org.webcastellum.ConfigurationLoader”, which can be used to load configuration values. The default implementation reads the configuration data from the web.xml file. Alternatively, there are also implementations for reading from properties files.
 
+=== Advanced tips for outsourcing the rules
+
+There is an interface for loading the rules, whose implementation class name can be configured in web.xml (init-param “RuleFileLoader”) (the default here is “org.webcastellum.ClasspathZipRuleFileLoader”). By default, WebCastellum includes the following implementations as “RuleFileLoader”:
+
+. org.webcastellum.DatabaseRuleFileLoader
+. org.webcastellum.DatasourceRuleFileLoader
+. org.webcastellum.FilesystemRuleFileLoader
+. org.webcastellum.ClasspathZipRuleFileLoader
+
+The first two are used to read the rules from a DB table. The file system-based loader loads from the disk and the last loader searches via a resource lookup in the classpath.
+
+These implementations have their own (specific) configurations, which can also be maintained as init-params in the web.xml:
+
+  org.webcastellum.DatabaseRuleFileLoader
+     init-param: RuleFilesJdbcDriver
+     init-param: RuleFilesJdbcUrl
+     init-param: RuleFilesJdbcUser
+     init-param: RuleFilesJdbcPassword
+     init-param: RuleFilesJdbcTable
+     init-param: RuleFilesJdbcColumnPath
+     init-param: RuleFilesJdbcColumnFilename
+     init-param: RuleFilesJdbcColumnPropertyKey
+     init-param: RuleFilesJdbcColumnPropertyValue
+
+   org.webcastellum.DatasourceRuleFileLoader
+     init-param: RuleFilesJdbcDatasource
+     init-param: RuleFilesJdbcTable
+     init-param: RuleFilesJdbcColumnPath
+     init-param: RuleFilesJdbcColumnFilename
+     init-param: RuleFilesJdbcColumnPropertyKey
+     init-param: RuleFilesJdbcColumnPropertyValue
+
+   org.webcastellum.FilesystemRuleFileLoader
+     init-param: RuleFilesBasePath
+     init-param: RuleFilesSuffix
+
+The default RuleFileLoader ClasspathZipRuleFileLoader loads the rules.zip from the classpath (by default under org.webcastellum. in the JAR) and the FilesystemRuleFileLoader goes to an exploded directory. Simply unpack the rules.zip to the disk and define the name of the unpacked root directory (relative to the Java process root or absolute with full path) in the specific parameter of this rule file loader in the web.xml: init-param “RuleFilesBasePath”.
+
+The dynamic reloading of rules at runtime can be controlled via the init-param “RuleFileReloadingInterval” (value in minutes; default is 0 = no reloading at runtime).
+
+There is a class in the sources (DatabaseRuleFileInserter) which is able to transfer rule files into a DB structure. The table and column names must be passed via the command line. The table must first be created accordingly (column type to hold strings). This allows all rules of all rule types to be transferred to a single table by calling up each rule type.
+
+=== Maven Repository
+
+If you prefer to use a Maven-compatible repository instead of downloading from SourceForge.net, use the following configuration data in your pom.xml file:
+
+[source, xml]
+----
+<project>
+      . . .
+      <dependencies>
+        <dependency>
+          <groupId>org.webcastellum</groupId>
+          <artifactId>webcastellum</artifactId>
+          <version>[1.8.4,)</version>
+          <scope>runtime</scope>
+        </dependency>
+      </dependencies>
+      . . .
+      <repositories>
+        <repository>
+          <id>webcastellum-repository</id>
+          <url>http://www.WebCastellum.org/maven/repository</url>
+        </repository>
+      </repositories>
+      . . .
+    </project>
+----
+
+The establishment of an automatic synchronization of the repository on WebCastellum.org with the public Maven Central Repository is currently being planned.
+
