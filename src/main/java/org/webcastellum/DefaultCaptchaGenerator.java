@@ -38,43 +38,25 @@ public final class DefaultCaptchaGenerator implements CaptchaGenerator {
     private static final Random RANDOM = new Random(); // not security relevant here
     
             
-    private String format, fontA, fontB;
+    private String format;
+    private String fontA;
+    private String fontB;
     private byte length;
-    private short width, height;
+    private short width;
+    private short height;
     private byte closeness; // the higher the value the closer the chars are rendered to each other
-    private byte linesBefore, linesAfter;
-    private boolean rasterBefore, rasterAfter;
+    private byte linesBefore;
+    private byte linesAfter;
+    private boolean rasterBefore;
+    private boolean rasterAfter;
     
     
+    @Override
     public void setFilterConfig(FilterConfig filterConfig) throws FilterConfigurationException {
         final ConfigurationManager configManager = ConfigurationUtils.createConfigurationManager(filterConfig);
-        { // length
-            final String value = ConfigurationUtils.extractOptionalConfigValue(configManager, PARAM_LENGTH, "7");
-            try {
-                this.length = Byte.parseByte(value);
-                if (this.length <= 0) throw new FilterConfigurationException("Length must be positive");
-            } catch (NumberFormatException e) {
-                throw new FilterConfigurationException("Unable to parse value into byte: "+value, e);
-            }
-        }
-        { // width
-            final String value = ConfigurationUtils.extractOptionalConfigValue(configManager, PARAM_IMAGE_WIDTH, "160");
-            try {
-                this.width = Short.parseShort(value);
-                if (this.width <= 0) throw new FilterConfigurationException("Width must be positive");
-            } catch (NumberFormatException e) {
-                throw new FilterConfigurationException("Unable to parse value into short: "+value, e);
-            }
-        }
-        { // height
-            final String value = ConfigurationUtils.extractOptionalConfigValue(configManager, PARAM_IMAGE_HEIGHT, "60");
-            try {
-                this.height = Short.parseShort(value);
-                if (this.height <= 0) throw new FilterConfigurationException("Height must be positive");
-            } catch (NumberFormatException e) {
-                throw new FilterConfigurationException("Unable to parse value into short: "+value, e);
-            }
-        }
+        setLength(configManager);
+        setImageWidth(configManager);
+        setImageHeight(configManager);
         // format
         this.format = ConfigurationUtils.extractOptionalConfigValue(configManager, PARAM_IMAGE_FORMAT, "jpeg");
         // font
@@ -84,41 +66,75 @@ public final class DefaultCaptchaGenerator implements CaptchaGenerator {
             final String value = ConfigurationUtils.extractOptionalConfigValue(configManager, PARAM_COMPLEXITY, "3");
             try {
                 final byte complexity = Byte.parseByte(value);
-                if (this.height <= 0) throw new FilterConfigurationException("Complexity must be positive");
-                if (complexity == 1) {
-                    this.rasterBefore = true;
-                    this.rasterAfter = false;
-                    this.closeness = 3;
-                    this.linesBefore = 1;
-                    this.linesAfter = 1;
-                } else if (complexity == 2) {
-                    this.rasterBefore = true;
-                    this.rasterAfter = false;
-                    this.closeness = 4;
-                    this.linesBefore = 2;
-                    this.linesAfter = 2;
-                } else if (complexity == 3) {
-                    this.rasterBefore = true;
-                    this.rasterAfter = false;
-                    this.closeness = 5;
-                    this.linesBefore = 3;
-                    this.linesAfter = 3;
-                } else if (complexity == 4) {
-                    this.rasterBefore = true;
-                    this.rasterAfter = true;
-                    this.closeness = 6;
-                    this.linesBefore = 4;
-                    this.linesAfter = 4;
-                } else if (complexity == 5) {
-                    this.rasterBefore = true;
-                    this.rasterAfter = true;
-                    this.closeness = 7;
-                    this.linesBefore = 5;
-                    this.linesAfter = 5;
-                } else throw new FilterConfigurationException("Complexity must be between 1 (easy) and 5 (complex)");
+                
+                this.rasterBefore = true;
+                switch (complexity) {
+                    case 1:
+                        this.rasterAfter = false;
+                        this.closeness = 3;
+                        this.linesBefore = 1;
+                        this.linesAfter = 1;
+                        break;
+                    case 2:
+                        this.rasterAfter = false;
+                        this.closeness = 4;
+                        this.linesBefore = 2;
+                        this.linesAfter = 2;
+                        break;
+                    case 3:
+                        this.rasterAfter = false;
+                        this.closeness = 5;
+                        this.linesBefore = 3;
+                        this.linesAfter = 3;
+                        break;
+                    case 4:
+                        this.rasterAfter = true;
+                        this.closeness = 6;
+                        this.linesBefore = 4;
+                        this.linesAfter = 4;
+                        break;
+                    case 5:
+                        this.rasterAfter = true;
+                        this.closeness = 7;
+                        this.linesBefore = 5;
+                        this.linesAfter = 5;
+                        break;
+                    default:
+                        throw new FilterConfigurationException("Complexity must be between 1 (easy) and 5 (complex)");
+                }
             } catch (NumberFormatException e) {
                 throw new FilterConfigurationException("Unable to parse value into byte: "+value, e);
             }
+        }
+    }
+
+    private void setImageHeight(final ConfigurationManager configManager) throws FilterConfigurationException {
+        final String value = ConfigurationUtils.extractOptionalConfigValue(configManager, PARAM_IMAGE_HEIGHT, "60");
+        try {
+            this.height = Short.parseShort(value);
+            if (this.height <= 0) throw new FilterConfigurationException("Height must be positive");
+        } catch (NumberFormatException e) {
+            throw new FilterConfigurationException("Unable to parse value into short: "+value, e);
+        }
+    }
+
+    private void setImageWidth(final ConfigurationManager configManager) throws FilterConfigurationException {
+        final String value = ConfigurationUtils.extractOptionalConfigValue(configManager, PARAM_IMAGE_WIDTH, "160");
+        try {
+            this.width = Short.parseShort(value);
+            if (this.width <= 0) throw new FilterConfigurationException("Width must be positive");
+        } catch (NumberFormatException e) {
+            throw new FilterConfigurationException("Unable to parse value into short: "+value, e);
+        }
+    }
+
+    private void setLength(final ConfigurationManager configManager) throws FilterConfigurationException {
+        final String value = ConfigurationUtils.extractOptionalConfigValue(configManager, PARAM_LENGTH, "7");
+        try {
+            this.length = Byte.parseByte(value);
+            if (this.length <= 0) throw new FilterConfigurationException("Length must be positive");
+        } catch (NumberFormatException e) {
+            throw new FilterConfigurationException("Unable to parse value into byte: "+value, e);
         }
     }
 
@@ -147,6 +163,7 @@ public final class DefaultCaptchaGenerator implements CaptchaGenerator {
     
     
     // see http://www.andrewtimberlake.com/blog/2006/06/ for some good tips
+    @Override
     public Captcha generateCaptcha() throws CaptchaGenerationException {
         // generate text
         final int captchaLength = this.length-1+RANDOM.nextInt(2);
@@ -229,44 +246,4 @@ public final class DefaultCaptchaGenerator implements CaptchaGenerator {
         }
         return new Captcha( String.valueOf(chars), sink.toByteArray(), this.width, this.height, this.format );
     }
-    
-
-    
-    
-    /** /
-    // just for local testing
-    public static final void main(String[] args) throws Exception {
-        String folder = "/tmp";
-        if (args.length > 0) folder = args[0];
-        final CaptchaGenerator generator = new DefaultCaptchaGenerator();
-        generator.setFilterConfig(new FilterConfig(){
-            public String getFilterName() {
-                throw new UnsupportedOperationException("Not supported yet.");
-            }
-            public javax.servlet.ServletContext getServletContext() {
-                throw new UnsupportedOperationException("Not supported yet.");
-            }
-            public java.util.Enumeration getInitParameterNames() {
-                throw new UnsupportedOperationException("Not supported yet.");
-            }
-            public String getInitParameter(String key) {
-                if (PARAM_COMPLEXITY.equals(key)) return "4";
-                return null;
-            }
-        });
-        final long timer = System.currentTimeMillis();
-        for (int i=0; i<10; i++) {
-            final Captcha captcha = generator.generateCaptcha();
-            final java.io.File file = new java.io.File(folder+"/bild"+i+"."+captcha.getImageFormat());
-            java.io.BufferedOutputStream output = null;
-            try {
-                output = new java.io.BufferedOutputStream( new java.io.FileOutputStream(file) );
-                output.write( captcha.getImage() );
-            } finally {
-                if (output != null) try { output.close(); } catch (IOException ignored) {}
-            }
-        }
-        System.out.println("Result in "+(System.currentTimeMillis()-timer)+" ms");
-    }/**/
-    
 }

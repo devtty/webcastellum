@@ -69,15 +69,22 @@ public class ServerUtilsTest {
     public void testParseContentDisposition() {
         Map resulta = ServerUtils.parseContentDisposition("Content-Disposition: form-data; name=\"field_value\"; filename=\"file_name.html\"");
         Map resultb = ServerUtils.parseContentDisposition("Content-Disposition: form-data; name=field_value; filename=file_name.html");
-        
+        Map resultc = ServerUtils.parseContentDisposition("Content-Disposition: form-data; name=\"field_value\"; filename=\"\"");
+                
         assertTrue(resulta.containsKey("filename"));
         assertTrue(resulta.containsKey("name"));
         assertEquals("file_name.html", resulta.get("filename"));
         assertEquals("field_value", resulta.get("name"));
+        
         assertTrue(resultb.containsKey("filename"));
         assertTrue(resultb.containsKey("name"));
         assertEquals("file_name.html", resultb.get("filename"));
         assertEquals("field_value", resultb.get("name"));
+        
+        assertTrue(resultc.containsKey("filename"));
+        assertTrue(resultc.containsKey("name"));
+        assertEquals("", resultc.get("filename"));
+        assertEquals("field_value", resultc.get("name"));
     }
 
     @Test
@@ -354,6 +361,21 @@ public class ServerUtilsTest {
         assertEquals(106, variants.getNonStandardPermutations().size());
         assertEquals(3, variants.getStandardPermutations().size());
         assertEquals(109, variants.size());
+    }
+    
+    @Test
+    public void testPermutateVariantsMap(){
+        Map map = new HashMap();
+
+        map.put("test0", new String[]{PERMUTATION_TEST_STRING});
+    
+        Map variants = ServerUtils.permutateVariants(map, true, (byte) 4);
+        assertTrue(variants.containsKey("test0"));
+        
+        Permutation[] p = (Permutation[]) variants.get("test0");
+        assertEquals(3, p[0].getStandardPermutations().size());
+        assertEquals(106, p[0].getNonStandardPermutations().size());
+        assertEquals(109, p[0].size());
     }
     
     @Test

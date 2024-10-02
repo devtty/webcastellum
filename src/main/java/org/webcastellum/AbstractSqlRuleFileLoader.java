@@ -40,7 +40,7 @@ public abstract class AbstractSqlRuleFileLoader extends AbstractRuleFileLoader {
     public final RuleFile[] loadRuleFiles() throws RuleLoadingException {
         if (this.path == null) throw new IllegalStateException("Path must be set before loading rules files");
         try {
-            final List/*<RuleFile>*/ rules = new ArrayList();
+            final List<RuleFile> rules = new ArrayList<>();
             
             Connection connection = null; 
             PreparedStatement preparedStatement = null;
@@ -76,8 +76,8 @@ public abstract class AbstractSqlRuleFileLoader extends AbstractRuleFileLoader {
                 if (connection != null) try { connection.close(); } catch (SQLException ignored) {}
             }
             
-            return (RuleFile[])rules.toArray(new RuleFile[0]);
-        } catch (Exception e) {
+            return rules.toArray(new RuleFile[0]);
+        } catch (SQLException | RuleLoadingException e) {
             throw new RuleLoadingException(e);
         }
     }

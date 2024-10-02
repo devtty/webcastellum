@@ -1,0 +1,243 @@
+:icons: font
+:ci: https://github.com/devtty/webcastellum/actions?query=workflow%3A%22Java+CI%22
+:sonar: https://sonarcloud.io/dashboard?id=devtty_webcastellum
+
+image:https://github.com/devtty/webcastellum/workflows/Java%20CI/badge.svg?branch=main[link={ci}]
+image:https://sonarcloud.io/api/project_badges/measure?project=devtty_webcastellum&metric=alert_status["Quality Gate Status", link={sonar}]
+image:https://img.shields.io/ossf-scorecard/github.com/devtty/webcastellum?label=openssf%20scorecard&style=flat[]
+
+== WebCastellum
+
+Java-based Open Source WAF (Web Application Firewall) to include inside a web application in order to protect it against attacks like SQL Injection, Cross-Site Scripting (XSS), Cross-Site Request Forgery (CSRF), Parameter Manipulation and many more.
+
+This quickstart readme contains the minimum steps required to integrate the WebCastellum Web Application Firewall 
+into the WAR archive of a web application. Further information on the installation as well as detailed instructions 
+for activating and customizing the numerous protection functions offered can be found in the https://github.com/devtty/webcastellum/wiki/files/WebCastellumGuideEnglish.pdf[WebCastellum 
+Reference Guide] .
+// Further information can be found at http://www.WebCastellum.org and in the WebCastellum Forum at http://forum.WebCastellum.org
+
+=== Basic installation and configuration of WebCastellum
+
+. unpack the WAR archive of the web application
+
+. copy the webcastellum.jar into the WEB-INF/lib directory
+
+. adaptation of the web.xml:
+
+.. Definition of a new servlet filter
+
+IMPORTANT: Filter must be defined before any other filters
+
+[source,xml]
+----
+  <filter>
+    <filter-name>WebCastellum</filter-name>
+    <filter-class>org.webcastellum.WebCastellumFilter</filter-class>
+    <init-param>
+      <param-name>ApplicationName</param-name>
+      <!-- Name of the application (relevant for logging) -->
+      <param-value>MyApplication</param-value>
+    </init-param>
+      <init-param>
+        <param-name>RedirectWelcomePage</param-name>
+        <!-- Redirect target (absolutely defined) to the login screen of the application to be protected -->
+        <param-value>/MyApplication/</param-value>
+      </init-param>
+      <init-param>
+         <param-name>CharacterEncoding</param-name>
+         <!-- The most common encodings are ISO-8859-1 or UTF-8 depending on the web application to be protected -->
+         <param-value>ISO-8859-1</param-value>
+      </init-param>
+      <init-param>
+          <param-name>AttackLogDirectory</param-name>
+          <!-- Logging folder (either relative to the JVM root or absolutely definable) -->
+          <param-value>logs</param-value>
+      </init-param>
+      <init-param>
+          <param-name>DefaultProductionModeCheckerValue</param-name>
+          <!-- Please set to “true” if productive use is to take place, so that no detailed information texts are displayed in the event of attacks are displayed, as is the case in development mode. -->
+          <param-value>false</param-value>
+      </init-param>
+      <init-param>
+          <param-name>TransparentForwarding</param-name>
+          <!-- Depending on the web framework used, set to “true” or “false” (see below). -->
+          <param-value>false</param-value>
+      </init-param>
+      <init-param>
+           <param-name>TransparentQueryString</param-name>
+           <param-value>false</param-value>
+      </init-param>
+      <!-- 
+                    ...
+                    ...
+                    ...
+                    The other numerous protection functions (e.g. URL encryption) and their configuration parameters 
+                    for the web.xml can be found in the WebCastellum Reference Guide.
+      -->
+    </filter>
+----
+
+.. Filter-Mappings Definition for dispatcher modes request, include and forward
+
+[source,xml]
+----
+       <filter-mapping>
+           <filter-name>WebCastellum</filter-name>
+           <url-pattern>/*</url-pattern>
+           <dispatcher>REQUEST</dispatcher>
+           <dispatcher>INCLUDE</dispatcher>
+           <dispatcher>FORWARD</dispatcher>
+       </filter-mapping>
+----
+
+IMPORTANT: If other servlet filters are configured in the web.xml of the application, WebCastellum is usually configured as the “first” filter, i.e. as the filter that the request passes through first. 
+All other filters must always be run afterwards. One exception, however, are special compression filters. These are (if available) exceptionally configured before WebCastellum in the web.xml, so that the responses are compression of the responses takes place after they are transferred to WebCastellum are transferred.  
+
+It should also be noted that for all other filters of the application (if it has any) the dispatcher setting in the filter mapping is also extended to “FORWARD” in addition to “REQUEST” so that the WebCastellum functions take effect accordingly. Especially when use of URL encryption, it is important that the filters of the application are also set to “FORWARD” are also set.
+
+=== Examples of configuration options
+
+The individual security features in the web.xml can be activated bit by bit as part of the further protection. The following consecutive security features are particularly suitable for demonstrating the increasing level of protection. The following configuration settings exist for this purpose.
+Configuration settings, which can be set to “true” in web.xml, for example:
+
+==== SecretTokenLinkInjection
+
+When this security feature is activated, randomly generated tokens are injected into links and forms and cross-checked (e.g. for further
+protection against CSRF attacks).
+
+==== QueryStringEncryption
+
+When this security feature is activated, the query strings of the links are also encrypted and thus protected against manipulation (for further protection against CSRF attacks and manipulation in general, among other things).
+
+==== ExtraEncryptedMediumPathRemoval
+
+When this security feature is activated, the filenames of the links are also replaced by random values (among other things to mislead malicious scanners and crawlers)
+
+==== ParameterAndFormProtection
+
+If this security feature is activated, the URL and especially the form parameters are also protected against manipulation (e.g. removal or addition of parameters).
+
+==== ExtraDisabledFormFieldProtection
+
+If this security feature is activated, form fields that are set as disabled are also protected against overwriting (for further protection against manipulation of disabled form fields).
+
+==== ExtraHiddenFormFieldProtection
+
+When this security feature is activated, hidden form fields are also removed and re-inserted in the subsequent request (for further protection against manipulation of hidden form fields).
+
+==== ExtraSelectboxProtection
+
+If this security feature is activated, the selectbox values are also checked against the permissible values in the follow-up request (for further protection against privilege escalation, among other things).
+
+==== ExtraCheckboxProtection
+
+If this security feature is activated, the checkbox values are also checked against the permissible values in the follow-up request (for further protection against privilege escalation, among other things).
+
+==== ExtraRadiobuttonProtection
+
+When this security feature is activated, the radio button values are also checked against the permissible values in the follow-up request (for further protection against privilege escalation, among other things).
+
+==== ExtraSelectboxValueMasking
+
+When this security feature is activated, the selectbox values are also replaced by a combination of random token and numerical value and then exchanged for the original value in the subsequent request (to avoid information disclosure, which would be the case if primary keys were disclosed, for example, and to provide further protection against CSRF attacks).
+
+==== ExtraCheckboxValueMasking
+
+When this security feature is activated, the checkbox values are also replaced by a combination of random token and numerical value and then exchanged for the original value in the subsequent request (e.g. to avoid information disclosure, which would be the case if primary keys were disclosed, and to further protect against CSRF attacks).
+
+==== ExtraRadiobuttonValueMasking
+
+When this security feature is activated, the radio button values are also replaced by a combination of random token and numerical value and then exchanged for the original value in the subsequent request (e.g. to Readme WebCastellum Demo Application Page 3 of 4 avoid information disclosure, which would be the case if primary keys were disclosed, and to further protect against CSRF attacks).
+
+Further configuration options can be found in the WebCastellum Reference Guide.
+
+=== Helpful Hints
+
+The supplied rule files are located by default in the Java archive webcastellum.jar in the rules.zip file. The individual protection functions must be activated selectively in web.xml.
+
+The basic configuration “development mode” provides a message that is presented to the user in the event of an attempted attack, which is helpful for development purposes. In a real deployment, the configuration would set a status code (e.g. HTTP 403 forbidden or HTTP 200 OK to confuse the vulnerability scanner with false positives) in the web.xml in response to an attack attempt instead of the message.
+
+The attack logs are stored in the folder that is set for the configuration value “AttackLogDirectory”. If a relative path is specified here instead of an absolute one, the start path of the Java process of the application server is assumed. A non-existent logging folder is not created automatically, but in such a case a corresponding message is displayed on the console (stdout or stderr). The web application is not started in the event of configuration errors. Instead, a corresponding exception indicating the configuration error is issued, exception indicating the configuration error.
+
+For the use of WebCastellum outside of a JavaEE container (e.g. in a pure web container), it must be ensured that the javax.mail package is available in addition to the inclusion of webcastellum.jar in the class path of the application. This can be done by including the JAR files (e.g. mail-api.jar and activation-api.jar) from the JavaEE stack in the class path of the web container or the web application. When used in a JavaEE container, no further inclusion of JAR files is necessary, as the JavaEE stack already contains all the necessary libraries. The JAR files for the javax.mail and javax.activation package can be downloaded here:
+
+. http://java.sun.com/products/javamail/downloads/index.html
+. http://java.sun.com/javase/technologies/desktop/javabeans/jaf/index.jsp
+
+For applications with multipart forms (file uploads), the rule file “multipart-size-limits/01_Oversized-Uploads.wcr” must be adapted so that multipart forms are permitted. See the enclosed ReferenceGuide on the subject of adapting rule files.
+
+The configuration parameter “TransparentForwarding” may need to be set to “true” or “false” (depending on the web framework used) if there are problems with links or form actions when using URL encryption. For example, the web framework “Apache Wicket” requires “true” and Spring Web-Flow based applications require “false”.
+
+The optional configuration parameter “ConfigurationLoader” defines the class name of an implementation of the interface “org.webcastellum.ConfigurationLoader”, which can be used to load configuration values. The default implementation reads the configuration data from the web.xml file. Alternatively, there are also implementations for reading from properties files.
+
+=== Advanced tips for outsourcing the rules
+
+There is an interface for loading the rules, whose implementation class name can be configured in web.xml (init-param “RuleFileLoader”) (the default here is “org.webcastellum.ClasspathZipRuleFileLoader”). By default, WebCastellum includes the following implementations as “RuleFileLoader”:
+
+. org.webcastellum.DatabaseRuleFileLoader
+. org.webcastellum.DatasourceRuleFileLoader
+. org.webcastellum.FilesystemRuleFileLoader
+. org.webcastellum.ClasspathZipRuleFileLoader
+
+The first two are used to read the rules from a DB table. The file system-based loader loads from the disk and the last loader searches via a resource lookup in the classpath.
+
+These implementations have their own (specific) configurations, which can also be maintained as init-params in the web.xml:
+
+  org.webcastellum.DatabaseRuleFileLoader
+     init-param: RuleFilesJdbcDriver
+     init-param: RuleFilesJdbcUrl
+     init-param: RuleFilesJdbcUser
+     init-param: RuleFilesJdbcPassword
+     init-param: RuleFilesJdbcTable
+     init-param: RuleFilesJdbcColumnPath
+     init-param: RuleFilesJdbcColumnFilename
+     init-param: RuleFilesJdbcColumnPropertyKey
+     init-param: RuleFilesJdbcColumnPropertyValue
+
+   org.webcastellum.DatasourceRuleFileLoader
+     init-param: RuleFilesJdbcDatasource
+     init-param: RuleFilesJdbcTable
+     init-param: RuleFilesJdbcColumnPath
+     init-param: RuleFilesJdbcColumnFilename
+     init-param: RuleFilesJdbcColumnPropertyKey
+     init-param: RuleFilesJdbcColumnPropertyValue
+
+   org.webcastellum.FilesystemRuleFileLoader
+     init-param: RuleFilesBasePath
+     init-param: RuleFilesSuffix
+
+The default RuleFileLoader ClasspathZipRuleFileLoader loads the rules.zip from the classpath (by default under org.webcastellum. in the JAR) and the FilesystemRuleFileLoader goes to an exploded directory. Simply unpack the rules.zip to the disk and define the name of the unpacked root directory (relative to the Java process root or absolute with full path) in the specific parameter of this rule file loader in the web.xml: init-param “RuleFilesBasePath”.
+
+The dynamic reloading of rules at runtime can be controlled via the init-param “RuleFileReloadingInterval” (value in minutes; default is 0 = no reloading at runtime).
+
+There is a class in the sources (DatabaseRuleFileInserter) which is able to transfer rule files into a DB structure. The table and column names must be passed via the command line. The table must first be created accordingly (column type to hold strings). This allows all rules of all rule types to be transferred to a single table by calling up each rule type.
+
+=== Maven Repository
+
+If you prefer to use a Maven-compatible repository instead of downloading from SourceForge.net, use the following configuration data in your pom.xml file:
+
+[source, xml]
+----
+<project>
+      . . .
+      <dependencies>
+        <dependency>
+          <groupId>org.webcastellum</groupId>
+          <artifactId>webcastellum</artifactId>
+          <version>[1.8.4,)</version>
+          <scope>runtime</scope>
+        </dependency>
+      </dependencies>
+      . . .
+      <repositories>
+        <repository>
+          <id>webcastellum-repository</id>
+          <url>http://www.WebCastellum.org/maven/repository</url>
+        </repository>
+      </repositories>
+      . . .
+    </project>
+----
+
+The establishment of an automatic synchronization of the repository on WebCastellum.org with the public Maven Central Repository is currently being planned.
+

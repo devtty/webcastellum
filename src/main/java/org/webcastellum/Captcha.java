@@ -7,11 +7,13 @@ import java.util.Map;
 public final class Captcha implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private final String value, imageFormat;
-    private final int width, height;
+    private final String value;
+    private final String imageFormat;
+    private final int width;
+    private final int height;
     private final long expiration = System.currentTimeMillis()+180000L; // = now + 3 minutes
 
-    private Map/*<String,String[]>*/ originalParameterMap;
+    private Map<String,String[]> originalParameterMap;
     private byte[] image;
     
     private String referenceId;
@@ -63,11 +65,11 @@ public final class Captcha implements Serializable {
     
     
     
-    public void setOriginalParameterMap(final Map/*<String,String[]>*/ originalParameterMap) {
-        this.originalParameterMap = originalParameterMap == null ? null : new HashMap/*<String,String[]>*/(originalParameterMap);
+    public void setOriginalParameterMap(final Map<String,String[]> originalParameterMap) {
+        this.originalParameterMap = originalParameterMap == null ? null : new HashMap<>(originalParameterMap);
     }
-    public Map/*<String,String[]>*/ getOriginalParameterMap() {
-        return this.originalParameterMap == null ? null : new HashMap/*<String,String[]>*/(this.originalParameterMap);
+    public Map<String,String[]> getOriginalParameterMap() {
+        return this.originalParameterMap == null ? null : new HashMap<>(this.originalParameterMap);
     }
     public void clearOriginalParameterMap() {
         if (this.originalParameterMap != null) {

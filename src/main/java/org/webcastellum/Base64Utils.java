@@ -20,7 +20,7 @@ public final class Base64Utils {
      * @return BASE64 encoded data
      */
     public static String encode(final byte[] data) {
-        final char output[] = new char[4];
+        final char[] output = new char[4];
         byte state = 1;
         int restbits = 0;
         int chunks = 0;
@@ -78,7 +78,7 @@ public final class Base64Utils {
      */
     public static byte[] decode(final String encoded) {
         int i;
-        byte output[] = new byte[3];
+        byte[] output = new byte[3];
         int state;
 
         ByteArrayOutputStream data = new ByteArrayOutputStream(encoded.length());

@@ -345,7 +345,7 @@ public final class ServerUtils {
                 HTML_ENCODING_MAPPING.put(character, key);
             }
         }
-    };
+    }
     
     
     private static final Pattern PATTERN_ENCODED_CHAR_EXCEPT_URL_ENCODING = Pattern.compile("(?:\\\\[xX]|\\\\[uU]00)[a-fA-F0-9]{2}|&#[0-9]{0,5}[0-9]{2};?|&#[xX][0-9]{0,5}[a-fA-F0-9]{2};?");
@@ -453,7 +453,7 @@ public final class ServerUtils {
         if (values == null) return null;
         final Integer[] result = new Integer[values.length];
         for (int i=0; i<values.length; i++) {
-            result[i] = new Integer(values[i]);
+            result[i] = values[i];
         }
         return result;
     }
@@ -462,7 +462,7 @@ public final class ServerUtils {
         if (values == null) return null;
         final int[] result = new int[values.length];
         for (int i=0; i<values.length; i++) {
-            result[i] = values[i].intValue();
+            result[i] = values[i];
         }
         return result;
     }
@@ -613,7 +613,10 @@ public final class ServerUtils {
         final Matcher matcher = PATTERN_SPECIAL_CHAR_HTML_ONLY.matcher(value);// TODO: reuse matcher per request
         final StringBuilder result = new StringBuilder( value.length() );
         int pos = 0;
-        String mapping, specialCharacter;
+        
+        String mapping;
+        String specialCharacter;
+        
         while (matcher.find()) {
             result.append( value.substring(pos,matcher.start()) );
             pos = matcher.end();
@@ -630,32 +633,20 @@ public final class ServerUtils {
             result.append( value.substring(pos) );
         return result.toString();
     }
+    
     public static String decodeBrokenValueExceptUrlEncoding(String value) {
         if (value == null) return null;
-        { // Special character mappings
-            final Matcher matcher = PATTERN_SPECIAL_CHAR.matcher(value); // TODO: reuse matcher per request
-            final StringBuilder result = new StringBuilder( value.length() );
-            int pos = 0;
-            String mapping, specialCharacter;
-            while (matcher.find()) {
-                result.append( value.substring(pos,matcher.start()) );
-                pos = matcher.end();
-                mapping = matcher.group();
-                specialCharacter = SPECIAL_CHAR_MAPPINGS.get(mapping);
-                if (specialCharacter != null)
-                    result.append(specialCharacter);
-                else
-                    result.append(mapping);
-            }
-            if (pos < value.length()) result.append( value.substring(pos) );
-            value = result.toString();
-        }
+        value = handleSpecialCharacterMapping(value);
         { // Charset encodings - except URL encodings
             final Matcher matcher = PATTERN_ENCODED_CHAR_EXCEPT_URL_ENCODING.matcher(value); // TODO: reuse matcher per request
             final StringBuilder result = new StringBuilder( value.length() );
             int pos = 0, length;
-            String encoded, decimal;
-            char zero, two;
+            
+            String encoded;
+            String decimal;
+            char zero;
+            char two;
+            
             while (matcher.find()) {
                 result.append( value.substring(pos,matcher.start()) );
                 pos = matcher.end();
@@ -680,29 +671,19 @@ public final class ServerUtils {
         }
         return value;
     }
+    
     public static String decodeBrokenValue(String value) {
         if (value == null) return null;
-        { // Special character mappings
-            final Matcher matcher = PATTERN_SPECIAL_CHAR.matcher(value);// TODO: reuse matcher per request
-            final StringBuilder result = new StringBuilder( value.length() );
-            int pos = 0;
-            String mapping, specialCharacter;
-            while (matcher.find()) {
-                result.append( value.substring(pos,matcher.start()) );
-                pos = matcher.end();
-                mapping = matcher.group();
-                specialCharacter = SPECIAL_CHAR_MAPPINGS.get(mapping);
-                if (specialCharacter != null) result.append(specialCharacter);
-                else result.append(mapping);
-            }
-            if (pos < value.length()) result.append( value.substring(pos) );
-            value = result.toString();
-        }
+        value = handleSpecialCharacterMapping(value); // Special character mappings
+        // TODO: reuse matcher per request
         { // Charset encodings
             final Matcher matcher = PATTERN_ENCODED_CHAR.matcher(value);
-            final StringBuilder result = new StringBuilder( value.length() ); // TODO: Java5 use StringBuilder
+            final StringBuilder result = new StringBuilder( value.length() );
             int pos = 0, length;
-            String encoded, decimal;
+            
+            String encoded;
+            String decimal;
+            
             while (matcher.find()) {
                 result.append( value.substring(pos,matcher.start()) );
                 pos = matcher.end();
@@ -841,10 +822,12 @@ public final class ServerUtils {
     public static String removeBackslashes(final String value) {
         // simply remove backslashes the same way as it is done in JavaScript (see JavaScript alert("aaa\aaa\\aaa\\\aaa\\\\aaa\\\\\aaa\\\\\\aaa") as an example)
         if (value == null) return value;
-        final StringBuilder result = new StringBuilder(value.length()); // TODO: Java5 use StringBuilder
+        final StringBuilder result = new StringBuilder(value.length());
         final int length = value.length();
         char c;
-        int next, nextNext;
+        int next;
+        int nextNext;
+        
         for (int i=0; i<length; i++) {
             c = value.charAt(i);
             if (c == '\\') {
@@ -886,107 +869,108 @@ public final class ServerUtils {
         final Permutation permutation = new Permutation();
         if (value != null) {
             permutation.addStandardPermutation(value);
-            if (DEBUG_PRINT_TUNING_TIMINGS) System.out.println("START with length "+value.length()+"\n"+System.currentTimeMillis());
-
+            
+            printTuningTiming("START with length "+value.length()+"\n");
+            
             if (decodingPermutationLevel >= 1) {
                 permutation.addStandardPermutation(ServerUtils.decodeBrokenValue(value)); // this is a standard permutation
-                if (DEBUG_PRINT_TUNING_TIMINGS) System.out.println(System.currentTimeMillis());
+                printTuningTiming();
                 final String value_utf8Decoded = ServerUtils.decodeBrokenUTF8(value);
                 permutation.addStandardPermutation(value_utf8Decoded); // this is a standard permutation
-                if (DEBUG_PRINT_TUNING_TIMINGS) System.out.println(System.currentTimeMillis());
+                printTuningTiming();
                 final String value_nullBytesRemoved = ServerUtils.removeNullBytes(value);
                 final boolean nullBytesRemovalCreatedNewValue;
                 if (!value_nullBytesRemoved.equals(value)) {
                     permutation.addNonStandardPermutation(value_nullBytesRemoved);
                     nullBytesRemovalCreatedNewValue = true;
                 } else nullBytesRemovalCreatedNewValue = false;
-                if (DEBUG_PRINT_TUNING_TIMINGS) System.out.println(System.currentTimeMillis());
+                printTuningTiming();
                 permutation.addNonStandardPermutation(ServerUtils.compressWhitespaces(value,decodingPermutationLevel));
-                if (DEBUG_PRINT_TUNING_TIMINGS) System.out.println(System.currentTimeMillis());
+                printTuningTiming();
                 permutation.addNonStandardPermutation(ServerUtils.removeWhitespaces(value,decodingPermutationLevel));
-                if (DEBUG_PRINT_TUNING_TIMINGS) System.out.println(System.currentTimeMillis());
+                printTuningTiming();
                 permutation.addNonStandardPermutation(ServerUtils.replaceCommentsWithSpace(value));
-                if (DEBUG_PRINT_TUNING_TIMINGS) System.out.println(System.currentTimeMillis());
+                printTuningTiming();
                 permutation.addNonStandardPermutation(ServerUtils.removeComments(value));
-                if (DEBUG_PRINT_TUNING_TIMINGS) System.out.println(System.currentTimeMillis());
+                printTuningTiming();
                 permutation.addNonStandardPermutation(ServerUtils.removeXmlCdataTags(value));
-                if (DEBUG_PRINT_TUNING_TIMINGS) System.out.println(System.currentTimeMillis());
+                printTuningTiming();
                 permutation.addNonStandardPermutation(ServerUtils.removeSamePathReferences(value));
-                if (DEBUG_PRINT_TUNING_TIMINGS) System.out.println(System.currentTimeMillis());
+                printTuningTiming();
                 permutation.addNonStandardPermutation(ServerUtils.removeMultiPathSlashes(value));
-                if (DEBUG_PRINT_TUNING_TIMINGS) System.out.println(System.currentTimeMillis());
+                printTuningTiming();
 
                 if (nonStandardPermutationsAllowed && decodingPermutationLevel >= 2) {
                     if (nullBytesRemovalCreatedNewValue) {
                         permutation.addNonStandardPermutation(ServerUtils.decodeBrokenValue(value_nullBytesRemoved));
                     }
-                    if (DEBUG_PRINT_TUNING_TIMINGS) System.out.println(System.currentTimeMillis());
+                    printTuningTiming();
                     permutation.addNonStandardPermutation(ServerUtils.compressWhitespaces(value_utf8Decoded,decodingPermutationLevel));
-                    if (DEBUG_PRINT_TUNING_TIMINGS) System.out.println(System.currentTimeMillis());
+                    printTuningTiming();
                     permutation.addNonStandardPermutation(ServerUtils.removeWhitespaces(value_utf8Decoded,decodingPermutationLevel));
-                    if (DEBUG_PRINT_TUNING_TIMINGS) System.out.println(System.currentTimeMillis());
+                    printTuningTiming();
                     final String value_decodedNullBytesRemoved = ServerUtils.removeNullBytes(value_utf8Decoded);
                     permutation.addNonStandardPermutation(value_decodedNullBytesRemoved);
-                    if (DEBUG_PRINT_TUNING_TIMINGS) System.out.println(System.currentTimeMillis());
+                    printTuningTiming();
                     permutation.addNonStandardPermutation(ServerUtils.replaceCommentsWithSpace(value_utf8Decoded));
-                    if (DEBUG_PRINT_TUNING_TIMINGS) System.out.println(System.currentTimeMillis());
+                    printTuningTiming();
                     permutation.addNonStandardPermutation(ServerUtils.removeComments(value_utf8Decoded));
-                    if (DEBUG_PRINT_TUNING_TIMINGS) System.out.println(System.currentTimeMillis());
+                    printTuningTiming();
                     permutation.addNonStandardPermutation(ServerUtils.removeSamePathReferences(value_utf8Decoded));
-                    if (DEBUG_PRINT_TUNING_TIMINGS) System.out.println(System.currentTimeMillis());
+                    printTuningTiming();
                     permutation.addNonStandardPermutation(ServerUtils.removeXmlCdataTags(value_utf8Decoded));
-                    if (DEBUG_PRINT_TUNING_TIMINGS) System.out.println(System.currentTimeMillis());
+                    printTuningTiming();
                     permutation.addNonStandardPermutation(ServerUtils.removeMultiPathSlashes(value_utf8Decoded));
-                    if (DEBUG_PRINT_TUNING_TIMINGS) System.out.println(System.currentTimeMillis());
+                    printTuningTiming();
                     permutation.addNonStandardPermutation(ServerUtils.removeBackslashes(value));
-                    if (DEBUG_PRINT_TUNING_TIMINGS) System.out.println(System.currentTimeMillis());
+                    printTuningTiming();
                     if (nullBytesRemovalCreatedNewValue) {
                         permutation.addNonStandardPermutation(ServerUtils.removeBackslashes(value_nullBytesRemoved));
                     }
-                    if (DEBUG_PRINT_TUNING_TIMINGS) System.out.println(System.currentTimeMillis());
+                    printTuningTiming();
                     permutation.addNonStandardPermutation(ServerUtils.removeBackslashes(value_utf8Decoded));
-                    if (DEBUG_PRINT_TUNING_TIMINGS) System.out.println(System.currentTimeMillis());
+                    printTuningTiming();
                     permutation.addNonStandardPermutation(ServerUtils.removeBackslashes(value_decodedNullBytesRemoved));
-                    if (DEBUG_PRINT_TUNING_TIMINGS) System.out.println(System.currentTimeMillis());
+                    printTuningTiming();
 
                     if (decodingPermutationLevel >= 3) {
                         //final String value_decodedNullBytesRemovedDecoded = ServerUtils.decodeBrokenValue(value_decodedNullBytesRemoved);
                         //permutation.addNonStandardPermutation(value_decodedNullBytesRemovedDecoded);
                         //if (DEBUG_PRINT_TUNING_TIMINGS) System.out.println(System.currentTimeMillis());
                         permutation.addNonStandardPermutation(ServerUtils.removeWhitespaces(value_decodedNullBytesRemoved,decodingPermutationLevel));
-                        if (DEBUG_PRINT_TUNING_TIMINGS) System.out.println(System.currentTimeMillis());
+                        printTuningTiming();
                         final String value_utf8DecodedTwice = ServerUtils.decodeBrokenUTF8(value_utf8Decoded);
                         permutation.addNonStandardPermutation(value_utf8DecodedTwice);
-                        if (DEBUG_PRINT_TUNING_TIMINGS) System.out.println(System.currentTimeMillis());
+                        printTuningTiming();
                         permutation.addNonStandardPermutation(ServerUtils.removeWhitespaces(value_utf8DecodedTwice,decodingPermutationLevel));
-                        if (DEBUG_PRINT_TUNING_TIMINGS) System.out.println(System.currentTimeMillis());
+                        printTuningTiming();
                         final String value_decodedTwiceNullBytesRemoved = ServerUtils.removeNullBytes(value_utf8DecodedTwice);
                         permutation.addNonStandardPermutation(value_decodedTwiceNullBytesRemoved);
-                        if (DEBUG_PRINT_TUNING_TIMINGS) System.out.println(System.currentTimeMillis());
+                        printTuningTiming();
                         //final String value_decodedTwiceNullBytesRemovedDecoded = ServerUtils.decodeBrokenValue(value_decodedTwiceNullBytesRemoved);
                         //permutation.addNonStandardPermutation(value_decodedTwiceNullBytesRemovedDecoded);
                         //if (DEBUG_PRINT_TUNING_TIMINGS) System.out.println(System.currentTimeMillis());
                         permutation.addNonStandardPermutation(ServerUtils.removeWhitespaces(value_decodedTwiceNullBytesRemoved,decodingPermutationLevel));
-                        if (DEBUG_PRINT_TUNING_TIMINGS) System.out.println(System.currentTimeMillis());
+                        printTuningTiming();
                         permutation.addNonStandardPermutation(ServerUtils.removeBackslashes(value_utf8DecodedTwice));
-                        if (DEBUG_PRINT_TUNING_TIMINGS) System.out.println(System.currentTimeMillis());
+                        printTuningTiming();
                         permutation.addNonStandardPermutation(ServerUtils.removeBackslashes(value_decodedTwiceNullBytesRemoved));
-                        if (DEBUG_PRINT_TUNING_TIMINGS) System.out.println(System.currentTimeMillis());
+                        printTuningTiming();
 
                         if (decodingPermutationLevel >= 4) {
                             // using separate loops to feed back the results of each step
                             for (final Iterator iter = permutation.getNonStandardPermutations().iterator(); iter.hasNext();) {
                                 permutation.addNonStandardPermutation( ServerUtils.replaceCommentsWithSpace((String)iter.next()) );
                             }
-                            if (DEBUG_PRINT_TUNING_TIMINGS) System.out.println(System.currentTimeMillis());
+                            printTuningTiming();
                             for (final Iterator iter = permutation.getNonStandardPermutations().iterator(); iter.hasNext();) {
                                 permutation.addNonStandardPermutation( ServerUtils.removeWhitespaces((String)iter.next(),decodingPermutationLevel) );
                             }
-                            if (DEBUG_PRINT_TUNING_TIMINGS) System.out.println(System.currentTimeMillis());
+                            printTuningTiming();
                             for (final Iterator iter = permutation.getNonStandardPermutations().iterator(); iter.hasNext();) {
                                 permutation.addNonStandardPermutation( ServerUtils.removeBackslashes((String)iter.next()) );
                             }
-                            if (DEBUG_PRINT_TUNING_TIMINGS) System.out.println(System.currentTimeMillis());
+                            printTuningTiming();
                         }
                     }
                 }
@@ -1276,7 +1260,7 @@ public final class ServerUtils {
                 }
             }
         } catch (IllegalStateException e) {
-            System.err.println("Not required to rename token parameter names since session already invalidated"); // TODO: better logging
+            LOGGER.log(Level.SEVERE, "Not required to rename token parameter names since session already invalidated");
         }
     }
     
@@ -1382,10 +1366,42 @@ public final class ServerUtils {
         int i=0;
         for (final Iterator iter = listOfIntegers.iterator(); iter.hasNext();) {
             final Integer element = (Integer) iter.next();
-            result[i++] = element.intValue();
+            result[i++] = element;
         }
         return result;
     }
     
+    private static String handleSpecialCharacterMapping(String value) {
+        // Special character mappings
+        final Matcher matcher = PATTERN_SPECIAL_CHAR.matcher(value); // TODO: reuse matcher per request
+        final StringBuilder result = new StringBuilder( value.length() );
+        int pos = 0;
+        String mapping;
+        String specialCharacter;
+        while (matcher.find()) {
+            result.append( value.substring(pos,matcher.start()) );
+            pos = matcher.end();
+            mapping = matcher.group();
+            specialCharacter = SPECIAL_CHAR_MAPPINGS.get(mapping);
+            if (specialCharacter != null)
+                result.append(specialCharacter);
+            else
+                result.append(mapping);
+        }
+        if (pos < value.length()) result.append( value.substring(pos) );
+        value = result.toString();
+        return value;
+    }
+        
+    private static void printTuningTiming(){
+        printTuningTiming(null);
+    }
     
+    private static void printTuningTiming(String message) {
+        if(DEBUG_PRINT_TUNING_TIMINGS){
+            if(message == null || message.isEmpty())
+                message = "TUNINGTIME: ";
+            LOGGER.log(Level.FINE, "{0}{1}", new Object[]{message, System.currentTimeMillis()});
+        }
+    }
 }

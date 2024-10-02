@@ -247,46 +247,19 @@ public final class RequestWrapper extends HttpServletRequestWrapper {
         
     @Override
     public /*synchronized*/ HttpSession getSession() {
-        HttpSession session = super.getSession();
-        // check if null + check if session has changed meanwhile
-        if (session == null) return null;
-        assert session != null;
         
-        if (this.currentSessionOfRequest == null) {
-            this.currentSessionOfRequest = fetchOrCreateSessionWrapper(session, false);
-        } 
-        if (!this.currentSessionOfRequest.isUsingDelegateSession(session)) {
-            // aha, change in session
-            if (this.transferProtectiveSessionContentToNewSessionsDefinedByApplication) {
-                // transfer the protective session content from an existing old session to the freshly created (by the application) new session
-                transferProtectiveSessionContent(this.currentSessionOfRequest, session);
-            }
-            this.currentSessionOfRequest = fetchOrCreateSessionWrapper(session, true);
-        }
-        assert this.currentSessionOfRequest != null;
-        return this.currentSessionOfRequest;
+        HttpSession session = super.getSession();
+        return currentSessionOfRequest(session);
     }
-    
+   
     @Override
     public /*synchronized*/ HttpSession getSession(final boolean create) {
         HttpSession session = super.getSession(create);
         // check if null + check if session has changed meanwhile
-        if (session == null) return null;
-        assert session != null;
-        if (this.currentSessionOfRequest == null) {
-            this.currentSessionOfRequest = fetchOrCreateSessionWrapper(session, false);
-        }
-        if (!this.currentSessionOfRequest.isUsingDelegateSession(session)) {
-            // aha, change in session
-            if (this.transferProtectiveSessionContentToNewSessionsDefinedByApplication) {
-                // transfer the protective session content from an existing old session to the freshly created (by the application) new session
-                transferProtectiveSessionContent(this.currentSessionOfRequest, session);
+        return currentSessionOfRequest(session);
+        // aha, change in session
+        // transfer the protective session content from an existing old session to the freshly created (by the application) new session
             }
-            this.currentSessionOfRequest = fetchOrCreateSessionWrapper(session, true);
-        }
-        assert this.currentSessionOfRequest != null;
-        return this.currentSessionOfRequest;
-    }
 
     
     protected /*synchronized*/ boolean isTransferProtectiveSessionContentToNewSessionsDefinedByApplication() {
@@ -372,5 +345,24 @@ public final class RequestWrapper extends HttpServletRequestWrapper {
         ));
     }
     
+    private HttpSession currentSessionOfRequest(HttpSession session) {
+        // check if null + check if session has changed meanwhile
+        if (session == null) return null;
+        assert session != null;
+        
+        if (this.currentSessionOfRequest == null) {
+            this.currentSessionOfRequest = fetchOrCreateSessionWrapper(session, false);
+        } 
+        if (!this.currentSessionOfRequest.isUsingDelegateSession(session)) {
+            // aha, change in session
+            if (this.transferProtectiveSessionContentToNewSessionsDefinedByApplication) {
+                // transfer the protective session content from an existing old session to the freshly created (by the application) new session
+                transferProtectiveSessionContent(this.currentSessionOfRequest, session);
+            }
+            this.currentSessionOfRequest = fetchOrCreateSessionWrapper(session, true);
+        }
+        assert this.currentSessionOfRequest != null;
+        return this.currentSessionOfRequest;
+    }
     
 }

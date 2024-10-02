@@ -19,7 +19,7 @@ public final class FilesystemRuleFileLoader extends AbstractFilebasedRuleFileLoa
         
     
     
-    //1.5@Override
+    @Override
     public void setFilterConfig(final FilterConfig filterConfig) throws FilterConfigurationException {
         super.setFilterConfig(filterConfig);
         final ConfigurationManager configManager = ConfigurationUtils.createConfigurationManager(filterConfig);
@@ -27,6 +27,7 @@ public final class FilesystemRuleFileLoader extends AbstractFilebasedRuleFileLoa
     }
     
     
+    @Override
     public RuleFile[] loadRuleFiles() throws RuleLoadingException {
         if (this.base == null) throw new IllegalStateException("FilterConfig must be set before loading rules files");
         if (this.path == null) throw new IllegalStateException("Path must be set before loading rules files");
@@ -34,7 +35,7 @@ public final class FilesystemRuleFileLoader extends AbstractFilebasedRuleFileLoa
             final File directory = new File(this.base, this.path);
             if (!directory.exists()) throw new IllegalArgumentException("Directory does not exist: "+directory.getAbsolutePath());
             if (!directory.isDirectory()) throw new IllegalArgumentException("Directory exists but is not a directory (maybe just a file?): "+directory.getAbsolutePath());
-            final List/*<RuleFile>*/ rules = new ArrayList/*<RuleFile>*/();
+            final List<RuleFile> rules = new ArrayList<>();
             final File[] files = directory.listFiles();
             for (File file : files) {
                 if (file.isFile() && isMatchingSuffix(file.getName())) {
@@ -50,7 +51,7 @@ public final class FilesystemRuleFileLoader extends AbstractFilebasedRuleFileLoa
                     }
                 }
             }
-            return (RuleFile[])rules.toArray(new RuleFile[0]);
+            return rules.toArray(RuleFile[]::new);
         } catch (Exception e) {
             throw new RuleLoadingException(e);
         }

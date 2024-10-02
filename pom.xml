@@ -158,7 +158,12 @@
             <id>webcastellum-repository</id>
             <name>WebCastellum Repository</name>
             <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
-        </repository> -->
+            </repository> -->
+        <repository>
+          <id>github</id>
+          <name>GitHub devtty Apache Maven Packages</name>
+          <url>https://maven.pkg.github.com/devtty/webcastellum</url>
+        </repository>
     </distributionManagement>
 
     <build>
@@ -166,6 +171,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
+                <version>3.3.0</version>
                 <configuration>
                     <archive>
                         <manifest>
@@ -178,6 +184,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.12.0</version>
                 <configuration>
                     <source>11</source>
                     <target>11</target>
@@ -187,19 +194,21 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.6.0</version>
                 <configuration>
                     <descriptors>
                         <descriptor>rules-assembly.xml</descriptor>
                     </descriptors>
                     <finalName>rules</finalName>
                     <outputDirectory>target/classes/org/webcastellum</outputDirectory>
+		    <appendAssemblyId>false</appendAssemblyId>
                 </configuration>
                 <executions>
                     <execution>
                         <id>rules-assembly</id>
                         <phase>compile</phase>
                         <goals>
-                            <goal>attached</goal>
+                            <goal>single</goal>
                         </goals>
                     </execution>
                 </executions>
@@ -207,6 +216,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
+                <version>3.3.1</version>
                 <configuration>
                     <encoding>${project.build.sourceEncoding}</encoding>
                 </configuration>
@@ -215,6 +225,7 @@
                 <inherited>true</inherited>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
+                <version>3.3.1</version>
                 <executions>
                     <execution>
                         <id>attach-sources</id>
@@ -228,6 +239,7 @@
                 <inherited>true</inherited>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.8.0</version>
                 <executions>
                     <execution>
                         <id>attach-javadocs</id>
@@ -253,7 +265,10 @@
             <plugin>
                <groupId>org.owasp</groupId>
                <artifactId>dependency-check-maven</artifactId>
-               <version>8.2.1</version>
+               <version>10.0.3</version>
+               <configuration>
+                   <nvdApiKey>${env.NVDAPIKEY}</nvdApiKey>
+               </configuration>
                <executions>
 		 <execution><goals><goal>check</goal></goals></execution>
                </executions>
@@ -293,7 +308,7 @@
            <dependency>
                 <groupId>org.jboss.arquillian</groupId>
                 <artifactId>arquillian-bom</artifactId>
-                <version>1.6.0.Final</version>
+                <version>1.8.0.Final</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -343,7 +358,7 @@
 	      <plugin>
 		<groupId>org.jacoco</groupId>
 		<artifactId>jacoco-maven-plugin</artifactId>
-		<version>0.8.8</version>
+		<version>0.8.12</version>
 		<executions>
 		  <execution>
 		    <id>prepare-agent</id>
@@ -364,6 +379,21 @@
 		    </configuration>
 		  </execution>
 		</executions>
+	      </plugin>
+	    </plugins>
+	  </build>
+	</profile>
+	<profile>
+	  <id>jdk17</id>
+	  <build>
+	    <plugins>
+	      <plugin>
+		<groupId>org.apache.maven.plugins</groupId>
+		<artifactId>maven-surefire-plugin</artifactId>
+		<version>3.2.3</version>
+		<configuration>
+                  <argLine>@{argLine} --add-opens=java.base/java.lang=ALL-UNNAMED</argLine>
+		</configuration>
 	      </plugin>
 	    </plugins>
 	  </build>
