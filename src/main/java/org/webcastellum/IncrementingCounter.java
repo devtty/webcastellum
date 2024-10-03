@@ -2,10 +2,11 @@ package org.webcastellum;
 
 public final class IncrementingCounter extends AbstractCounter implements Cloneable {
     private static final long serialVersionUID = 1L;
-        
     
-    private long lastEventMillis, minimumTimestampForForeignActions=0;
-    private int totalCounter, deltaCounter; // delta-counter is resetted when remote cluster service sends the counter over the wire. the recipient decides if it chooses the delta upon merge or creates a fresh one
+    private long lastEventMillis = 0;
+    private long minimumTimestampForForeignActions=0;
+    private int totalCounter;
+    private int deltaCounter; // delta-counter is resetted when remote cluster service sends the counter over the wire. the recipient decides if it chooses the delta upon merge or creates a fresh one
 
     
     public IncrementingCounter(final long resetPeriodMillis) {
@@ -23,9 +24,10 @@ public final class IncrementingCounter extends AbstractCounter implements Clonea
         this.deltaCounter = objectToCopy.deltaCounter;
     }
     
+    //TODO DR221104 (remove) usage in ClusterPublishIncrementingCounterTask, copy could be used but no tests available
     public Object clone() throws CloneNotSupportedException {
     //1.5public IncrementingCounter clone() throws CloneNotSupportedException {
-        return (IncrementingCounter) super.clone();
+        return super.clone();
     }
     
     public int getDelta() {
@@ -57,13 +59,6 @@ public final class IncrementingCounter extends AbstractCounter implements Clonea
         }
     }
 
-    
-    
-    
-    
-    
-    
-    
     public final /*synchronized*/ void decrementQuietly() { // quietly = without touching lastEventMillis
         if (this.totalCounter > 0) this.totalCounter--;
         if (this.deltaCounter > 0) this.deltaCounter--;
@@ -92,38 +87,8 @@ public final class IncrementingCounter extends AbstractCounter implements Clonea
     }
 
     
-    //1.5@Override
+    @Override
     public final String toString() {
         return "counter:"+totalCounter+"("+this.deltaCounter+")"+getResetPeriodMillis();
     }
-    
-    
-    
-    
-    
-
-    
-    
-    
-    
-    /* just testing clone
-    public static final void main(String[] args) throws CloneNotSupportedException {
-        IncrementingCounter a = new IncrementingCounter(1234567);
-        a.increment();
-        a.increment();
-        a.increment();
-        a.increment();
-        a.resetDelta();
-        a.increment();
-        a.increment();
-        IncrementingCounter b = a.clone();
-        b.increment();
-        b.resetDelta();
-        b.increment();
-        b.setResetPeriodMillis(9876543);
-        System.out.println(a);
-        System.out.println(b);
-    }*/    
-    
-    
 }

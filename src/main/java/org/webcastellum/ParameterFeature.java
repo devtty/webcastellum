@@ -4,8 +4,19 @@ public final class ParameterFeature {
     
     private final String name;
     
-    private boolean isHavingDigits, isHavingLetters, isHavingPunctation, isHavingQuotes, isHavingSingleQuotes, isHavingBraces, isHavingMail,
-            isHavingTags, isHavingAmpersands, isHavingSpecialChars, isHavingWhitespace, isHavingMathSymbols, isHavingMultipleValues;
+    private boolean havingDigits;
+    private boolean havingLetters;
+    private boolean havingPunctation;
+    private boolean havingQuotes;
+    private boolean havingSingleQuotes;
+    private boolean havingBraces;
+    private boolean havingMail;
+    private boolean havingTags;
+    private boolean havingAmpersands;
+    private boolean havingSpecialChars;
+    private boolean havingWhitespace;
+    private boolean havingMathSymbols;
+    private boolean havingMultipleValues;
     private int maximumSize;
     
     
@@ -17,114 +28,109 @@ public final class ParameterFeature {
     public String getParameterName() {
         return name;
     }
-
-    
-    
     
     public boolean isHavingSingleQuotes() {
-        return isHavingSingleQuotes;
+        return this.havingSingleQuotes;
     }
 
-    public void setHavingSingleQuotes(boolean isHavingSingleQuotes) {
-        this.isHavingSingleQuotes = isHavingSingleQuotes;
+    public void setHavingSingleQuotes(boolean havingSingleQuotes) {
+        this.havingSingleQuotes = havingSingleQuotes;
     }
 
-    
     public boolean isHavingMail() {
-        return isHavingMail;
+        return this.havingMail;
     }
 
-    public void setHavingMail(boolean isHavingMail) {
-        this.isHavingMail = isHavingMail;
+    public void setHavingMail(boolean havingMail) {
+        this.havingMail = havingMail;
     }
-
 
     public boolean isHavingAmpersands() {
-        return isHavingAmpersands;
+        return this.havingAmpersands;
     }
 
-    public void setHavingAmpersands(boolean isHavingAmpersands) {
-        this.isHavingAmpersands = isHavingAmpersands;
+    public void setHavingAmpersands(boolean havingAmpersands) {
+        this.havingAmpersands = havingAmpersands;
     }
 
     public boolean isHavingBraces() {
-        return isHavingBraces;
+        return this.havingBraces;
     }
 
-    public void setHavingBraces(boolean isHavingBraces) {
-        this.isHavingBraces = isHavingBraces;
+    public void setHavingBraces(boolean havingBraces) {
+        this.havingBraces = havingBraces;
     }
 
     public boolean isHavingDigits() {
-        return isHavingDigits;
+        return this.havingDigits;
     }
 
-    public void setHavingDigits(boolean isHavingDigits) {
-        this.isHavingDigits = isHavingDigits;
+    public void setHavingDigits(boolean havingDigits) {
+        this.havingDigits = havingDigits;
     }
 
     public boolean isHavingLetters() {
-        return isHavingLetters;
+        return this.havingLetters;
     }
 
-    public void setHavingLetters(boolean isHavingLetters) {
-        this.isHavingLetters = isHavingLetters;
+    public void setHavingLetters(boolean havingLetters) {
+        this.havingLetters = havingLetters;
     }
 
     public boolean isHavingMathSymbols() {
-        return isHavingMathSymbols;
+        return this.havingMathSymbols;
     }
 
-    public void setHavingMathSymbols(boolean isHavingMathSymbols) {
-        this.isHavingMathSymbols = isHavingMathSymbols;
-    }
-
-    public boolean isHavingMultipleValues() {
-        return isHavingMultipleValues;
-    }
-
-    public void setHavingMultipleValues(boolean isHavingMultipleValues) {
-        this.isHavingMultipleValues = isHavingMultipleValues;
+    public void setHavingMathSymbols(boolean havingMathSymbols) {
+        this.havingMathSymbols = havingMathSymbols;
     }
 
     public boolean isHavingPunctation() {
-        return isHavingPunctation;
+        return havingPunctation;
     }
 
-    public void setHavingPunctation(boolean isHavingPunctation) {
-        this.isHavingPunctation = isHavingPunctation;
+    public void setHavingPunctation(boolean havingPunctation) {
+        this.havingPunctation = havingPunctation;
     }
 
     public boolean isHavingQuotes() {
-        return isHavingQuotes;
+        return havingQuotes;
     }
 
-    public void setHavingQuotes(boolean isHavingQuotes) {
-        this.isHavingQuotes = isHavingQuotes;
-    }
-
-    public boolean isHavingSpecialChars() {
-        return isHavingSpecialChars;
-    }
-
-    public void setHavingSpecialChars(boolean isHavingSpecialChars) {
-        this.isHavingSpecialChars = isHavingSpecialChars;
+    public void setHavingQuotes(boolean havingQuotes) {
+        this.havingQuotes = havingQuotes;
     }
 
     public boolean isHavingTags() {
-        return isHavingTags;
+        return havingTags;
     }
 
-    public void setHavingTags(boolean isHavingTags) {
-        this.isHavingTags = isHavingTags;
+    public void setHavingTags(boolean havingTags) {
+        this.havingTags = havingTags;
+    }
+
+    public boolean isHavingSpecialChars() {
+        return havingSpecialChars;
+    }
+
+    public void setHavingSpecialChars(boolean havingSpecialChars) {
+        this.havingSpecialChars = havingSpecialChars;
     }
 
     public boolean isHavingWhitespace() {
-        return isHavingWhitespace;
+        return havingWhitespace;
     }
 
-    public void setHavingWhitespace(boolean isHavingWhitespace) {
-        this.isHavingWhitespace = isHavingWhitespace;
+    public void setHavingWhitespace(boolean havingWhitespace) {
+        this.havingWhitespace = havingWhitespace;
+    }
+
+    public boolean isHavingMultipleValues() {
+        return havingMultipleValues;
+    }
+
+    public void setHavingMultipleValues(boolean havingMultipleValues) {
+        this.havingMultipleValues = havingMultipleValues;
     }
 
     public int getMaximumSize() {
@@ -135,13 +141,9 @@ public final class ParameterFeature {
         this.maximumSize = maximumSize;
     }
     
-
-    
-    
-    //1.5@Override
+    @Override
     public String toString() {
-        return this.name+"("+this.maximumSize+")"+(this.isHavingMultipleValues?"*":"1");
+        return this.name+"("+this.maximumSize+")"+(this.havingMultipleValues?"*":"1");
     }
-    
-    
+
 }

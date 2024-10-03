@@ -3,21 +3,53 @@ package org.webcastellum;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import static java.util.Map.entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.servlet.http.HttpSession;
 import org.junit.Assert;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import org.junit.Ignore;
+import org.junit.Before;
+import static org.mockito.ArgumentMatchers.any;
 import org.mockito.Mockito;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class ServerUtilsTest {
     
+    
+    private HttpSession session;
+    
+    
+    private static final String PERMUTATION_TEST_STRING = "&Auml;a&szlig; Äaß "
+            + "Hello World? Hello%20World%3F Hello World& Hello+World%26"
+            + "Hello%20World%3F& Hello%20World%3F&amp; Hello%20World%3F&amp; Hello%20World%3F&amp;"
+            + "Hello%20World%3F&± Hello%20World%3F&amp;&plusmn;"
+            + "Hello%20World%3F&amp;± Hello%20World%3F&amp;&plusmn;"
+            + "Hello%20World%3F& Hello%20World%3F&amp;"
+            + "Hello%20World%3F&± Hello%20World%3F&amp;&plusmn;"
+            + "¼ %BC ¼ \u00bc \\XBC ¼ & \\XBC+&amp;"
+            + "Hello World?& Hello%20World%3F& a/_2%K72F0abcd a%2F_2%K72F0abcd"
+            + "a/_2%2KF0abcd a%2F_2%2KF0abcd"
+            + "test it tes\0t" + (char) 0x0 + " it"
+            + "Hello Wor\nl\td" + " Hello     World "
+            + "Hello /* comment */World/*second comment*/"
+            + "./test /test/. /test/./dir"
+            + "/test/dir /test//dir /test///dir //test//dir"
+            + "Hello <![CDATA[World]]>"
+            + "Hello \\World Hello \\\\World Hello \\\\\\World Hello \\\\World \\\\\\Test";
+
     public ServerUtilsTest() {
+    }
+    
+    @Before
+    public void setUp(){
+        session = Mockito.mock(HttpSession.class);
     }
 
     @Test
@@ -27,18 +59,44 @@ public class ServerUtilsTest {
     }
 
     @Test
+    public void testParseContentDispositionWithoutDisposition() {
+        assertTrue(ServerUtils.parseContentDisposition(null).isEmpty());
+        assertTrue(ServerUtils.parseContentDisposition("").isEmpty());
+        assertTrue(ServerUtils.parseContentDisposition(" ").isEmpty());
+    }
+    
+    @Test
     public void testParseContentDisposition() {
-        //TODO implement
+        Map resulta = ServerUtils.parseContentDisposition("Content-Disposition: form-data; name=\"field_value\"; filename=\"file_name.html\"");
+        Map resultb = ServerUtils.parseContentDisposition("Content-Disposition: form-data; name=field_value; filename=file_name.html");
+        Map resultc = ServerUtils.parseContentDisposition("Content-Disposition: form-data; name=\"field_value\"; filename=\"\"");
+                
+        assertTrue(resulta.containsKey("filename"));
+        assertTrue(resulta.containsKey("name"));
+        assertEquals("file_name.html", resulta.get("filename"));
+        assertEquals("field_value", resulta.get("name"));
+        
+        assertTrue(resultb.containsKey("filename"));
+        assertTrue(resultb.containsKey("name"));
+        assertEquals("file_name.html", resultb.get("filename"));
+        assertEquals("field_value", resultb.get("name"));
+        
+        assertTrue(resultc.containsKey("filename"));
+        assertTrue(resultc.containsKey("name"));
+        assertEquals("", resultc.get("filename"));
+        assertEquals("field_value", resultc.get("name"));
     }
 
     @Test
     public void testStartsWithJavaScriptOrMailto() {
         assertFalse(ServerUtils.startsWithJavaScriptOrMailto(null));
-        assertTrue(ServerUtils.startsWithJavaScriptOrMailto("javascript:x"));
-        assertTrue(ServerUtils.startsWithJavaScriptOrMailto("mailto:x"));
-        assertTrue(ServerUtils.startsWithJavaScriptOrMailto(" mAiltO:x"));
-        assertTrue(ServerUtils.startsWithJavaScriptOrMailto("    JaVAscriPt:x"));
-        assertFalse(ServerUtils.startsWithJavaScriptOrMailto("    JaVAscriP:x"));
+        assertTrue(ServerUtils.startsWithJavaScriptOrMailto("javascript:test"));
+        assertTrue(ServerUtils.startsWithJavaScriptOrMailto("mailto:test"));
+        assertTrue(ServerUtils.startsWithJavaScriptOrMailto("JAVASCRIPT:test"));
+        assertTrue(ServerUtils.startsWithJavaScriptOrMailto("MAILTO:test"));
+        assertTrue(ServerUtils.startsWithJavaScriptOrMailto(" mAiltO:test"));
+        assertTrue(ServerUtils.startsWithJavaScriptOrMailto("    JaVAscriPt:test"));
+        assertFalse(ServerUtils.startsWithJavaScriptOrMailto("    JaVAscriP:test"));
     }
 
     @Test
@@ -49,13 +107,14 @@ public class ServerUtilsTest {
         //TODO refactor convertSimpleToObjectArray to stream usage
         Assert.assertArrayEquals(result, Arrays.stream(values).boxed().toArray(Integer[]::new));
         
-        
         values = null;
         assertNull(ServerUtils.convertSimpleToObjectArray(values));
     }
 
     @Test
     public void testConvertObjectToSimpleArray() {
+        assertNull(ServerUtils.convertObjectToSimpleArray(null));
+        
         Integer[] values = {1,2,3};
         int[] result = ServerUtils.convertObjectToSimpleArray(values);
         //TODO refactor usages of convertObjectToSimpleArray
@@ -101,6 +160,9 @@ public class ServerUtilsTest {
         assertFalse(ServerUtils.isSameServer("http://test.org/a", "http://test.com/a"));
         assertFalse(ServerUtils.isSameServer("http://test.org", "htp://test.org"));
         //TODO correct method name would be isSameHostName
+        assertFalse(ServerUtils.isSameServer("http://test.org/index.html", "index.html"));
+        assertFalse(ServerUtils.isSameServer("index.html", "index.html"));
+        assertFalse(ServerUtils.isSameServer("index.html", "http://test.org/index.html"));
     }
 
     @Test
@@ -111,14 +173,36 @@ public class ServerUtilsTest {
         assertFalse(ServerUtils.containsColonBeforeFirstSlashOrQuestionmark("colonBehind/:"));
         assertTrue(ServerUtils.containsColonBeforeFirstSlashOrQuestionmark("colon:before?"));
         assertTrue(ServerUtils.containsColonBeforeFirstSlashOrQuestionmark("colon:before/"));
+        assertTrue(ServerUtils.containsColonBeforeFirstSlashOrQuestionmark("has:colon"));
+    }
+    
+    @Test(expected = NullPointerException.class)
+    public void testIsInternalHostURLWithoutCompareWith(){
+        ServerUtils.isInternalHostURL(null, "linkedUrl");
+    }
+    
+    @Test(expected = NullPointerException.class)
+    public void testIsInternalHostURLWithoutUrl(){
+        ServerUtils.isInternalHostURL("url", null);
     }
     
     @Test
-    @Ignore
     public void testIsInternalHostURL() {
+        String currentRequestUrlToCompareWith = "http://test.org";
+        assertTrue(ServerUtils.isInternalHostURL(currentRequestUrlToCompareWith, "http://test.org/index.php?hello=world"));
+        assertTrue(ServerUtils.isInternalHostURL(currentRequestUrlToCompareWith, "https://test.org/index.php?hello=world"));
+        assertTrue(ServerUtils.isInternalHostURL(currentRequestUrlToCompareWith, "./index.php"));
+        assertTrue(ServerUtils.isInternalHostURL(currentRequestUrlToCompareWith, "index.php"));
+        assertTrue(ServerUtils.isInternalHostURL(currentRequestUrlToCompareWith, "/test/index.php"));
+        assertTrue(ServerUtils.isInternalHostURL(currentRequestUrlToCompareWith, "http://test.org:8080/index.php"));
+        
+        assertFalse(ServerUtils.isInternalHostURL(currentRequestUrlToCompareWith, "http://test.de:/index.php"));
+        assertFalse(ServerUtils.isInternalHostURL(currentRequestUrlToCompareWith, "https://test.de:/index.php"));
+        assertFalse(ServerUtils.isInternalHostURL(currentRequestUrlToCompareWith, "https://test.org:-80/index.php"));
+        
         //TODO later
     }
-
+    
     @Test
     public void testEncodeHtmlSafe() {
         assertNull(ServerUtils.encodeHtmlSafe(null));
@@ -136,14 +220,17 @@ public class ServerUtilsTest {
     @Test
     public void testDecodeBrokenValueHtmlOnly() {
         assertNull(ServerUtils.decodeBrokenValueHtmlOnly(null, true));
-        //TODO test more
+        assertEquals("Hello%20World%3F&", ServerUtils.decodeBrokenValueHtmlOnly("Hello%20World%3F&amp;", true));
+        assertEquals("Hello%20World%3F&amp;", ServerUtils.decodeBrokenValueHtmlOnly("Hello%20World%3F&amp;", false));
+        assertEquals("Hello%20World%3F&±", ServerUtils.decodeBrokenValueHtmlOnly("Hello%20World%3F&amp;&plusmn;", true));
+        assertEquals("Hello%20World%3F&amp;±", ServerUtils.decodeBrokenValueHtmlOnly("Hello%20World%3F&amp;&plusmn;", false));
     }
 
     @Test
     public void testDecodeBrokenValueExceptUrlEncoding() {
         assertNull(ServerUtils.decodeBrokenValueUrlEncodingOnly(null));
-        
-        //TODO test more
+        assertEquals("Hello%20World%3F&", ServerUtils.decodeBrokenValueExceptUrlEncoding("Hello%20World%3F&amp;"));
+        assertEquals("Hello%20World%3F&±", ServerUtils.decodeBrokenValueExceptUrlEncoding("Hello%20World%3F&amp;&plusmn;"));
     }
 
     @Test
@@ -159,7 +246,9 @@ public class ServerUtilsTest {
     @Test
     public void testDecodeBrokenUTF8() {
         assertNull(ServerUtils.decodeBrokenUTF8(null));
-        //TODO test more
+        assertEquals("Hello World?&", ServerUtils.decodeBrokenUTF8("Hello%20World%3F&"));
+        assertEquals("a/_2%K72F0abcd", ServerUtils.decodeBrokenUTF8("a%2F_2%K72F0abcd"));
+        assertEquals("a/_2%2KF0abcd", ServerUtils.decodeBrokenUTF8("a%2F_2%2KF0abcd"));
     }
 
     @Test
@@ -225,21 +314,87 @@ public class ServerUtilsTest {
         assertEquals("Hello \\World", ServerUtils.removeBackslashes("Hello \\\\\\World"));
         assertEquals("Hello \\World \\Test", ServerUtils.removeBackslashes("Hello \\\\World \\\\\\Test"));
     }
-
-    /* later
-    @Test
-    public void testPermutateVariants_3args_1() {
-    }
-
-    @Test
-    public void testPermutateVariants_3args_2() {
+    
+    @Test(expected = IllegalArgumentException.class)
+    public void testPermutateVariantsWithNegativeLevel(){
+        ServerUtils.permutateVariants("", true, (byte) -1);
     }
     
+    
+    // The permutate test just count the results (so.. no real tests) 
+    @Test
+    public void testPermutateVariantsLevel0(){
+        Permutation variants = ServerUtils.permutateVariants(PERMUTATION_TEST_STRING, true, (byte) 0);
+        assertEquals(0, variants.getNonStandardPermutations().size());
+        assertEquals(1, variants.getStandardPermutations().size());
+        assertEquals(1, variants.size());
+    }
+    
+    @Test
+    public void testPermutateVariantsLevel1(){
+        Permutation variants = ServerUtils.permutateVariants(PERMUTATION_TEST_STRING, true, (byte) 1);
+        assertEquals(8, variants.getNonStandardPermutations().size());
+        assertEquals(3, variants.getStandardPermutations().size());
+        assertEquals(11, variants.size());
+    }
+    
+    @Test
+    public void testPermutateVariantsLevel2(){
+        Permutation variants = ServerUtils.permutateVariants(PERMUTATION_TEST_STRING, true, (byte) 2);
+        assertEquals(21, variants.getNonStandardPermutations().size());
+        assertEquals(3, variants.getStandardPermutations().size());
+        assertEquals(24, variants.size());
+    }
+    
+    @Test
+    public void testPermutateVariantsLevel3(){
+        Permutation variants = ServerUtils.permutateVariants(PERMUTATION_TEST_STRING, true, (byte) 3);
+        assertEquals(21, variants.getNonStandardPermutations().size());
+        assertEquals(3, variants.getStandardPermutations().size());
+        assertEquals(24, variants.size());
+    }
+    
+    @Test
+    public void testPermutateVariantsLevel4(){
+        Permutation variants = ServerUtils.permutateVariants(PERMUTATION_TEST_STRING, true, (byte) 4);
+        assertEquals(106, variants.getNonStandardPermutations().size());
+        assertEquals(3, variants.getStandardPermutations().size());
+        assertEquals(109, variants.size());
+    }
+    
+    @Test
+    public void testPermutateVariantsMap(){
+        Map map = new HashMap();
 
+        map.put("test0", new String[]{PERMUTATION_TEST_STRING});
+    
+        Map variants = ServerUtils.permutateVariants(map, true, (byte) 4);
+        assertTrue(variants.containsKey("test0"));
+        
+        Permutation[] p = (Permutation[]) variants.get("test0");
+        assertEquals(3, p[0].getStandardPermutations().size());
+        assertEquals(106, p[0].getNonStandardPermutations().size());
+        assertEquals(109, p[0].size());
+    }
+    
     @Test
     public void testIsVariantMatching() {
+        Permutation permutation = new Permutation();
+        permutation.addStandardPermutation("hello");
+        permutation.addStandardPermutation("world");
+        permutation.addNonStandardPermutation("nonstandard");
+        
+        
+        Matcher emptyMatcherToReuse = Pattern.compile("").matcher("");
+        
+        assertFalse(ServerUtils.isVariantMatching(permutation, new WordDictionary("test"), emptyMatcherToReuse, true));
+        assertTrue(ServerUtils.isVariantMatching(permutation, new WordDictionary("hello"), emptyMatcherToReuse, true));
+        assertTrue(ServerUtils.isVariantMatching(permutation, new WordDictionary("world"), emptyMatcherToReuse, true));
+        assertTrue(ServerUtils.isVariantMatching(permutation, new WordDictionary("world"), emptyMatcherToReuse, false));
+        assertTrue(ServerUtils.isVariantMatching(permutation, new WordDictionary("nonstandard"), emptyMatcherToReuse, true));
+        assertFalse(ServerUtils.isVariantMatching(permutation, new WordDictionary("nonstandard"), emptyMatcherToReuse, false));
+        
     }
-    */
 
     @Test
     public void testEscapeSpecialCharactersHTML() {
@@ -301,6 +456,12 @@ public class ServerUtilsTest {
         assertEquals("index.html", ServerUtils.extractResourceToBeAccessed("http://localhost/test/index.html?query", "test", "http://localhost/test/", false));
         assertEquals("index.html", ServerUtils.extractResourceToBeAccessed("test/index.html?query", "test", "http://localhost/test/", false));
         assertEquals("index.html", ServerUtils.extractResourceToBeAccessed("./test/index.html?query", "test", "http://localhost/test/", false));
+        
+        assertEquals("/test", ServerUtils.extractResourceToBeAccessed("", "test", "http://localhost/test", true));
+        assertEquals("/test", ServerUtils.extractResourceToBeAccessed("?", "test", "http://localhost/test", true));
+        assertEquals("/test/index.html", ServerUtils.extractResourceToBeAccessed("", "test", "http://localhost/test/index.html", true));
+        assertEquals("test/index.html", ServerUtils.extractResourceToBeAccessed("./index.html", "test", "http://localhost/test/", true));
+        assertEquals("test/", ServerUtils.extractResourceToBeAccessed("test/", "test", "http://localhost/test/", true));
     }
 
     @Test
@@ -317,23 +478,49 @@ public class ServerUtilsTest {
     public void testRemoveParameterFromQueryString() {
         assertNull(ServerUtils.removeParameterFromQueryString(null, "test"));
         assertEquals("test", ServerUtils.removeParameterFromQueryString("test", null));
+        assertEquals("", ServerUtils.removeParameterFromQueryString("param", "param"));
         assertEquals("", ServerUtils.removeParameterFromQueryString("param=test", "param"));
         assertEquals("param2=test2", ServerUtils.removeParameterFromQueryString("param1=test&param2=test2", "param1"));
+        assertEquals("param1=test", ServerUtils.removeParameterFromQueryString("param1=test&param2=test2", "param2"));
+        assertEquals("hello", ServerUtils.removeParameterFromQueryString("hello", "world"));
+        //assertEquals("param1=test", ServerUtils.removeParameterFromQueryString("param1=test&", "world"));
     }
 
-    /*
+    
+    
+    @Test(expected = NullPointerException.class)
+    public void testFindReusableSessionContentKeyOrCreateNewOneWithoutContent() {
+        ServerUtils.findReusableSessionContentKeyOrCreateNewOne(session, null, true, true);
+    }
+
     @Test
-    public void testFindReusableSessionContentKeyOrCreateNewOne() {
+    public void testFindReusableSessionContentKeyOrCreateNewOneWithoutReuseSession(){
+        ParameterAndFormProtection content = new ParameterAndFormProtection(true);
+        String result = ServerUtils.findReusableSessionContentKeyOrCreateNewOne(session, content, false, false);
         
-    }
-
-    @Test
-    public void testRenameSecretTokenParameterInAllCachedParameterAndFormProtectionObjects() {
+        assertNotNull(result);
+        assertFalse(result.isEmpty());
+        verify(session).setAttribute(WebCastellumFilter.INTERNAL_CONTENT_PREFIX+result, content);
     }
     
-    TODO later
-    */
+    @Test
+    public void testFindReusableSessionContentKeyOrCreateNewOneWithReuseSession(){
+        ParameterAndFormProtection content = new ParameterAndFormProtection(true);
+        
+        when(session.getAttribute(WebCastellumFilter.SESSION_REUSABLE_KEY_LIST_KEY)).thenReturn(new ArrayList(Arrays.asList("testKey")));
 
+        //correct key but wrong content
+        String result = ServerUtils.findReusableSessionContentKeyOrCreateNewOne(session, content, true, false);
+        assertNotEquals("testKey", result);
+        
+        
+        //key and content matches
+        when(session.getAttribute(WebCastellumFilter.INTERNAL_CONTENT_PREFIX+"testKey")).thenReturn(content);
+        result = ServerUtils.findReusableSessionContentKeyOrCreateNewOne(session, content, true, true);
+        
+        assertEquals("testKey", result);
+    }
+    
     @Test
     public void testUrlEncode() throws Exception {
         assertNull(ServerUtils.urlEncode(null));
@@ -374,29 +561,78 @@ public class ServerUtilsTest {
     @Test
     public void testQuoteReplacement() {
         assertNull(ServerUtils.quoteReplacement(null));
-        //just catch the NPE
+        assertEquals("te\\\\\"st", ServerUtils.quoteReplacement("te\\\"st"));
+        assertEquals("te\\$t", ServerUtils.quoteReplacement("te$t"));
     }
 
+    @Test(expected = NullPointerException.class)
+    public void testGetAttributeNamesIncludingInternalWithoutSession(){
+        ServerUtils.getAttributeNamesIncludingInternal(null);
+    }
+    
     @Test
-    public void testGetAttributeNamesIncludingInternal() {
-        //TODO later
-    }
+    public void testGetAttributeNamesIncludingInternal(){
+        List list = Arrays.asList("attribute1", "attribute2");
+        when(session.getAttributeNames()).thenReturn(Collections.enumeration(list));
 
+        ServerUtils.getAttributeNamesIncludingInternal(session).asIterator().forEachRemaining(action -> {
+            assertTrue(list.contains(action));
+        });
+    }
+    
+    @Test(expected = NullPointerException.class)
+    public void testGetAttributeIncludingInternalWithoutSession() {
+        ServerUtils.getAttributeIncludingInternal(null,"");
+    }
+    
     @Test
     public void testGetAttributeIncludingInternal() {
-        //TODO later
+        when(session.getAttribute("testAttribute")).thenReturn("testValue");
+        assertEquals("testValue", ServerUtils.getAttributeIncludingInternal(session,"testAttribute"));
     }
 
     @Test
+    public void testConvertListOfPatternToArrayOfMatcherWithoutPatterns() {
+        assertNull(ServerUtils.convertListOfPatternToArrayOfMatcher(null));
+    }
+    
+    @Test
     public void testConvertListOfPatternToArrayOfMatcher() {
+        List patterns = Arrays.asList(
+                Pattern.compile("[A-Z]"), 
+                Pattern.compile("[0-9]"));
+        Matcher[] m = ServerUtils.convertListOfPatternToArrayOfMatcher(patterns);
+        
+        assertEquals(2, m.length);
+        assertEquals("[A-Z]", m[0].pattern().pattern());
+        assertEquals("[0-9]", m[1].pattern().pattern());
     }
 
     @Test
     public void testConcatenateArrays() {
+        String[] original = new String[]{"Kermit", "Gonzo", "Fozzie"};
+        String[] additional = new String[]{"Waldorf", "Statler"};
+        
+        assertArrayEquals(additional, ServerUtils.concatenateArrays(null, additional));
+        assertArrayEquals(additional, ServerUtils.concatenateArrays(new String[0], additional));
+        assertArrayEquals(original, ServerUtils.concatenateArrays(original, null));
+        assertArrayEquals(original, ServerUtils.concatenateArrays(original, new String[0]));
+        
+        String[] combined = ServerUtils.concatenateArrays(original, additional);
+        assertEquals(5, combined.length);
+        assertEquals("Fozzie", combined[2]);
+        assertEquals("Waldorf", combined[3]);
     }
 
     @Test
     public void testConvertIntegerListToIntArray() {
+        List intList = Arrays.asList(1, 2, 3, 4 ,5);
+        
+        assertNull(ServerUtils.convertIntegerListToIntArray(null));
+        int[] intArray = ServerUtils.convertIntegerListToIntArray(intList);
+        assertEquals(5, intArray.length);
+        assertEquals(1, intArray[0]);
+        assertEquals(5, intArray[4]);
     }
     
 }

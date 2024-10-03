@@ -16,30 +16,37 @@ public final class ServletInputStreamAdapter extends ServletInputStream {
         this.delegate = delegate;
     }
 
+    @Override
     public int available() throws IOException {
         return delegate.available();
     }
 
+    @Override
     public int read() throws IOException {
         return delegate.read();
     }
 
+    @Override
     public int read(byte[] buf) throws IOException {
         return delegate.read(buf);
     }
 
+    @Override
     public int read(byte[] buf, int offset, int length) throws IOException {
         return delegate.read(buf, offset, length);
     }
 
-    public void mark(int readLimit) {
+    @Override
+    public synchronized void mark(int readLimit) {
         delegate.mark(readLimit);
     }
 
-    public void reset() throws IOException {
+    @Override
+    public synchronized void reset() throws IOException {
         delegate.reset();
     }
 
+    @Override
     public boolean markSupported() {
         return delegate.markSupported();
     }

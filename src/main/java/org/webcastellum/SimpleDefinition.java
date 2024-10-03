@@ -13,7 +13,7 @@ public abstract class SimpleDefinition extends AbstractDefinition {
     private final Pattern servletPathOrRequestURIPattern;
 
 
-    public SimpleDefinition(final boolean enabled, final String identification, final String description, final WordDictionary servletPathOrRequestURIPrefilter, final Pattern servletPathOrRequestURIPattern) {
+    protected SimpleDefinition(final boolean enabled, final String identification, final String description, final WordDictionary servletPathOrRequestURIPrefilter, final Pattern servletPathOrRequestURIPattern) {
         super(enabled, identification, description);
         this.servletPathOrRequestURIPrefilter = servletPathOrRequestURIPrefilter; // nullable
         if (servletPathOrRequestURIPattern == null) throw new NullPointerException("servletPathOrRequestURIPattern must not be null");

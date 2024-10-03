@@ -10,24 +10,17 @@ public abstract class AbstractDefinitionContainer implements Serializable {
     protected static final String KEY_DESCRIPTION = "description";
     protected static final String KEY_ENABLED = "enabled";
 
-    
-    
     protected final RuleFileLoader ruleFileLoader;
     
-    protected SortedSet/*<AbstractDefinition>*/ definitions = new TreeSet();
+    protected SortedSet<AbstractDefinition> definitions = new TreeSet<>();
 
     // shortcut
     protected boolean hasEnabledDefinitions = false;
-
     
-    
-    public AbstractDefinitionContainer(final RuleFileLoader ruleFileLoader) {
+    protected AbstractDefinitionContainer(final RuleFileLoader ruleFileLoader) {
         if (ruleFileLoader == null) throw new NullPointerException("ruleFileLoader must not be null");
         this.ruleFileLoader = ruleFileLoader;
     }
-    
-    
-
     
     /** 
      * NOTE: The caller of this class already synchronizes the reloading and using of rules properly 
@@ -36,7 +29,7 @@ public abstract class AbstractDefinitionContainer implements Serializable {
      *
      *@return message to log when loading is finished (to avoid logging while within synchronized block, since Tomcat for example has problems with stdout to a file after a hibernation when in synchronized block)
      */
-    public abstract String parseDefinitions() throws RuleLoadingException, IllegalRuleDefinitionFormatException;
+    public abstract String parseDefinitions() throws RuleLoadingException;
     
 /** 
      * NOTE: The caller of this class already synchronizes the reloading and using of rules properly 

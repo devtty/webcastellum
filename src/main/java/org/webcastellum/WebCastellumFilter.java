@@ -229,6 +229,9 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
     
     
     private static boolean isOldJavaEE13 = false;
+
+    private static final String PATTERN_BREAKING = "[\n\r\t]";
+
     
     private final ContentInjectionHelper contentInjectionHelper = new ContentInjectionHelper();
     
@@ -556,7 +559,7 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
                 {
                     final String expectedParameterAndFormProtectionKeyKey = (String) ServerUtils.getAttributeIncludingInternal(session,SESSION_PARAMETER_AND_FORM_PROTECTION_RANDOM_TOKEN_KEY_KEY);
                     if (expectedParameterAndFormProtectionKeyKey != null) {
-                        final String key = request.getParameter(expectedParameterAndFormProtectionKeyKey); // here the temporarily injected param is still in the request (not in the extracted request-param-map though, but that is by design and OK)
+                        final String key = request.getParameter(expectedParameterAndFormProtectionKeyKey.replaceAll(PATTERN_BREAKING, "")); // here the temporarily injected param is still in the request (not in the extracted request-param-map though, but that is by design and OK)
                         if (key == null && !isIncomingParameterAndFormProtectionExclude) {
                             // Session theft (client provided no matching param-and-form pointer token)
                             if (isEntryPoint) {
@@ -1110,7 +1113,7 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
                 final String parameterName = (String) parameters.nextElement();
                 final String[] parameterValues = request.getParameterValues(parameterName);
                 for (String parameterValue : parameterValues) {
-                    logLocal(parameterName+" = " + parameterValue);
+                    logLocal((parameterName+" = " + parameterValue).replaceAll(PATTERN_BREAKING, ""));
                 }
             }
             
@@ -1325,7 +1328,7 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
                 }
                 // when it is still null, there's someone attacking us
                 if (captcha == null) {
-                    final Attack attack = this.attackHandler.handleAttack(request, requestDetails.clientAddress, "No captcha available for ID: "+captchaIdReceivedForForm);
+                    final Attack attack = this.attackHandler.handleAttack(request, requestDetails.clientAddress, "No captcha available for ID: "+captchaIdReceivedForForm.replaceAll(PATTERN_BREAKING, "_"));
                     return new AllowedFlagWithMessage(false, attack);
                 }
                 assert captcha != null;
@@ -1376,7 +1379,7 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
             try {
                 final Captcha captcha = (Captcha) ServerUtils.getAttributeIncludingInternal(session, SESSION_CAPTCHA_IMAGES+captchaIdReceivedForImage);
                 if (captcha == null) {
-                    final Attack attack = this.attackHandler.handleAttack(request, requestDetails.clientAddress, "No captcha (image) available for ID: "+captchaIdReceivedForImage.replaceAll("[\n\r\t]", "_"));
+                    final Attack attack = this.attackHandler.handleAttack(request, requestDetails.clientAddress, "No captcha (image) available for ID: "+captchaIdReceivedForImage.replaceAll(PATTERN_BREAKING, "_"));
                     return new AllowedFlagWithMessage(false, attack);
                 }
                 if (response.isCommitted()) {
@@ -1490,9 +1493,6 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
         return new AllowedFlagWithMessage(true);
     }
     
-    
-    
-
     private AllowedFlagWithMessage selectboxCheckboxRadiobuttonProtection(final HttpSession session, final RequestDetails requestDetails, final RequestWrapper request, final ResponseWrapper response, final Map/*<String,List<String>>*/ fieldsName2AllowedValues, 
                                                             final boolean isProtectionEnabled, final boolean isMaskingEnabled, final String maskingPrefixSessionKey, final boolean isIncomingFieldProtectionExclude) throws StopFilterProcessingException, IOException {
         // Here we uncover and check the select/check/radiobox-protected values (anyway even when isIncomingSelect/Check/RadioboxFieldProtectionExclude is true):
@@ -1716,11 +1716,11 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
         if (this.catchAll) {
             try {
                 internalDoFilter(request, response, chain);
-            } catch (Exception e) {
+            } catch (IOException | ServletException e) {
                 logLocal("Uncaught exception: "+e.getClass().getName()+": "+e.getMessage()); // TODO: hier auch den root-cause loggen !
                 try {
                     sendUncaughtExceptionResponse((HttpServletResponse)response, e);
-                } catch (Exception e2) {
+                } catch (IOException e2) {
                     logLocal("Uncaught exception during return of exception message: "+e2.getClass().getName()+": "+e2.getMessage());
                 }
             }
@@ -2557,8 +2557,8 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
             this.attackHandler.handleRegularRequest(httpRequest, clientAddress); // = since we're about to stop this request, we log it here
             this.attackHandler.logWarningRequestMessage("Desired stop in filter processing of previously logged request: "+e.getMessage());
             return; // = stop processing as desired :-)
-        } catch (Exception e) {
-            final String message = "Exception ("+e.getMessage()+") while checking request (therefore disallowing it by default)";
+        } catch (IOException | NoSuchAlgorithmException | ServletException | CustomRequestMatchingException e) {
+            final String message = "Exception ("+e.getClass().getName()+e.getMessage()+") while checking request (therefore disallowing it by default)";
             allowed = new AllowedFlagWithMessage(false, new Attack(message));
             if (!(e instanceof ServerAttackException)) {
                 Logger.getGlobal().log(Level.SEVERE, message);

@@ -175,7 +175,7 @@ public abstract class AbstractRelaxingHtmlParserStream extends FilterOutputStrea
     
     
     //1.5@Override
-    public final void write(byte bbuf[], int off, int len) throws IOException {
+    public final void write(byte[] bbuf, int off, int len) throws IOException {
         final int end = off + len;
          if (this.useTunedBlockParser) {
              int pos = off;
@@ -202,7 +202,7 @@ public abstract class AbstractRelaxingHtmlParserStream extends FilterOutputStrea
 
     
     //1.5@Override
-    public final void write(byte bbuf[]) throws IOException {
+    public final void write(byte[] bbuf) throws IOException {
         write(bbuf, 0, bbuf.length);
     }
 

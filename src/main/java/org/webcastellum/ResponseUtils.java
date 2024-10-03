@@ -488,8 +488,10 @@ public final class ResponseUtils {
         if (matcher.find()) {
             //String actionURL = extractAttributeValueFromAttributeAndValueString( matcher.group() ).trim();
             String actionURL = matcher.group(1);
-            if (!includeQueryString) actionURL = stripQueryString(actionURL);
-            return actionURL.trim();
+            if(!includeQueryString) 
+                actionURL = stripQueryString(actionURL);
+            if(actionURL!=null)
+                return actionURL.trim();
         }
         return ""; // = treat a missing action attribute like an empty action attribute
     }
@@ -624,7 +626,7 @@ public final class ResponseUtils {
         return isFormFieldHavingAttribute(tag, MULTIPLE_LOWERCASED);
     }
     public static boolean isFormFieldHavingAttribute(final String tag, final String attribute) {
-        if (tag == null) return true;
+        if (tag == null) return false;
         final String withoutValuesLowerCased = removeAttributeValues(tag).toLowerCase();
         final int pos = withoutValuesLowerCased.indexOf(attribute);
         if (pos == -1 || pos == 0 || pos == withoutValuesLowerCased.length()-attribute.length()) return false; // attribute must be there AND within the tag so at least a < or > should be around
