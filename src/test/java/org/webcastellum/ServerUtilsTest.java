@@ -229,7 +229,6 @@ public class ServerUtilsTest {
     @Test
     public void testDecodeBrokenValueExceptUrlEncoding() {
         assertNull(ServerUtils.decodeBrokenValueUrlEncodingOnly(null));
-        
         assertEquals("Hello%20World%3F&", ServerUtils.decodeBrokenValueExceptUrlEncoding("Hello%20World%3F&amp;"));
         assertEquals("Hello%20World%3F&±", ServerUtils.decodeBrokenValueExceptUrlEncoding("Hello%20World%3F&amp;&plusmn;"));
     }
@@ -521,7 +520,6 @@ public class ServerUtilsTest {
         
         assertEquals("testKey", result);
     }
-    
     
     @Test
     public void testUrlEncode() throws Exception {
