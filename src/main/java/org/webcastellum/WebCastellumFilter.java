@@ -232,7 +232,6 @@ public final class WebCastellumFilter implements javax.servlet.Filter {
 
     private static final String PATTERN_BREAKING = "[\n\r\t]";
 
-    
     private final ContentInjectionHelper contentInjectionHelper = new ContentInjectionHelper();
     
     /**

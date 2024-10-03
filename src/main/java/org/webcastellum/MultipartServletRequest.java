@@ -196,12 +196,10 @@ public final class MultipartServletRequest extends HttpServletRequestWrapper {
             return;
         }
         // NOW THE URL PARAMS ALSO (they can be safely taken from the underlying original request, which holds all URL params BUT NO form params since we're havig a multipart form submit here...)
-
         LOGGER.log(Level.INFO, "==> in delegate: {0}", getRequest().getParameterMap().toString().replaceAll(PATTERN_BREAKING, "_"));        
         for (final Enumeration urlParamNames = getRequest().getParameterNames(); urlParamNames.hasMoreElements();) {
             final String urlParamName = (String) urlParamNames.nextElement();
             LOGGER.log(Level.FINE, "---> URL PARAM IN MULTIPART FORM: {0}", urlParamName.replaceAll(PATTERN_BREAKING, "_"));
-
             final String[] values = getRequest().getParameterValues(urlParamName);
             if (values != null) {
                 for (String value : values) {
