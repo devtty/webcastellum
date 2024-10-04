@@ -5,12 +5,14 @@ import java.util.List;
 import java.util.Map;
 
 public final class Snapshot implements Serializable {
+    
     private static final long serialVersionUID = 1L;
 
-    private final String type, systemIdentifier;
+    private final String type;
+    private final String systemIdentifier;
     
-    private Map/*<String,IncrementingCounter>*/ payload;
-    private List/*<String>*/ removals;
+    private Map<String,IncrementingCounter> payload;
+    private List<String> removals;
     private long removalTimestamp;
 
     // used internally
@@ -35,14 +37,14 @@ public final class Snapshot implements Serializable {
     /**
      * @return map of things to increment
      */
-    public Map/*<String,IncrementingCounter>*/ getPayload() {
+    public Map<String,IncrementingCounter> getPayload() {
         return payload;
     }
 
     /**
      * @return list of things to remove
      */
-    public List/*<String>*/ getRemovals() {
+    public List<String> getRemovals() {
         return removals;
     }
     
@@ -69,37 +71,5 @@ public final class Snapshot implements Serializable {
     public String getType() {
         return type;
     }
-    
-    
-    
-    
-    
-    
-    
-    /* just testing serialization * /
-    public static final void main(String[] args) throws Exception {
-        Map payload = new HashMap();
-        for (int i=0; i<1000; i++) {
-            IncrementingCounter counter = new IncrementingCounter((long)(Math.random()*10000)+5000);
-            int x = (int)(Math.random()*1500);
-            System.out.println(x);
-            for (int k=0; k<x; k++) counter.increment();
-            payload.put(IdGeneratorUtils.createId(), counter);
-        }
-        Snapshot s = new Snapshot("ThisIsJustATestType", IdGeneratorUtils.createId(), payload);
-        ObjectOutputStream output = null;
-        try {
-            output = new ObjectOutputStream( new BufferedOutputStream( new FileOutputStream("/tmp/file.test") ) );
-            output.writeObject(s);
-            output.flush();
-        } finally {
-            if (output != null) output.close();
-        }
-    }
-    /**/
-
-    
-    
-    
     
 }
