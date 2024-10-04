@@ -16,7 +16,9 @@ public final class MultipartFileInfo {
 
     private final boolean bufferFileUploadsToDisk;
     
-    private String name, contentType, filename;
+    private String name;
+    private String contentType;
+    private String filename;
     private long length;
 
     private byte[] data = new byte[0]; // never null

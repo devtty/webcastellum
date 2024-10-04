@@ -14,8 +14,12 @@ public final class ClusterPublishIncrementingCounterTask extends TimerTask {
     
     private static final Logger LOGGER = Logger.getLogger(ClusterPublishIncrementingCounterTask.class.getName());
     
-    private final String type, systemIdentifier;
-    private final String clusterInitialContextFactory, clusterJmsProviderUrl, clusterJmsConnectionFactory, clusterJmsTopic;
+    private final String type;
+    private final String systemIdentifier;
+    private final String clusterInitialContextFactory;
+    private final String clusterJmsProviderUrl;
+    private final String clusterJmsConnectionFactory;
+    private final String clusterJmsTopic;
     private final Map/*<String,Counter>*/ map;
 
     public ClusterPublishIncrementingCounterTask(final String type, final String systemIdentifier, final String clusterInitialContextFactory, final String clusterJmsProviderUrl, final String clusterJmsConnectionFactory, final String clusterJmsTopic, final Map/*<String,Counter>*/ map) {

@@ -42,8 +42,10 @@ public final class AttackHandler {
     
     private ClientBlacklist clientBlacklist;
 
-    private Timer cleanupTimerAttackTracking, cleanupTimerRedirectTracking;
-    private TimerTask taskAttackTracking, taskRedirectTracking;
+    private Timer cleanupTimerAttackTracking;
+    private Timer cleanupTimerRedirectTracking;
+    private TimerTask taskAttackTracking;
+    private TimerTask taskRedirectTracking;
 
     // learning mode aggregation logger
     private Logger learningModeLogger;

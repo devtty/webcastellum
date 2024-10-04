@@ -52,7 +52,9 @@ public final class LearnedRequest {
     private static final Pattern PATTERN_SPECIAL = Pattern.compile("["+CHECK_SPECIAL+"]");
 
         
-    private final String servletPath, method, name;
+    private final String servletPath;
+    private final String method;
+    private final String name;
     private final Map/*<String,ParameterFeature>*/ parameterFeatures = new HashMap();
 
     public LearnedRequest(final String servletPath, final String method) {
@@ -103,9 +105,19 @@ public final class LearnedRequest {
         // counts
         if (values.size() > 1) feature.setHavingMultipleValues(true);
         // for each value:
-        Matcher matcherDigits=null, matcherLetters=null, matcherPunctation=null, matcherQuotes=null, matcherSingleQuotes=null,
-                matcherBraces=null, matcherTags=null, matcherAmpersands=null, matcherMath=null, matcherMail=null, 
-                matcherWhitespace=null, matcherSpecial=null;
+        Matcher matcherDigits=null;
+        Matcher matcherLetters=null;
+        Matcher matcherPunctation=null;
+        Matcher matcherQuotes=null;
+        Matcher matcherSingleQuotes=null;
+        Matcher matcherBraces=null;
+        Matcher matcherTags=null;
+        Matcher matcherAmpersands=null;
+        Matcher matcherMath=null;
+        Matcher matcherMail=null;
+        Matcher matcherWhitespace=null;
+        Matcher matcherSpecial=null;
+        
         for (final Iterator iter = values.iterator(); iter.hasNext();) {
             String value = (String) iter.next();
             if (value == null) value = "";

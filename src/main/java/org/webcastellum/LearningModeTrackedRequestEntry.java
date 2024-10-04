@@ -8,7 +8,13 @@ import java.util.Map;
     
 
 public final class LearningModeTrackedRequestEntry {
-    private String version, servletPath, method, mimeType, contentLength, referrer, encoding;
+    private String version;
+    private String servletPath;
+    private String method;
+    private String mimeType;
+    private String contentLength;
+    private String referrer;
+    private String encoding;
     private Map/*<String,List<String>>*/ parameters = new HashMap();
 
     public void addParameter(final String name, final String value) {

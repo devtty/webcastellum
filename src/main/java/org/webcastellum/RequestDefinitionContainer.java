@@ -184,7 +184,11 @@ public abstract class RequestDefinitionContainer/*<T extends RequestDefinition>*
         final RuleFile[] ruleFiles = this.ruleFileLoader.loadRuleFiles();
         final String message = "WebCastellum loaded " + (ruleFiles.length < 10 ? " " : "") + ruleFiles.length + " security rule" + (ruleFiles.length == 1 ? ":  " : "s: ") + this.ruleFileLoader.getPath() + " (via " + this.ruleFileLoader.getClass().getName() + ")"; // TODO: Java5 use StringBuilder
         final SortedSet newDefinitions = new TreeSet();
-        boolean newHasEnabledDefinitions = false, newHavingEnabledRequestParamCheckingRules = false, newHavingEnabledQueryStringCheckingRules = false, newHavingEnabledHeaderCheckingRules = false, newHavingEnabledCookieCheckingRules = false;
+        boolean newHasEnabledDefinitions = false;
+        boolean newHavingEnabledRequestParamCheckingRules = false;
+        boolean newHavingEnabledQueryStringCheckingRules = false;
+        boolean newHavingEnabledHeaderCheckingRules = false;
+        boolean newHavingEnabledCookieCheckingRules = false;
 
         for (RuleFile ruleFile : ruleFiles) {
             final Properties properties = ruleFile.getProperties();

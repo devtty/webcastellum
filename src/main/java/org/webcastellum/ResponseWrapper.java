@@ -31,7 +31,9 @@ public final class ResponseWrapper extends HttpServletResponseWrapper {
     
     private static final Logger LOGGER = Logger.getLogger(ResponseWrapper.class.getName());
     
-    private static final Pattern PATTERN_CRLF = Pattern.compile("\r\n");  private Matcher matcherCRLF;
+    private static final Pattern PATTERN_CRLF = Pattern.compile("\r\n");
+    private Matcher matcherCRLF;
+    
     private static final String HEADER_LAST_MODIFIED = "Last-Modified";
     private static final int FUTURE_LAST_MODIFIED_TOLERANCE = 250; // TODO konfigurierbar machen
 

@@ -12,8 +12,10 @@ import java.util.regex.Pattern;
 public final class FormFieldMaskingExcludeDefinition extends SimpleDefinition {
     private static final long serialVersionUID = 1L;
 
-    private WordDictionary formNamePrefilter, fieldNamePrefilter;
-    private Pattern formNamePattern, fieldNamePattern;
+    private WordDictionary formNamePrefilter;
+    private WordDictionary fieldNamePrefilter;
+    private Pattern formNamePattern;
+    private Pattern fieldNamePattern;
 
     public FormFieldMaskingExcludeDefinition(final boolean enabled, final String identification, final String description, final WordDictionary servletPathOrRequestURIPrefilter, final Pattern servletPathOrRequestURIPattern) {
         super(enabled, identification, description, servletPathOrRequestURIPrefilter, servletPathOrRequestURIPattern);

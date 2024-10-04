@@ -12,9 +12,8 @@ public final class Permutation implements Serializable {
     // "Set" to make it unique
     
     // "Set" to make it unique
-    private Set/*<String>*/ standardPermutations = new HashSet(), nonStandardPermutations = new HashSet();
-    
-    
+    private Set<String> standardPermutations = new HashSet();
+    private Set<String> nonStandardPermutations = new HashSet();
     
     public Permutation() {
     }
@@ -42,16 +41,15 @@ public final class Permutation implements Serializable {
         this.nonStandardPermutations = Collections.unmodifiableSet(this.nonStandardPermutations);
     }
 
-    public Set/*<String>*/ getStandardPermutations() {
+    public Set<String> getStandardPermutations() {
         if (!this.sealed) return new HashSet(this.standardPermutations);
         return this.standardPermutations;
     }
 
-    public Set/*<String>*/ getNonStandardPermutations() {
+    public Set<String> getNonStandardPermutations() {
         if (!this.sealed) return new HashSet(this.nonStandardPermutations);
         return this.nonStandardPermutations;
     }
-    
     
     //1.5@Override
     public String toString() {

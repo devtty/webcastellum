@@ -21,7 +21,11 @@ public abstract class AbstractSqlRuleFileLoader extends AbstractRuleFileLoader {
     public static final String PARAM_JDBC_COLUMN_PROPERTY_VALUE = "RuleFilesJdbcColumnPropertyValue";
     
     
-    protected String table, columnPath, columnFilename, columnPropertyKey, columnPropertyValue;
+    protected String table;
+    protected String columnPath;
+    protected String columnFilename;
+    protected String columnPropertyKey;
+    protected String columnPropertyValue;
     
 
     public void setFilterConfig(final FilterConfig filterConfig) throws FilterConfigurationException {

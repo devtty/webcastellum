@@ -5,7 +5,15 @@ import java.util.regex.Pattern;
 public final class IncomingProtectionExcludeDefinition extends RequestDefinition {
     private static final long serialVersionUID = 1L;
     
-    private boolean excludeForceEntranceProtection, excludeParameterAndFormProtection, excludeSelectboxFieldProtection, excludeCheckboxFieldProtection, excludeRadiobuttonFieldProtection, excludeReferrerProtection, excludeSecretTokenProtection, excludeSessionToHeaderBindingProtection, excludeExtraSessionTimeoutHandling;
+    private boolean excludeForceEntranceProtection;
+    private boolean excludeParameterAndFormProtection;
+    private boolean excludeSelectboxFieldProtection;
+    private boolean excludeCheckboxFieldProtection;
+    private boolean excludeRadiobuttonFieldProtection;
+    private boolean excludeReferrerProtection;
+    private boolean excludeSecretTokenProtection;
+    private boolean excludeSessionToHeaderBindingProtection;
+    private boolean excludeExtraSessionTimeoutHandling;
  
     public IncomingProtectionExcludeDefinition(final boolean enabled, final String identification, final String description,    final WordDictionary servletPathPrefilter, final Pattern servletPathPattern, final boolean servletPathPatternNegated) {
         super(enabled, identification, description, servletPathPrefilter, servletPathPattern, servletPathPatternNegated);

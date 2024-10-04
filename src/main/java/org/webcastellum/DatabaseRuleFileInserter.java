@@ -116,8 +116,13 @@ public final class DatabaseRuleFileInserter {
         final String jdbcUrl = args[1];
         final String jdbcUser = args[2];
         final String jdbcPassword = args[3];
-        final String table = args[4]; final Matcher matcher = allowedDatabaseCharacters.matcher(table); if (!matcher.matches()) showErrorAndExit("The parameter does not validate against the syntax pattern ("+allowedDatabaseCharacters+"): "+table);
-        final String columnPath = args[5]; matcher.reset(columnPath); if (!matcher.matches()) showErrorAndExit("The parameter does not validate against the syntax pattern ("+allowedDatabaseCharacters+"): "+columnPath);
+        final String table = args[4];
+        final Matcher matcher = allowedDatabaseCharacters.matcher(table);
+        if (!matcher.matches())
+            showErrorAndExit("The parameter does not validate against the syntax pattern ("+allowedDatabaseCharacters+"): "+table);
+        final String columnPath = args[5]; matcher.reset(columnPath);
+        if (!matcher.matches())
+            showErrorAndExit("The parameter does not validate against the syntax pattern ("+allowedDatabaseCharacters+"): "+columnPath);
         final String columnFilename = args[6]; matcher.reset(columnFilename); if (!matcher.matches()) showErrorAndExit("The parameter does not validate against the syntax pattern ("+allowedDatabaseCharacters+"): "+columnFilename);
         final String columnPropertyKey = args[7]; matcher.reset(columnPropertyKey); if (!matcher.matches()) showErrorAndExit("The parameter does not validate against the syntax pattern ("+allowedDatabaseCharacters+"): "+columnPropertyKey);
         final String columnPropertyValue = args[8]; matcher.reset(columnPropertyValue); if (!matcher.matches()) showErrorAndExit("The parameter does not validate against the syntax pattern ("+allowedDatabaseCharacters+"): "+columnPropertyValue);

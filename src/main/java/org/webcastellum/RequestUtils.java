@@ -405,7 +405,8 @@ public final class RequestUtils {
                     && queryString.charAt(index-5) == '&' && queryString.charAt(index-4) == 'a' && queryString.charAt(index-3) == 'm' && queryString.charAt(index-2) == 'p' && queryString.charAt(index-1) == ';';
             final int start = isAmpersandBefore ? index-1 : isMaskedAmpersandBefore ? index-5 : index;
             // determine end
-            int end = queryString.length()-1; char c;
+            int end = queryString.length()-1;
+            char c;
             for (int i=index+parameterKey.length(); i<queryString.length(); i++) {
                 c = queryString.charAt(i);
                 if (c == '&' || c == '#') {
@@ -524,7 +525,8 @@ public final class RequestUtils {
                 // define what to decrypt
                 String decrypt = servletPathWithQueryStringEncrypted.substring(firstQuestionMarkOrAmpersandLeftFromCryptoDetectionString+1, firstAmpersandOrEqualsRightFromCryptoDetectionString > -1 ? firstAmpersandOrEqualsRightFromCryptoDetectionString : servletPathWithQueryStringEncrypted.length());
                 // save any anchor
-                String anchor = null; final int anchorPos = decrypt.indexOf('#');
+                String anchor = null;
+                final int anchorPos = decrypt.indexOf('#');
                 if (anchorPos > -1) {
                     anchor = decrypt.substring(anchorPos);
                     decrypt = decrypt.substring(0,anchorPos);

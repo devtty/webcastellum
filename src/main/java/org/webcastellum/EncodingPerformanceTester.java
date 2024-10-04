@@ -34,7 +34,8 @@ public final class EncodingPerformanceTester {
         System.out.println("-----");
 
         
-        long start, duration; 
+        long start;
+        long duration; 
         
         // time decoding permutation stuff
         start = System.currentTimeMillis();
