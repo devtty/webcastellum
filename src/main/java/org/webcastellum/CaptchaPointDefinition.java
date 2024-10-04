@@ -9,7 +9,9 @@ import java.util.regex.Pattern;
 public final class CaptchaPointDefinition extends RequestDefinition {
     private static final long serialVersionUID = 1L;
  
-    private String captchaPageContent, captchaImageHTML, captchaFormHTML;
+    private String captchaPageContent;
+    private String captchaImageHTML;
+    private String captchaFormHTML;
 
     private transient String htmlContentLoaded;
     

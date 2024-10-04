@@ -104,7 +104,8 @@ public final class ResponseUtils {
         if (url.contains(tokenKey)) return url; // TODO: ist der Check hier noetig?
         final StringBuilder result = new StringBuilder(url.length());
         // temporarily remove any anchor
-        String anchor = null; final int anchorPos = determineAnchorPos(url,false);
+        String anchor = null;
+        final int anchorPos = determineAnchorPos(url,false);
         if (anchorPos > -1) {
             anchor = url.substring(anchorPos);
             if (anchorPos > 0) result.append( url.substring(0,anchorPos) );
@@ -348,7 +349,8 @@ public final class ResponseUtils {
                 
                 LOGGER.log(Level.FINE, "resourceToBeAccessed={0}", resourceToBeAccessed);
                 // temporarily remove any anchor
-                String anchor = null; final int anchorPos = determineAnchorPos(url,true);
+                String anchor = null;
+                final int anchorPos = determineAnchorPos(url,true);
                 StringBuilder encrypt = null;
                 if (anchorPos > -1) {
                     anchor = url.substring(anchorPos);

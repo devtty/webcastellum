@@ -175,7 +175,8 @@ public final class LearningModeFileParser {
         BufferedReader reader = null;
         try {
             reader = new BufferedReader( new FileReader(file) );
-            String line; int i=0; // reading and index stuff
+            String line;
+            int i=0; // reading and index stuff
             LearningModeTrackedRequestEntry requestEntry = null;
             while ((line=reader.readLine()) != null) {
                 if (line.indexOf(START_OF_ENTRY) >= 0) {

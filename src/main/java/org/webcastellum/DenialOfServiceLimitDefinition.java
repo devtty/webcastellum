@@ -5,7 +5,8 @@ import java.util.regex.Pattern;
 public final class DenialOfServiceLimitDefinition extends RequestDefinition {
     private static final long serialVersionUID = 1L;
  
-    private int watchPeriodMillis, clientDenialOfServiceLimit;
+    private int watchPeriodMillis;
+    private int clientDenialOfServiceLimit;
     
     public DenialOfServiceLimitDefinition(final boolean enabled, final String identification, final String description,     final WordDictionary servletPathPrefilter, final Pattern servletPathPattern, final boolean servletPathPatternNegated) {
         super(enabled, identification, description, servletPathPrefilter, servletPathPattern, servletPathPatternNegated);

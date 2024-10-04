@@ -39,7 +39,8 @@ import javax.servlet.http.HttpSession;
 public final class ResponseProtectionPerformanceTester {
 
     private static final int DEFAULT_EXECUTION_COUNT = 100;
-    private final File htmlFile,  outputFile;
+    private final File htmlFile;
+    private final File outputFile;
 
     public ResponseProtectionPerformanceTester(final File htmlFile) {
         this.htmlFile = htmlFile;
@@ -49,7 +50,8 @@ public final class ResponseProtectionPerformanceTester {
     public void execute(final int executionCount) throws NoSuchAlgorithmException, NoSuchPaddingException, FileNotFoundException, IOException, RuleLoadingException {
         System.out.println("Source file: " + this.htmlFile.getAbsoluteFile());
         System.out.println("Target file: " + this.outputFile.getAbsoluteFile());
-        long durationWithout, durationWith;
+        long durationWithout;
+        long durationWith;
         for (int i=0; i<5; i++) {
             durationWithout = test(false, executionCount);
             durationWith = test(true, executionCount);
