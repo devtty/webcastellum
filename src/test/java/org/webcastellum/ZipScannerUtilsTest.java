@@ -41,15 +41,15 @@ public class ZipScannerUtilsTest {
     public void testIsZipBomb_3args_2() throws IOException{
         File file = new File("src/test/resources/test.zip");
         //test.zip contains 2 files with a 7 bytes
-        assertFalse(ZipScannerUtils.isZipBomb(file, 14, 2, 3.0));
-        assertTrue(ZipScannerUtils.isZipBomb(file, 13, 2, 3.0));
-        assertTrue(ZipScannerUtils.isZipBomb(file, 14, 1, 3.0));
+        assertFalse(ZipScannerUtils.isZipBomb(file, 14, 2, 3));
+        assertTrue(ZipScannerUtils.isZipBomb(file, 13, 2, 3));
+        assertTrue(ZipScannerUtils.isZipBomb(file, 14, 1, 3));
     }
     
     @Test
     public void testIsZipBomb_Stream() throws FileNotFoundException, IOException{
         InputStream input = new FileInputStream(new File("src/test/resources/test.zip"));
-        assertFalse(ZipScannerUtils.isZipBomb(input, 14, 2, 3.0));
+        assertFalse(ZipScannerUtils.isZipBomb(input, 14, 2, 3));
     }
     
 }
