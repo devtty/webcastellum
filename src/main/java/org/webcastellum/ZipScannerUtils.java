@@ -83,9 +83,9 @@ public final class ZipScannerUtils {
                     totalSizeEntry += nBytes;
                     countedTotalBytes += nBytes;
 
-                    double compressionRatio = totalSizeEntry / ze.getCompressedSize();
+                    long compressionRatio = totalSizeEntry / ze.getCompressedSize();
 
-                    if (compressionRatio > (double) thresholdRatio) {
+                    if (compressionRatio > thresholdRatio) {
                         return true;
                     }
                 }
