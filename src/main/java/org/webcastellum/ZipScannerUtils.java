@@ -8,6 +8,7 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
 public final class ZipScannerUtils {
@@ -26,23 +27,26 @@ public final class ZipScannerUtils {
     
     
     public static final String[] extractNameAndCommentStrings(final File file) throws IOException {
-        
-        ZipFile zipFile = new ZipFile(file);
-        Enumeration<? extends ZipEntry> entries = zipFile.entries();
-        
-        final Set<String> nameAndComments = new HashSet<>();
-        
-        while(entries.hasMoreElements()){
-            ZipEntry ze = entries.nextElement();
-            String name = ze.getName();
-                String comment = ze.getComment();
-                if (name != null)
-                    nameAndComments.add(name);
-                if (comment != null)
-                    nameAndComments.add(comment);
+        try(ZipFile zipFile = new ZipFile(file)){
+            Enumeration<? extends ZipEntry> entries = zipFile.entries();
+
+            final Set<String> nameAndComments = new HashSet<>();
+
+            while(entries.hasMoreElements()){
+                ZipEntry ze = entries.nextElement();
+                String name = ze.getName();
+                    String comment = ze.getComment();
+                    if (name != null)
+                        nameAndComments.add(name);
+                    if (comment != null)
+                        nameAndComments.add(comment);
+            }
+
+            return nameAndComments.isEmpty() ? null : (String[]) nameAndComments.toArray(String[]::new);
+        }catch(ZipException ex){
+            //not a ZIP file - so no ZIP comments
+            return EMPTY;
         }
-        
-        return nameAndComments.isEmpty() ? null : (String[]) nameAndComments.toArray(String[]::new);
     }
     
     public static final boolean isZipBomb(final InputStream input, final long thresholdTotalSize, final long thresholdFileCount, final double thresholdRatio) throws IOException {
@@ -59,39 +63,44 @@ public final class ZipScannerUtils {
         if (thresholdTotalSize < 0) throw new IllegalArgumentException("thresholdTotalSize must not be negative");
         if (thresholdFileCount < 0) throw new IllegalArgumentException("thresholdFileCount must not be negative");
         
-        ZipFile zipFile = new ZipFile(file);
-        Enumeration<? extends ZipEntry> entries = zipFile.entries();
-        
-        long countedFiles = 0;
-        long countedTotalBytes = 0;
-        
-        while(entries.hasMoreElements()){
-            ZipEntry ze = entries.nextElement();
-            InputStream in = new BufferedInputStream(zipFile.getInputStream(ze));
-            
-            countedFiles++;
-            
-            int nBytes = -1;
-            byte[] buffer = new byte[2048];
-            long totalSizeEntry = 0;
-            
-            while((nBytes = in.read(buffer)) > 0) {
-                totalSizeEntry += nBytes;
-                countedTotalBytes += nBytes;
+        try (ZipFile zipFile = new ZipFile(file)) {
+            Enumeration<? extends ZipEntry> entries = zipFile.entries();
 
-                double compressionRatio = totalSizeEntry / ze.getCompressedSize();
+            long countedFiles = 0;
+            long countedTotalBytes = 0;
 
-                if (compressionRatio > thresholdRatio) {
+            while (entries.hasMoreElements()) {
+                ZipEntry ze = entries.nextElement();
+                InputStream in = new BufferedInputStream(zipFile.getInputStream(ze));
+
+                countedFiles++;
+
+                int nBytes = -1;
+                byte[] buffer = new byte[2048];
+                long totalSizeEntry = 0;
+
+                while ((nBytes = in.read(buffer)) > 0) {
+                    totalSizeEntry += nBytes;
+                    countedTotalBytes += nBytes;
+
+                    double compressionRatio = totalSizeEntry / ze.getCompressedSize();
+
+                    if (compressionRatio > (double) thresholdRatio) {
+                        return true;
+                    }
+                }
+
+                if (countedTotalBytes > thresholdTotalSize) {
+                    return true;
+                }
+
+                if (countedFiles > thresholdFileCount && thresholdFileCount > 0) {
                     return true;
                 }
             }
-
-            if(countedTotalBytes > thresholdTotalSize) {
-                return true;
-            }
-
-            if(countedFiles > thresholdFileCount && thresholdFileCount > 0)
-                return true;
+        } catch (ZipException ex) {
+            // nota ZIP file - so no ZipBomb
+            return false;
         }
          return false;
     }
