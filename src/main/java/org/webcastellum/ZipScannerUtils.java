@@ -1,5 +1,6 @@
 package org.webcastellum;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,47 +44,56 @@ public final class ZipScannerUtils {
         }
     }
     
-    public static final boolean isZipBomb(final InputStream input, final long thresholdTotalSize, final long thresholdFileCount) throws IOException {
+    public static final boolean isZipBomb(final InputStream input, final long thresholdTotalSize, final long thresholdFileCount, final double thresholdRatio) throws IOException {
         File temp = null;
         try {
             temp = TempFileUtils.writeToTempFile(input);
-            return isZipBomb(temp, thresholdTotalSize, thresholdFileCount);
+            return isZipBomb(temp, thresholdTotalSize, thresholdFileCount, thresholdRatio);
         } finally {
             if (temp != null) TempFileUtils.deleteTempFile(temp);
         }
     }
-    public static final boolean isZipBomb(final File file, final long thresholdTotalSize, final long thresholdFileCount) throws IOException {
+    public static final boolean isZipBomb(final File file, final long thresholdTotalSize, final long thresholdFileCount, final double thresholdRatio) throws IOException {
         if (thresholdTotalSize < 0) throw new IllegalArgumentException("thresholdTotalSize must not be negative");
         if (thresholdFileCount < 0) throw new IllegalArgumentException("thresholdFileCount must not be negative");
         
-        try(ZipFile zipFile = new ZipFile(file, ZipFile.OPEN_READ)) {
-            ZipEntry entry;
-            long countedFiles = 0;
-            long countedTotalBytes = 0;
+        ZipFile zipFile = new ZipFile(file);
+        Enumeration<? extends ZipEntry> entries = zipFile.entries();
+        
+        long countedFiles = 0;
+        long countedTotalBytes = 0;
+        
+        while(entries.hasMoreElements()){
+            ZipEntry ze = entries.nextElement();
+            InputStream in = new BufferedInputStream(zipFile.getInputStream(ze));
             
-            for (final Enumeration<? extends ZipEntry> entries = zipFile.entries(); entries.hasMoreElements();) {
-                if (++countedFiles > thresholdFileCount && thresholdFileCount > 0) return true;
-                entry = (ZipEntry) entries.nextElement();
-                final long size = entry.getSize();
-                if (size > 0 && thresholdTotalSize > 0) {
-                    if (size > thresholdTotalSize) 
-                        return true;
-                    countedTotalBytes += size;
-                    if (countedTotalBytes > thresholdTotalSize) 
-                        return true;
+            countedFiles++;
+            
+            int nBytes = -1;
+            byte[] buffer = new byte[2048];
+            long totalSizeEntry = 0;
+            
+            while((nBytes = in.read(buffer)) > 0) {
+                totalSizeEntry += nBytes;
+                countedTotalBytes += nBytes;
+
+                double compressionRatio = totalSizeEntry / ze.getCompressedSize();
+
+                if (compressionRatio > thresholdRatio) {
+                    return true;
                 }
             }
-            return false;
-        } catch (ZipException e) {
-            // not a ZIP file - so no ZIP bomb
-            return false;
+
+            if(countedTotalBytes > thresholdTotalSize) {
+                return true;
+            }
+
+            if(countedFiles > thresholdFileCount && thresholdFileCount > 0)
+                return true;
         }
+         return false;
     }
 
-    
-    
-    
-    
     private ZipScannerUtils() {}
     
     

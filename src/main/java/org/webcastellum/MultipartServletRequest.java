@@ -182,7 +182,7 @@ public final class MultipartServletRequest extends HttpServletRequestWrapper {
                 // check against ZIP bombs
                 if (multipartSizeLimit != null && (multipartSizeLimit.getZipBombThresholdTotalSize() > 0 || multipartSizeLimit.getZipBombThresholdFileCount() > 0)) {
                     // TODO: wenn eh per file auf disk gebuffered wurde, ist ein mpFileInfo.getFile() um erneut ein file daraus zuschreiben (in ZipScannerUtils) doppelt gemoppelt... daher im falle von disk buffering lieber einfach nur den file-handle druchreichen an ZipScannerUtils....
-                    if (ZipScannerUtils.isZipBomb(mpFileInfo.getFile(), multipartSizeLimit.getZipBombThresholdTotalSize(), multipartSizeLimit.getZipBombThresholdFileCount())) {
+                    if (ZipScannerUtils.isZipBomb(mpFileInfo.getFile(), multipartSizeLimit.getZipBombThresholdTotalSize(), multipartSizeLimit.getZipBombThresholdFileCount(), multipartSizeLimit.getZipBombThresholdCompressionRatio())) {
                         throw new ServerAttackException("Potential ZIP bomb detected");
                     }
                 }

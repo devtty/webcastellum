@@ -1,6 +1,8 @@
 This file lists the major changes of the last few WebCastellum releases:
 
-
+Version 1.8.5
+===========================================
+- ZipBomb Test considers compression ratio and calculates size
 
 
 Version 1.8.3 major new features (released on 2009-09-26):
@@ -17,7 +19,7 @@ Version 1.8.3 major new features (released on 2009-09-26):
   which uses a properties file from the filesystem to load configuration data. When using
   this configuration loader the filename of the properties file to hold the configuration values
   must be specified via init-param "PropertiesFileConfigurationLoader_File". Unless you set
-  "PropertiesFileConfigurationLoader_FallbackToWebXml" to "false" (defualt is "true")
+  "PropertiesFileConfigurationLoader_FallbackToWebXml" to "false" (default is "true")
   configuration data not found in the properties file will be loaded as a fallback from the
   web.xml file. This way you can externalize (overwrite) certain parts of your configuration
   into properties files and keep other parts still inside the web.xml file.

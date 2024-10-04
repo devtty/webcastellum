@@ -13,5 +13,6 @@ maxFileNameLength=1000
 
 zipBombThresholdTotalSize=100000000
 zipBombThresholdFileCount=500
+zipBombThresholdCompressionRatio=3.0
 
 enabled=true

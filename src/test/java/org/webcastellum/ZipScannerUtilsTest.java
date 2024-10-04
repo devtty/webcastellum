@@ -27,13 +27,13 @@ public class ZipScannerUtilsTest {
 
     @Test
     public void testIsZipBombWithNegativeTotalSize(){
-        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> ZipScannerUtils.isZipBomb(new File("src/test/resources/test.zip"), -1, 0));
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> ZipScannerUtils.isZipBomb(new File("src/test/resources/test.zip"), -1, 0, 3.0));
         assertEquals("thresholdTotalSize must not be negative", ex.getMessage());
     }
     
     @Test
     public void testIsZipBombWithNegativeFileCount(){
-        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> ZipScannerUtils.isZipBomb(new File("src/test/resources/test.zip"), 0, -1));
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> ZipScannerUtils.isZipBomb(new File("src/test/resources/test.zip"), 0, -1, 3.0));
         assertEquals("thresholdFileCount must not be negative", ex.getMessage());
     }
     
@@ -41,15 +41,15 @@ public class ZipScannerUtilsTest {
     public void testIsZipBomb_3args_2() throws IOException{
         File file = new File("src/test/resources/test.zip");
         //test.zip contains 2 files with a 7 bytes
-        assertFalse(ZipScannerUtils.isZipBomb(file, 14, 2));
-        assertTrue(ZipScannerUtils.isZipBomb(file, 13, 2));
-        assertTrue(ZipScannerUtils.isZipBomb(file, 14, 1));
+        assertFalse(ZipScannerUtils.isZipBomb(file, 14, 2, 3.0));
+        assertTrue(ZipScannerUtils.isZipBomb(file, 13, 2, 3.0));
+        assertTrue(ZipScannerUtils.isZipBomb(file, 14, 1, 3.0));
     }
     
     @Test
     public void testIsZipBomb_Stream() throws FileNotFoundException, IOException{
         InputStream input = new FileInputStream(new File("src/test/resources/test.zip"));
-        assertFalse(ZipScannerUtils.isZipBomb(input, 14, 2));
+        assertFalse(ZipScannerUtils.isZipBomb(input, 14, 2, 3.0));
     }
     
 }
