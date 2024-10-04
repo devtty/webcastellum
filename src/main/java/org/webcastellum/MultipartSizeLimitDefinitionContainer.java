@@ -13,6 +13,7 @@ public final class MultipartSizeLimitDefinitionContainer extends SimpleDefinitio
     private static final String KEY_MAX_FILE_NAME_LENGTH = "maxFileNameLength";    
     private static final String KEY_ZIP_BOMB_THRESHOLD_TOTAL = "zipBombThresholdTotalSize";
     private static final String KEY_ZIP_BOMB_THRESHOLD_COUNT = "zipBombThresholdFileCount";
+    private static final String KEY_ZIP_BOMB_THRESHOLD_RATIO = "zipBombThresholdCompressionRatio";
     
     
     
@@ -40,6 +41,7 @@ public final class MultipartSizeLimitDefinitionContainer extends SimpleDefinitio
         multipartSizeLimitDefinition.setMaxFileNameLength( getValueAndRemoveKey(properties,KEY_MAX_FILE_NAME_LENGTH) );
         multipartSizeLimitDefinition.setZipBombThresholdTotalSize( getValueAndRemoveKey(properties,KEY_ZIP_BOMB_THRESHOLD_TOTAL) );
         multipartSizeLimitDefinition.setZipBombThresholdFileCount( getValueAndRemoveKey(properties,KEY_ZIP_BOMB_THRESHOLD_COUNT) );
+        multipartSizeLimitDefinition.setZipBombThresholdCompressionRatio( getValueAndRemoveKey(properties, KEY_ZIP_BOMB_THRESHOLD_RATIO));
     }
     
     

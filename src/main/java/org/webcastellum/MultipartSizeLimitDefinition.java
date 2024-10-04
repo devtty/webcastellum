@@ -11,6 +11,7 @@ public final class MultipartSizeLimitDefinition extends SimpleDefinition {
     private int maxFileNameLength;
     private int zipBombThresholdTotalSize;
     private int zipBombThresholdFileCount;
+    private int zipBombThresholdCompressionRatio;
 
     public MultipartSizeLimitDefinition(final boolean enabled, final String identification, final String description, final WordDictionary servletPathOrRequestURIPrefilter, final Pattern servletPathOrRequestURIPattern) {
         super(enabled, identification, description, servletPathOrRequestURIPrefilter, servletPathOrRequestURIPattern);
@@ -67,8 +68,17 @@ public final class MultipartSizeLimitDefinition extends SimpleDefinition {
     public int getZipBombThresholdFileCount() {
         return this.zipBombThresholdFileCount;
     }
+    
     public void setZipBombThresholdFileCount(final int limit) {
         this.zipBombThresholdFileCount = limit;
+    }
+
+    public int getZipBombThresholdCompressionRatio() {
+        return zipBombThresholdCompressionRatio;
+    }
+
+    public void setZipBombThresholdCompressionRatio(final int zipBombThresholdCompressionRatio) {
+        this.zipBombThresholdCompressionRatio = zipBombThresholdCompressionRatio;
     }
     
 }

@@ -48,7 +48,7 @@ public class MultipartSizeLimitDefinitionTest{
         assertEquals(0, def.getMaxFileUploadSize());
         assertEquals(0, def.getZipBombThresholdTotalSize());
         assertEquals(0, def.getZipBombThresholdFileCount());
-        
+        assertEquals(0, def.getZipBombThresholdCompressionRatio());
     }
     
 }
