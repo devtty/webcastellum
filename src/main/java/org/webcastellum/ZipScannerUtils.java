@@ -8,7 +8,6 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
 public final class ZipScannerUtils {
@@ -24,24 +23,26 @@ public final class ZipScannerUtils {
             if (temp != null) TempFileUtils.deleteTempFile(temp);
         }
     }
+    
+    
     public static final String[] extractNameAndCommentStrings(final File file) throws IOException {
-        try (ZipFile zipFile = new ZipFile(file, ZipFile.OPEN_READ)) {
-            final Set<String> nameAndComments = new HashSet<>();
-            
-            zipFile.entries().asIterator().forEachRemaining(entry -> {
-                String name = entry.getName();
-                String comment = entry.getComment();
+        
+        ZipFile zipFile = new ZipFile(file);
+        Enumeration<? extends ZipEntry> entries = zipFile.entries();
+        
+        final Set<String> nameAndComments = new HashSet<>();
+        
+        while(entries.hasMoreElements()){
+            ZipEntry ze = entries.nextElement();
+            String name = ze.getName();
+                String comment = ze.getComment();
                 if (name != null)
                     nameAndComments.add(name);
                 if (comment != null)
                     nameAndComments.add(comment);
-            });
-            
-            return nameAndComments.isEmpty() ? null : (String[]) nameAndComments.toArray(String[]::new);
-        } catch (ZipException e) {
-            // not a ZIP file - so no ZIP comments
-            return EMPTY;
         }
+        
+        return nameAndComments.isEmpty() ? null : (String[]) nameAndComments.toArray(String[]::new);
     }
     
     public static final boolean isZipBomb(final InputStream input, final long thresholdTotalSize, final long thresholdFileCount, final double thresholdRatio) throws IOException {
@@ -53,6 +54,7 @@ public final class ZipScannerUtils {
             if (temp != null) TempFileUtils.deleteTempFile(temp);
         }
     }
+    
     public static final boolean isZipBomb(final File file, final long thresholdTotalSize, final long thresholdFileCount, final double thresholdRatio) throws IOException {
         if (thresholdTotalSize < 0) throw new IllegalArgumentException("thresholdTotalSize must not be negative");
         if (thresholdFileCount < 0) throw new IllegalArgumentException("thresholdFileCount must not be negative");
