@@ -7,7 +7,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 
-public class DenialOfServiceLimitDefinitionTest {
+public class DenialOfServiceLimitDefinitionTest{
     
     WordDictionary servletPathPrefilter = new WordDictionary("a b");
     Pattern servletPathPattern = Pattern.compile("/");
@@ -38,19 +38,22 @@ public class DenialOfServiceLimitDefinitionTest {
         assertProperties(def, true, null, null);
     }
     
-    @Test(expected = NullPointerException.class)
+    @Test
     public void testDenialOfServiceLimitDefinitionWithoutIdentification() {
-        new DenialOfServiceLimitDefinition(true, null, "description", servletPathPrefilter, servletPathPattern, true);
+        NullPointerException npe = assertThrows(NullPointerException.class, () -> new DenialOfServiceLimitDefinition(true, null, "description", servletPathPrefilter, servletPathPattern, true));
+        assertEquals("identification must not be null", npe.getMessage());
     }
     
-    @Test(expected = NullPointerException.class)
+    @Test
     public void testDenialOfServiceLimitDefinitionWithoutDescription() {
-        new DenialOfServiceLimitDefinition(true, "identification", null, servletPathPrefilter, servletPathPattern, true);
+        NullPointerException npe = assertThrows(NullPointerException.class, () -> new DenialOfServiceLimitDefinition(true, "identification", null, servletPathPrefilter, servletPathPattern, true));
+        assertEquals("description must not be null", npe.getMessage());
     }
     
-    @Test(expected = NullPointerException.class)
+    @Test
     public void testDenialOfServiceLimitDefinitionWithoutPattern() {
-        new DenialOfServiceLimitDefinition(true, "identification", "description", servletPathPrefilter, null, true);
+        NullPointerException npe = assertThrows(NullPointerException.class, () -> new DenialOfServiceLimitDefinition(true, "identification", "description", servletPathPrefilter, null, true));
+        assertEquals("servletPathPattern must not be null", npe.getMessage());
     }
     
     private void assertProperties(DenialOfServiceLimitDefinition def, boolean expectedEnabled, WordDictionary expectedPrefilter, Pattern pattern){

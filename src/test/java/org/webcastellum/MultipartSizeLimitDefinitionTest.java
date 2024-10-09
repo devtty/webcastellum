@@ -20,19 +20,22 @@ public class MultipartSizeLimitDefinitionTest{
         assertProperties(def, true, null);
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void testMultipartSizeLimitDefinitionWithoutIdentification() {
-        new MultipartSizeLimitDefinition(true, null, "description", servletPathOrRequestURIPrefilter, servletPathOrRequestURIPattern);
+        NullPointerException npe = assertThrows(NullPointerException.class, () -> new MultipartSizeLimitDefinition(true, null, "description", servletPathOrRequestURIPrefilter, servletPathOrRequestURIPattern));
+        assertEquals("identification must not be null", npe.getMessage());
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void testMultipartSizeLimitDefinitionWithoutDescription() {
-        new MultipartSizeLimitDefinition(true, "identification", null, servletPathOrRequestURIPrefilter, servletPathOrRequestURIPattern);
+        NullPointerException npe = assertThrows(NullPointerException.class, () -> new MultipartSizeLimitDefinition(true, "identification", null, servletPathOrRequestURIPrefilter, servletPathOrRequestURIPattern));
+        assertEquals("description must not be null", npe.getMessage());
     }
     
-    @Test(expected = NullPointerException.class)
+    @Test
     public void testMultipartSizeLimitDefinitionWithoutPattern() {
-        new MultipartSizeLimitDefinition(true, "identification", "description", servletPathOrRequestURIPrefilter, null);
+        NullPointerException npe = assertThrows(NullPointerException.class, () -> new MultipartSizeLimitDefinition(true, "identification", "description", servletPathOrRequestURIPrefilter, null));
+        assertEquals("servletPathOrRequestURIPattern must not be null", npe.getMessage());
     }
     
     private void assertProperties(MultipartSizeLimitDefinition def, boolean expectedEnabled, WordDictionary expectedPrefilter){
@@ -43,6 +46,7 @@ public class MultipartSizeLimitDefinitionTest{
         assertEquals(servletPathOrRequestURIPattern, def.getServletPathOrRequestURIPattern());
 
         assertFalse(def.isMultipartAllowed());
+        assertEquals(0, def.getMaxFileNameLength());
         assertEquals(0, def.getMaxInputStreamLength());
         assertEquals(0, def.getMaxFileUploadCount());
         assertEquals(0, def.getMaxFileUploadSize());

@@ -10,7 +10,7 @@ public abstract class AbstractRelaxingHtmlParserStream extends FilterOutputStrea
     
     private final boolean useTunedBlockParser;
     
-    private final int[] LAST_FEW = new int[4]; // 4 since <!-- is the longest value to check and that has 4 standard ascii chars/bytes
+    private final int[] lastFew = new int[4]; // 4 since <!-- is the longest value to check and that has 4 standard ascii chars/bytes
     private final ByteArrayOutputStream currentTag = new ByteArrayOutputStream();
     protected final String encoding;
     
@@ -95,7 +95,7 @@ public abstract class AbstractRelaxingHtmlParserStream extends FilterOutputStrea
                 }
                 // reset tag content + "last few" array aside
                 this.currentTag.reset();
-                LAST_FEW[0]=0; LAST_FEW[1]=0; LAST_FEW[2]=0; LAST_FEW[3]=0;
+                lastFew[0]=0; lastFew[1]=0; lastFew[2]=0; lastFew[3]=0;
                 // set within tag flag
                 this.isWithinTag = true;
             } else if (original == TAG_END) {
@@ -105,15 +105,15 @@ public abstract class AbstractRelaxingHtmlParserStream extends FilterOutputStrea
         }
         if (this.isWithinTag) {
             // track last few chars/bytes
-            LAST_FEW[0]=LAST_FEW[1]; LAST_FEW[1]=LAST_FEW[2]; LAST_FEW[2]=LAST_FEW[3]; // direct assignment is faster than System.arrayCopy for under about 50 chars/bytes (and LAST_FEW_LENGTH is even just under 10 chars/bytes)
-            LAST_FEW[3] = original;
+            lastFew[0]=lastFew[1]; lastFew[1]=lastFew[2]; lastFew[2]=lastFew[3]; // direct assignment is faster than System.arrayCopy for under about 50 chars/bytes (and LAST_FEW_LENGTH is even just under 10 chars/bytes)
+            lastFew[3] = original;
             // continue
             this.currentTag.write(original);
             if (this.isWithinComment) {
                 if (original == TAG_END) {
                     // chance to have an end-tag for the colsing of the comment (at least that should be possible)
     // OLD                if ( this.currentTag.toString(this.encoding).trim().endsWith(COMMENT_END) ) {
-                    if ( LAST_FEW[1]=='-' && LAST_FEW[2]=='-' && LAST_FEW[3]=='>' ) {
+                    if ( lastFew[1]=='-' && lastFew[2]=='-' && lastFew[3]=='>' ) {
                         this.isWithinComment = false;
                         this.isWithinTag = false;
                         // remove within tag flag - delayed
@@ -121,7 +121,7 @@ public abstract class AbstractRelaxingHtmlParserStream extends FilterOutputStrea
                     }
                 }
 //OLD            } else if ( this.currentTag.toString(this.encoding).trim().equals(COMMENT_START) ) {
-            } else if ( LAST_FEW[1]=='!' && LAST_FEW[2]=='-' && LAST_FEW[3]=='-' && LAST_FEW[0]=='<' /*the '<'-check here at index 0 put at the end since this condition-part is mostly true so that we better fail faster by having the index 1 thing checked at first*/) {
+            } else if ( lastFew[1]=='!' && lastFew[2]=='-' && lastFew[3]=='-' && lastFew[0]=='<' /*the '<'-check here at index 0 put at the end since this condition-part is mostly true so that we better fail faster by having the index 1 thing checked at first*/) {
                 this.isWithinComment = true;
             }
         } else writeChar = true;
@@ -134,7 +134,7 @@ public abstract class AbstractRelaxingHtmlParserStream extends FilterOutputStrea
             this.isWithinTag = false;
             // reset tag content + "last few" array aside
             this.currentTag.reset();
-            LAST_FEW[0]=0; LAST_FEW[1]=0; LAST_FEW[2]=0; LAST_FEW[3]=0;
+            lastFew[0]=0; lastFew[1]=0; lastFew[2]=0; lastFew[3]=0;
         }
         if (writeChar) handleText(original);
     }
@@ -147,25 +147,25 @@ public abstract class AbstractRelaxingHtmlParserStream extends FilterOutputStrea
         if (this.isWithinTag) {
             // track last few chars/bytes
             if (count >= 4) {
-                LAST_FEW[0] = bytesWithoutAnyTagRelevantChars[endPosExclusive-4]; 
-                LAST_FEW[1] = bytesWithoutAnyTagRelevantChars[endPosExclusive-3]; 
-                LAST_FEW[2] = bytesWithoutAnyTagRelevantChars[endPosExclusive-2];
-                LAST_FEW[3] = bytesWithoutAnyTagRelevantChars[endPosExclusive-1];
+                lastFew[0] = bytesWithoutAnyTagRelevantChars[endPosExclusive-4]; 
+                lastFew[1] = bytesWithoutAnyTagRelevantChars[endPosExclusive-3]; 
+                lastFew[2] = bytesWithoutAnyTagRelevantChars[endPosExclusive-2];
+                lastFew[3] = bytesWithoutAnyTagRelevantChars[endPosExclusive-1];
             } else if (count == 3) {
-                LAST_FEW[0] = LAST_FEW[1]; 
-                LAST_FEW[1] = bytesWithoutAnyTagRelevantChars[endPosExclusive-3]; 
-                LAST_FEW[2] = bytesWithoutAnyTagRelevantChars[endPosExclusive-2];
-                LAST_FEW[3] = bytesWithoutAnyTagRelevantChars[endPosExclusive-1];
+                lastFew[0] = lastFew[1]; 
+                lastFew[1] = bytesWithoutAnyTagRelevantChars[endPosExclusive-3]; 
+                lastFew[2] = bytesWithoutAnyTagRelevantChars[endPosExclusive-2];
+                lastFew[3] = bytesWithoutAnyTagRelevantChars[endPosExclusive-1];
             } else if (count == 2) {
-                LAST_FEW[0] = LAST_FEW[1]; 
-                LAST_FEW[1] = LAST_FEW[2]; 
-                LAST_FEW[2] = bytesWithoutAnyTagRelevantChars[endPosExclusive-2];
-                LAST_FEW[3] = bytesWithoutAnyTagRelevantChars[endPosExclusive-1];
+                lastFew[0] = lastFew[1]; 
+                lastFew[1] = lastFew[2]; 
+                lastFew[2] = bytesWithoutAnyTagRelevantChars[endPosExclusive-2];
+                lastFew[3] = bytesWithoutAnyTagRelevantChars[endPosExclusive-1];
             } else if (count == 1) {
-                LAST_FEW[0] = LAST_FEW[1]; 
-                LAST_FEW[1] = LAST_FEW[2]; 
-                LAST_FEW[2] = LAST_FEW[3];
-                LAST_FEW[3] = bytesWithoutAnyTagRelevantChars[endPosExclusive-1];
+                lastFew[0] = lastFew[1]; 
+                lastFew[1] = lastFew[2]; 
+                lastFew[2] = lastFew[3];
+                lastFew[3] = bytesWithoutAnyTagRelevantChars[endPosExclusive-1];
             }
             // continue
             this.currentTag.write(bytesWithoutAnyTagRelevantChars, startPosInclusive, count);
