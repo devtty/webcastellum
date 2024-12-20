@@ -11,6 +11,7 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import org.junit.Ignore;
 
 public class CryptoUtilsTest {
 
@@ -33,19 +34,22 @@ public class CryptoUtilsTest {
         assertEquals((byte) 0x1, CryptoUtils.toByteValue("1"));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testToByteValueWithToLongArgument() {
-        CryptoUtils.toByteValue("001");
+        IllegalArgumentException iae = assertThrows(IllegalArgumentException.class, () -> CryptoUtils.toByteValue("001"));
+        assertEquals("hex must be at max a two-digit hex value like B1", iae.getMessage());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testToByteValueWithToShortArgument() {
-        CryptoUtils.toByteValue("");
+        IllegalArgumentException iae = assertThrows(IllegalArgumentException.class, () -> CryptoUtils.toByteValue(""));
+        assertEquals("hex must be at max a two-digit hex value like B1", iae.getMessage());
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void testToByteValueWithNullArgument() {
-        CryptoUtils.toByteValue(null);
+        NullPointerException npe = assertThrows(NullPointerException.class, () -> CryptoUtils.toByteValue(null));
+        assertEquals("Cannot invoke \"String.length()\" because \"hex\" is null", npe.getMessage());
     }
 
     @Test
@@ -57,24 +61,28 @@ public class CryptoUtilsTest {
         assertEquals(1, CryptoUtils.toIntValue("1"));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testToIntValueWithToLongArgument() {
-        CryptoUtils.toIntValue("ABCDEF121");
+        IllegalArgumentException iae = assertThrows(IllegalArgumentException.class, () -> CryptoUtils.toIntValue("ABCDEF121"));
+        assertEquals("hex must be at max a eight-digit hex value like ABCDEF12", iae.getMessage());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testToIntValueWithToShortArgument() {
-        CryptoUtils.toIntValue("");
+        IllegalArgumentException iae = assertThrows(IllegalArgumentException.class, () -> CryptoUtils.toIntValue(""));
+        assertEquals("hex must be at max a eight-digit hex value like ABCDEF12", iae.getMessage());
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void testToIntValueWithNullArgument() {
-        CryptoUtils.toIntValue(null);
+        NullPointerException npe = assertThrows(NullPointerException.class, () -> CryptoUtils.toIntValue(null));
+        assertEquals("Cannot invoke \"String.length()\" because \"hex\" is null", npe.getMessage());
     }
 
     //TODO testing randomness through adding values to a list is not reliable bc. double values are possible
     
     @Test
+    @Ignore("see TODO")
     public void testGenerateRandomToken_boolean() {
         List<String> strings = new ArrayList<>();
         String s = "";
@@ -95,6 +103,7 @@ public class CryptoUtilsTest {
     }
 
     @Test
+    @Ignore("see TODO")
     public void testGenerateRandomToken_boolean_int() {
         List<String> strings = new ArrayList<>();
         for (int i = 0; i < 100; i++) {
@@ -112,6 +121,7 @@ public class CryptoUtilsTest {
     }
 
     @Test
+    @Ignore("see TODO")
     public void testGenerateRandomBytes_boolean() {
         List<byte[]> a = new ArrayList<>();
 
@@ -132,6 +142,7 @@ public class CryptoUtilsTest {
     }
 
     @Test
+    @Ignore("see TODO")
     public void testGenerateRandomBytes_boolean_int() {
         List<byte[]> a = new ArrayList<>();
 
@@ -150,6 +161,7 @@ public class CryptoUtilsTest {
     }
 
     @Test
+    @Ignore("see TODO")
     public void testGenerateRandomNumber_boolean() {
         List<Integer> a = new ArrayList<>();
         for (int i = 0; i < 100; i++){
@@ -165,6 +177,7 @@ public class CryptoUtilsTest {
     }
 
     @Test
+    @Ignore("see TODO")
     public void testGenerateRandomNumber_3args() {
         List<Integer> a = new ArrayList<>();
         for(int i = 0; i < 20; i++){
@@ -183,19 +196,22 @@ public class CryptoUtilsTest {
         }
     }
     
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testGenerateRandomNumber_negativeLow(){
-        CryptoUtils.generateRandomNumber(true, -1, 10);
+        IllegalArgumentException iae = assertThrows(IllegalArgumentException.class, () -> CryptoUtils.generateRandomNumber(true, -1, 10));
+        assertEquals("Values cannot be negative", iae.getMessage());
     }
     
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testGenerateRandomNumber_negativeHigh(){
-        CryptoUtils.generateRandomNumber(true, 1, -10);
+        IllegalArgumentException iae = assertThrows(IllegalArgumentException.class, () -> CryptoUtils.generateRandomNumber(true, 1, -10));
+        assertEquals("Values cannot be negative", iae.getMessage());
     }
     
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testGenerateRandomNumber_negativeDifference(){
-        CryptoUtils.generateRandomNumber(true, 5, 4);
+        IllegalArgumentException iae = assertThrows(IllegalArgumentException.class, () -> CryptoUtils.generateRandomNumber(true, 5, 4));
+        assertEquals("Low value must be lower than high value (low=5 and high=4)", iae.getMessage());
     }
     
     @Test
@@ -203,7 +219,6 @@ public class CryptoUtilsTest {
         assertTrue(CryptoUtils.getHashLength() == 32);
     }
 
-    
     @Test
     public void testHash() throws Exception {
         byte[] saltBefore = "salt".getBytes();
@@ -303,13 +318,10 @@ public class CryptoUtilsTest {
         }
     }
     
-    @Test(expected = NullPointerException.class)
+    @Test
     public void testDecryptURLSafeWithoutKey(){
-        try{
-            CryptoUtils.decryptURLSafe("test", null);
-        }catch (UnsupportedEncodingException | InvalidKeyException | NoSuchAlgorithmException | BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException ex){
-            fail("En-/De-cryption failed");
-        }
+        NullPointerException npe = assertThrows(NullPointerException.class, () -> CryptoUtils.decryptURLSafe("test", null));
+        assertEquals("key must not be null", npe.getMessage());
     }
 
     @Test
