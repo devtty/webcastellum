@@ -3,15 +3,15 @@ package org.webcastellum;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Enumeration;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -33,6 +33,10 @@ public final class DatabaseRuleFileInserter {
     private final String fileStorageBase;
     private final String fileStoragePath;
     
+    private static final Logger LOGGER = Logger.getLogger(DatabaseRuleFileInserter.class.getName());
+    private static final String PARAM_VALIDATION_MSG = "The parameter does not validate against the syntax pattern (%s): {%s}";
+    private static final String SQL_LOG_MSG = "SQL Error (%d): %s";
+    
     public DatabaseRuleFileInserter(final String jdbcDriver, final String jdbcUrl, final String jdbcUser, final String jdbcPassword, final String table, final String columnPath, final String columnFilename, final String columnPropertyKey, final String columnPropertyValue, final String fileStorageBase, final String fileStoragePath) {
         this.jdbcDriver = jdbcDriver;
         this.jdbcUrl = jdbcUrl;
@@ -48,7 +52,7 @@ public final class DatabaseRuleFileInserter {
     }
 
     
-    public void convertFromFileToDatabase() throws FileNotFoundException, IOException, ClassNotFoundException, SQLException {
+    public void convertFromFileToDatabase() throws IOException, ClassNotFoundException, SQLException {
         final File directory = new File(this.fileStorageBase, this.fileStoragePath);
         if (!directory.exists()) throw new IllegalArgumentException("Directory does not exist: "+directory.getAbsolutePath());
         if (!directory.isDirectory()) throw new IllegalArgumentException("Directory exist but is not a real directory (maybe a file?): "+directory.getAbsolutePath());
@@ -58,47 +62,50 @@ public final class DatabaseRuleFileInserter {
             Class.forName(this.jdbcDriver);
             Connection connection = null; 
             PreparedStatement preparedStatement = null;
-            ResultSet resultSet = null;
+
             try {
                 connection = DriverManager.getConnection(this.jdbcUrl, this.jdbcUser, this.jdbcPassword);
                 connection.setAutoCommit(false);
                 preparedStatement = connection.prepareStatement("INSERT INTO "+this.table+" ("+this.columnPath+", "+this.columnFilename+", "+this.columnPropertyKey+", "+this.columnPropertyValue+") VALUES (?,?,?,?)");
                 for (File file : files) {
                     if (file.isFile()) {
-                        if (!file.canRead()) throw new IllegalArgumentException("Unable to read rule definition file: "+file.getAbsolutePath());
+                        if (!file.canRead()) 
+                            throw new IllegalArgumentException("Unable to read rule definition file: "+file.getAbsolutePath());
                         final Properties properties = new Properties();
-                        BufferedInputStream input = null;
-                        try {
-                            input = new BufferedInputStream( new FileInputStream(file) );
-                            properties.load(input);
-                            for (final Enumeration/*<String>*/ keys = properties.propertyNames(); keys.hasMoreElements();) {
+                        
+                        try(BufferedInputStream in = new BufferedInputStream( new FileInputStream(file) )) {
+                            properties.load(in);
+                            Enumeration<?> keys = properties.propertyNames();
+                            while(keys.hasMoreElements()){
                                 final String key = (String) keys.nextElement();
                                 final String value = properties.getProperty(key);
-                                try {
-                                    preparedStatement.clearParameters();
-                                } catch (NullPointerException e) {
-                                    // TODO: log here, that Oracle has a bug in its JDBC driver, that keeps throwing NPEs here
-                                }
+                                
                                 preparedStatement.setString(1, path);
                                 preparedStatement.setString(2, file.getName());
                                 preparedStatement.setString(3, key);
                                 preparedStatement.setString(4, value);
                                 preparedStatement.addBatch();
+                                
+                                preparedStatement.clearParameters();
                             }
                             preparedStatement.executeBatch();
-                            System.out.println("Finished with file "+file.getAbsolutePath());
-                        } finally {
-                            if (input != null) try { input.close(); } catch (IOException ignored) {}
+                            LOGGER.log(Level.INFO, "Finished with file {0}", file.getAbsolutePath());
                         }
                     }
                 }
                 connection.commit();
             } catch (RuntimeException | IOException | SQLException e) {
-                if (connection != null) try { connection.rollback(); } catch (SQLException ignored) {}
+                if (connection != null) try { connection.rollback(); } catch (SQLException ignored) {
+                    LOGGER.log(Level.FINE, String.format( SQL_LOG_MSG, ignored.getErrorCode(), ignored.getSQLState() ));
+                }
                 throw e;
             } finally {
-                if (preparedStatement != null) try { preparedStatement.close(); } catch (SQLException ignored) {}
-                if (connection != null) try { connection.close(); } catch (SQLException ignored) {}
+                if (preparedStatement != null) try { preparedStatement.close(); } catch (SQLException ignored) {
+                    LOGGER.log(Level.FINE, String.format( SQL_LOG_MSG, ignored.getErrorCode(), ignored.getSQLState() ));
+                }
+                if (connection != null) try { connection.close(); } catch (SQLException ignored) {
+                    LOGGER.log(Level.FINE, String.format( SQL_LOG_MSG, ignored.getErrorCode(), ignored.getSQLState() ));
+                }
             }
         }
     }
@@ -106,9 +113,9 @@ public final class DatabaseRuleFileInserter {
     
     public static void main(String[] args) {
         if (args.length != 11) {
-            System.out.println(Version.tagLine());
-            System.err.println("This tool imports existing security rule properties files into the database");
-            System.err.println("Provide the following arguments: jdbcDriver jdbcUrl jdbcUser jdbcPassword table columnPath columnFilename columnPropertyKey columnPropertyValue fileStorageBase fileStoragePath");
+            LOGGER.log(Level.INFO, Version.tagLine());
+            LOGGER.log(Level.SEVERE, "This tool imports existing security rule properties files into the database");
+            LOGGER.log(Level.SEVERE, "Provide the following arguments: jdbcDriver jdbcUrl jdbcUser jdbcPassword table columnPath columnFilename columnPropertyKey columnPropertyValue fileStorageBase fileStoragePath");
             System.exit(-1);
         }
         final Pattern allowedDatabaseCharacters = Pattern.compile(AbstractSqlRuleFileLoader.VALID_DATABASE_SYNTAX);
@@ -119,13 +126,13 @@ public final class DatabaseRuleFileInserter {
         final String table = args[4];
         final Matcher matcher = allowedDatabaseCharacters.matcher(table);
         if (!matcher.matches())
-            showErrorAndExit("The parameter does not validate against the syntax pattern ("+allowedDatabaseCharacters+"): "+table);
+            showErrorAndExit(String.format(PARAM_VALIDATION_MSG, allowedDatabaseCharacters, table));
         final String columnPath = args[5]; matcher.reset(columnPath);
         if (!matcher.matches())
-            showErrorAndExit("The parameter does not validate against the syntax pattern ("+allowedDatabaseCharacters+"): "+columnPath);
-        final String columnFilename = args[6]; matcher.reset(columnFilename); if (!matcher.matches()) showErrorAndExit("The parameter does not validate against the syntax pattern ("+allowedDatabaseCharacters+"): "+columnFilename);
-        final String columnPropertyKey = args[7]; matcher.reset(columnPropertyKey); if (!matcher.matches()) showErrorAndExit("The parameter does not validate against the syntax pattern ("+allowedDatabaseCharacters+"): "+columnPropertyKey);
-        final String columnPropertyValue = args[8]; matcher.reset(columnPropertyValue); if (!matcher.matches()) showErrorAndExit("The parameter does not validate against the syntax pattern ("+allowedDatabaseCharacters+"): "+columnPropertyValue);
+            showErrorAndExit(String.format(PARAM_VALIDATION_MSG, allowedDatabaseCharacters, columnPath));
+        final String columnFilename = args[6]; matcher.reset(columnFilename); if (!matcher.matches()) showErrorAndExit(String.format(PARAM_VALIDATION_MSG,allowedDatabaseCharacters, columnFilename));
+        final String columnPropertyKey = args[7]; matcher.reset(columnPropertyKey); if (!matcher.matches()) showErrorAndExit(String.format(PARAM_VALIDATION_MSG,allowedDatabaseCharacters, columnPropertyKey));
+        final String columnPropertyValue = args[8]; matcher.reset(columnPropertyValue); if (!matcher.matches()) showErrorAndExit(String.format(PARAM_VALIDATION_MSG, allowedDatabaseCharacters, columnPropertyValue));
         final String fileStorageBase = args[9];
         final String fileStoragePath = args[10];
         try {
@@ -141,7 +148,7 @@ public final class DatabaseRuleFileInserter {
     }
 
     private static void showErrorAndExit(final String message) {
-        System.err.println("ERROR: "+message);
+        LOGGER.log(Level.SEVERE, "ERROR: {0}", message);
         System.exit(-2);
     }
 
