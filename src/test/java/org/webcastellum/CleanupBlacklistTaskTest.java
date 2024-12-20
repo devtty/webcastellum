@@ -16,14 +16,16 @@ public class CleanupBlacklistTaskTest {
 
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void testConstructorWithoutName(){
-        new CleanupBlacklistTask(null, new HashMap());
+        NullPointerException npe = assertThrows(NullPointerException.class, () -> new CleanupBlacklistTask(null, new HashMap()));
+        assertEquals("name must not be null", npe.getMessage());
     }
     
-    @Test(expected = NullPointerException.class)
+    @Test
     public void testConstructorWithoutMap(){
-        new CleanupBlacklistTask("test", null);
+        NullPointerException npe = assertThrows(NullPointerException.class, () -> new CleanupBlacklistTask("test", null));
+        assertEquals("map must not be null", npe.getMessage());
     }
     
     @Test
