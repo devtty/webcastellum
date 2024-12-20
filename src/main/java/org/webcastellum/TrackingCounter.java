@@ -16,7 +16,7 @@ public final class TrackingCounter extends AbstractCounter {
     // TODO: make this value configurable
     private static final int DEFAULT_AGGREGATION_PERIOD_SECONDS = 10;
             
-    private final List/*<AggregatedTrackedValue>*/ counter = new ArrayList();
+    private final List<AggregatedTrackedValue> counter = new ArrayList<>();
     private final long aggregationPeriodMillis;
     private AggregatedTrackedValue current;
     
@@ -28,9 +28,8 @@ public final class TrackingCounter extends AbstractCounter {
         increment();
     }
     
-    
-    
     // NOTE: This method might be called *very* frequently so it should be fast and low-memory consuming !!
+    @Override
     public final synchronized void increment() {
         if (this.current == null) { // = we're fresh and completely empty
             createAndAddNewAggregation();
@@ -52,39 +51,38 @@ public final class TrackingCounter extends AbstractCounter {
     }
     
     
+    @Override
     public final synchronized boolean isOveraged() {
         cutoffOldTrackings();
         return this.counter.isEmpty();
     }
     
     
+    @Override
     public final synchronized int getCounter() {
         cutoffOldTrackings();
         int result = 0;
-        for (final Iterator iter = this.counter.iterator(); iter.hasNext();) {
-            final AggregatedTrackedValue trackedValue = (AggregatedTrackedValue) iter.next();
-            result += trackedValue.size;
-        }
+        result = counter.stream().map(trackedValue -> trackedValue.size).reduce(result, Integer::sum);
         return result;
     }
     
 
-    private final void cutoffOldTrackings() {
+    private void cutoffOldTrackings() {
         if (this.counter.isEmpty()) return;
         final long cutoffTimestamp = System.currentTimeMillis() - this.getResetPeriodMillis();
-        for (final Iterator iter = this.counter.iterator(); iter.hasNext();) {
-            final AggregatedTrackedValue trackedValue = (AggregatedTrackedValue) iter.next();
-            if (trackedValue.timestamp < cutoffTimestamp) iter.remove();
-            else break; // since the elements are in chronological order
+        for (final Iterator<AggregatedTrackedValue> iter = this.counter.iterator(); iter.hasNext();) {
+            final AggregatedTrackedValue trackedValue = iter.next();
+            if (trackedValue.timestamp < cutoffTimestamp) 
+                iter.remove();
+            else 
+                break; // since the elements are in chronological order
         }
     }
     
-    
-    //1.5@Override
+    @Override
     public final String toString() {
         return "counter with reset period: "+getResetPeriodMillis();
     }
-    
     
     
     // An aggregated tracked value (we aggregate a little bit to save time and memory)
@@ -95,10 +93,5 @@ public final class TrackingCounter extends AbstractCounter {
             this.timestamp = System.currentTimeMillis() + aggregationPeriodMillis;
         }
     }
-    
-    
-    
-    
-    
     
 }
