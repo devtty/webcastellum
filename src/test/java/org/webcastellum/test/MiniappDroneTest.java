@@ -3,6 +3,11 @@ package org.webcastellum.test;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.drone.api.annotation.Drone;
@@ -11,9 +16,13 @@ import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 
 @RunWith(value = Arquillian.class)
 @RunAsClient
@@ -49,5 +58,68 @@ public class MiniappDroneTest {
     public void testRoot(){
         webdriver.get(contextPath.toExternalForm());
         assertTrue("TITLE: ".concat(webdriver.getTitle()), webdriver.getTitle().contains("MiniApp"));
+        checkMenu();
     }
+    
+    @Test
+    public void testTest(){
+        webdriver.get(contextPath.toExternalForm() + "/test/");
+        assertEquals("TEST", webdriver.findElement(By.cssSelector("body > h2:nth-child(1)")).getText());
+        assertTrue(Pattern.compile("Session-ID((.|\n)*)([A-F0-9]{32})").matcher(webdriver.getPageSource()).find());
+    }
+    
+    @Test
+    public void testTestWithParams(){
+        webdriver.get(contextPath.toExternalForm() + "/test/?testparam=test1&testparam2=test2");
+        assertEquals("TEST", webdriver.findElement(By.cssSelector("body > h2:nth-child(1)")).getText());
+        assertTrue(Pattern.compile("Session-ID((.|\n)*)([A-F0-9]{32})").matcher(webdriver.getPageSource()).find());
+        assertEquals("testparam", webdriver.findElement(By.cssSelector("body > dl:nth-child(4) > dt:nth-child(1)")).getText());
+        assertEquals("[test1]", webdriver.findElement(By.cssSelector("body > dl:nth-child(4) > dd:nth-child(2)")).getText());
+        assertEquals("testparam2", webdriver.findElement(By.cssSelector("body > dl:nth-child(4) > dt:nth-child(3)")).getText());
+        assertEquals("[test2]", webdriver.findElement(By.cssSelector("body > dl:nth-child(4) > dd:nth-child(4)")).getText());
+    }
+    
+    @Test
+    public void testRedirect(){
+        webdriver.get(contextPath.toExternalForm() + "/redirect");
+        String currentUrl = webdriver.getCurrentUrl();
+        assertEquals("http://localhost:8080/miniapp/", currentUrl);
+    }
+    
+    @Test
+    public void testStartLink(){
+        webdriver.get(contextPath.toExternalForm() + "/");
+        HashSet<String> encUri = new HashSet<>();
+        
+        for(int i=0; i<20; i++){
+            WebElement startLink = webdriver.findElement(By.linkText("start"));
+            String href = startLink.getAttribute("href");
+            assertFalse(href.contains("index.jsp"));
+            startLink.click();
+            assertTrue(encUri.add(webdriver.getCurrentUrl()));
+            System.out.println("C"+ i + ": " + webdriver.getCurrentUrl());
+        }
+    }
+
+    private void checkMenu() {
+        List<WebElement> startLink = webdriver.findElements(By.linkText("start"));
+        assertEquals(1, startLink.size());
+     
+        List<WebElement> formLinks = webdriver.findElements(By.linkText("form"));
+        assertEquals(11, formLinks.size());
+        
+        
+        //warum nur 10?
+        List<WebElement> echoLinks = webdriver.findElements(By.linkText("echo"));
+        assertEquals(10, echoLinks.size());
+        
+        List<WebElement> incrementLinks = webdriver.findElements(By.partialLinkText("increment by"));
+        assertEquals(3, incrementLinks.size());
+
+        //warum 3 statt 2
+        List<WebElement> miniappLinks = webdriver.findElements(By.partialLinkText("MiniApp"));
+        assertEquals(3, incrementLinks.size());
+        
+    }
+
 }
