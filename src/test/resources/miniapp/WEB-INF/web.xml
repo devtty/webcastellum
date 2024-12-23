@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+
+    
+    <!-- =============================================================================== -->
+    <!-- =============================================================================== -->
+    <!--  WebCastellum Security Filter Settings -->
+    <!-- =============================================================================== -->
+    <!-- =============================================================================== -->
+    <filter>
+        <filter-name>WebCastellum</filter-name>
+        <filter-class>org.webcastellum.WebCastellumFilter</filter-class>
+
+        <init-param>
+            <param-name>ApplicationName</param-name>
+            <param-value>miniapp</param-value>
+        </init-param>
+        <init-param>
+            <param-name>RedirectWelcomePage</param-name>
+            <param-value>/miniapp/</param-value>
+        </init-param>
+
+
+        <init-param>
+            <param-name>CharacterEncoding</param-name>
+            <param-value>ISO-8859-1</param-value>
+        </init-param>
+        <!--
+        <init-param>
+            <param-name>AttackLogDirectory</param-name>
+            <param-value>/tmp</param-value>
+        </init-param>
+        -->
+        <init-param>
+            <param-name>HandleUncaughtExceptions</param-name>
+            <param-value>true</param-value>
+        </init-param>
+        <init-param>
+            <param-name>ForceEntranceThroughEntryPoints</param-name>
+            <param-value>true</param-value>
+        </init-param>
+        <init-param>
+            <param-name>BlockNonLocalRedirects</param-name>
+            <param-value>true</param-value>
+        </init-param>
+        <init-param>
+            <param-name>StripHtmlComments</param-name>
+            <param-value>true</param-value>
+        </init-param>
+        <init-param>
+            <param-name>SecretTokenLinkInjection</param-name>
+            <param-value>true</param-value>
+        </init-param>
+
+
+        <init-param>
+            <param-name>QueryStringEncryption</param-name>
+            <param-value>true</param-value>
+        </init-param>
+        <init-param>
+            <param-name>ExtraEncryptedMediumPathRemoval</param-name>
+            <param-value>true</param-value>
+        </init-param>
+        <init-param>
+            <param-name>ParameterAndFormProtection</param-name>
+            <param-value>true</param-value>
+        </init-param>
+        <init-param>
+            <param-name>ExtraStrictParameterCheckingForLinks</param-name>
+            <param-value>true</param-value>
+        </init-param>
+        <init-param>
+            <param-name>ExtraDisabledFormFieldProtection</param-name>
+            <param-value>true</param-value>
+        </init-param>
+        <init-param>
+            <param-name>ExtraHiddenFormFieldProtection</param-name>
+            <param-value>true</param-value>
+        </init-param>
+        <init-param>
+            <param-name>ExtraSelectboxProtection</param-name>
+            <param-value>true</param-value>
+        </init-param>
+        <init-param>
+            <param-name>ExtraCheckboxProtection</param-name>
+            <param-value>true</param-value>
+        </init-param>
+        <init-param>
+            <param-name>ExtraRadiobuttonProtection</param-name>
+            <param-value>true</param-value>
+        </init-param>
+        <init-param>
+            <param-name>ExtraSelectboxValueMasking</param-name>
+            <param-value>true</param-value>
+        </init-param>
+        <init-param>
+            <param-name>ExtraCheckboxValueMasking</param-name>
+            <param-value>true</param-value>
+        </init-param>
+        <init-param>
+            <param-name>ExtraRadiobuttonValueMasking</param-name>
+            <param-value>true</param-value>
+        </init-param>
+
+
+        <init-param>
+            <param-name>DefaultProductionModeCheckerValue</param-name>
+            <param-value>true</param-value>
+        </init-param>
+        <init-param>
+            <param-name>RuleFileReloadingInterval</param-name>
+            <param-value>240</param-value>
+        </init-param>
+        <init-param>
+            <param-name>PreAndPostAttackLogCount</param-name>
+            <param-value>0</param-value>
+        </init-param>
+        <init-param>
+            <param-name>TieWebSessionToClientAddress</param-name>
+            <param-value>false</param-value>
+        </init-param>
+        <init-param>
+            <param-name>TieWebSessionToHeaderList</param-name>
+            <param-value>User-Agent,Accept-Encoding</param-value>
+        </init-param>
+        <init-param>
+            <param-name>BlockRequestsWithUnknownReferrer</param-name>
+            <param-value>false</param-value>
+        </init-param>
+        <init-param>
+            <param-name>BlockRequestsWithMissingReferrer</param-name>
+            <param-value>false</param-value>
+        </init-param>
+        <init-param>
+            <param-name>BlockResponseHeadersWithCRLF</param-name>
+            <param-value>true</param-value>
+        </init-param>
+        <init-param>
+            <param-name>BlockInvalidOrFutureLastModifiedResponseHeaders</param-name>
+            <param-value>true</param-value>
+        </init-param>
+        <init-param>
+            <param-name>ForcedSessionInvalidationPeriod</param-name>
+            <param-value>300</param-value>
+        </init-param>
+        <init-param>
+            <param-name>BlockAttackingClientsThreshold</param-name>
+            <param-value>15</param-value>
+        </init-param>
+        <init-param>
+            <param-name>BlockAttackingClientsDuration</param-name>
+            <param-value>20</param-value>
+        </init-param>
+        <init-param>
+            <param-name>ResetPeriodAttack</param-name>
+            <param-value>10</param-value>
+        </init-param>
+        <init-param>
+            <param-name>ResetPeriodSessionCreation</param-name>
+            <param-value>5</param-value>
+        </init-param>
+        <init-param>
+            <param-name>ResetPeriodBadResponseCode</param-name>
+            <param-value>2</param-value>
+        </init-param>
+        <init-param>
+            <param-name>ResetPeriodRedirectThreshold</param-name>
+            <param-value>2</param-value>
+        </init-param>
+        <init-param>
+            <param-name>HousekeepingInterval</param-name>
+            <param-value>15</param-value>
+        </init-param>
+        <init-param>
+            <param-name>BlockRepeatedRedirectsThreshold</param-name>
+            <param-value>150</param-value>
+        </init-param>
+        <init-param>
+            <param-name>BlockInvalidEncodedQueryString</param-name>
+            <param-value>false</param-value>
+        </init-param>
+        <init-param>
+            <param-name>InvalidateSessionOnAttack</param-name>
+            <param-value>true</param-value>
+        </init-param>
+        <init-param>
+            <param-name>AntiCacheResponseHeaderInjectionContentTypes</param-name>
+            <param-value>text/html</param-value>
+        </init-param>
+        <init-param>
+            <param-name>ResponseBodyModificationContentTypes</param-name>
+            <param-value>text/html</param-value>
+        </init-param>
+
+
+    </filter>
+    <filter-mapping>
+        <filter-name>WebCastellum</filter-name>
+        <url-pattern>/*</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>INCLUDE</dispatcher>
+        <dispatcher>FORWARD</dispatcher>
+    </filter-mapping>
+    <!-- =============================================================================== -->
+    <!-- =============================================================================== -->
+    <!-- =============================================================================== -->
+    <!-- =============================================================================== -->
+
+
+
+    <servlet>
+        <servlet-name>redirect</servlet-name>
+        <servlet-class>demo.Redirect</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>redirect</servlet-name>
+        <url-pattern>/redirect</url-pattern>
+    </servlet-mapping>
+    <session-config>
+        <session-timeout>
+            30
+        </session-timeout>
+    </session-config>
+    <welcome-file-list>
+        <welcome-file>index.jsp</welcome-file>
+    </welcome-file-list>
+</web-app>

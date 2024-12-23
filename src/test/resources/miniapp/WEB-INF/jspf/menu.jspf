@@ -1,0 +1,64 @@
+<%-- using response.encodeURL() in case the client does not support cookies --%>
+Sample links:
+<ul>
+    <li><a href="<%=response.encodeURL("index.jsp")%>">start</a></li>
+</ul>
+
+Form links:
+<ul>
+    <li><a href="<%=response.encodeURL("form.jsp")%>">form</a></li>
+    <li><a href="<%=response.encodeURL("form.jsp?test=eins")%>">form</a></li>
+    <li><a href="<%=response.encodeURL("form.jsp?test=eins&test=zwei")%>">form</a></li>
+    <li><a href="<%=response.encodeURL("form.jsp?test=eins&test=zwei&mehr=3")%>">form</a></li>
+    <li><a href="<%=response.encodeURL("form.jsp?test=eins&test=zwei&mehr=3&weiter=vier#anker")%>">form</a></li>
+    <li><a href="<%=response.encodeURL("form.jsp?test=eins&test=zwei&mehr=3&weiter=vier&mehr=5#anker")%>">form</a></li>
+    <li><a href="<%=response.encodeURL("form.jsp?test=eins&test=zwei&mehr=3&weiter=vier&mehr=5&mehr=6#anker")%>">form</a></li>
+    <li><a href="<%=response.encodeURL("form.jsp?test=eins&test=zwei&mehr=3&weiter=vier&mehr=5&mehr=6&mehr=7#anker")%>">form</a></li>
+    <li><a href="<%=response.encodeURL("form.jsp?test=eins&test=zwei&mehr=3&weiter=vier&mehr=5&mehr=6&mehr=7&mehr=8#anker")%>">form</a></li>
+    <li><a href="<%=response.encodeURL("form.jsp?test=eins&test=zwei&mehr=3&weiter=vier&mehr=5&mehr=6&mehr=7&mehr=8&mehr=9#anker")%>">form</a></li>
+    <li><a href="<%=response.encodeURL("form.jsp?test=eins&test=zwei&mehr=3&weiter=vier&mehr=5&mehr=6&mehr=7&mehr=8&mehr=9&mehr=10#anker")%>">form</a></li>
+</ul>
+
+More sample links:
+<ul>
+    <li><a href="<%=response.encodeURL("echo.jsp")%>">echo</a></li>
+    <li><a href="<%=response.encodeURL("echo.jsp?test=eins")%>">echo</a></li>
+    <li><a href="<%=response.encodeURL("echo.jsp?test=eins&test=zwei")%>">echo</a></li>
+    <li><a href="<%=response.encodeURL("echo.jsp?test=eins&test=zwei&mehr=3")%>">echo</a></li>
+    <li><a href="<%=response.encodeURL("echo.jsp?test=eins&test=zwei&mehr=3&weiter=vier#anker")%>">echo</a></li>
+</ul>
+Links with JavaScript:
+<ul>
+    <li><a href="javascript:location.href='<%=response.encodeURL("echo.jsp")%>'">echo</a></li>
+    <li><a href="javascript:location.href='<%=response.encodeURL("echo.jsp?test=eins")%>'">echo</a></li>
+    <li><a href="javascript:location.href='<%=response.encodeURL("echo.jsp?test=eins&test=zwei")%>'">echo</a></li>
+    <li><a href="javascript:location.href='<%=response.encodeURL("echo.jsp?test=eins&test=zwei&mehr=3")%>'">echo</a></li>
+    <li><a href="javascript:location.href='<%=response.encodeURL("echo.jsp?test=eins&test=zwei&mehr=3&weiter=vier#anker")%>'">echo</a></li>
+</ul>
+EventHandler with JavaScript:
+<ul>
+    <li><span onclick="location.href='<%=response.encodeURL("echo.jsp")%>'" style="text-decoration:underline">echo</span></li>
+    <li><span onclick="location.href='<%=response.encodeURL("echo.jsp?test=eins")%>'" style="text-decoration:underline">echo</span></li>
+    <li><span onclick="location.href='<%=response.encodeURL("echo.jsp?test=eins&test=zwei")%>'" style="text-decoration:underline">echo</span></li>
+    <li><span onclick="location.href='<%=response.encodeURL("echo.jsp?test=eins&test=zwei&mehr=3")%>'" style="text-decoration:underline">echo</span></li>
+    <li><span onclick="location.href='<%=response.encodeURL("echo.jsp?test=eins&test=zwei&mehr=3&weiter=vier#anker")%>'" style="text-decoration:underline">echo</span></li>
+</ul>
+Popups with JavaScript:
+<ul>
+    <li><span onclick="window.open('<%=response.encodeURL("echo.jsp")%>')" style="text-decoration:underline">echo</span></li>
+    <li><span onclick="window.open('<%=response.encodeURL("echo.jsp?test=eins")%>')" style="text-decoration:underline">echo</span></li>
+    <li><span onclick="window.open('<%=response.encodeURL("echo.jsp?test=eins&test=zwei")%>')" style="text-decoration:underline">echo</span></li>
+    <li><span onclick="window.open('<%=response.encodeURL("echo.jsp?test=eins&test=zwei&mehr=3")%>')" style="text-decoration:underline">echo</span></li>
+    <li><span onclick="window.open('<%=response.encodeURL("echo.jsp?test=eins&test=zwei&mehr=3&weiter=vier#anker")%>')" style="text-decoration:underline">echo</span></li>
+</ul>
+Increment sample counter:
+<ul>
+    <li><a href="<%=response.encodeURL("increment.jsp?by=1")%>">increment by 1</a></li>
+    <li><a href="<%=response.encodeURL("increment.jsp?by=2")%>">increment by 2</a></li>
+    <li><a href="<%=response.encodeURL("increment.jsp?by=3")%>">increment by 3</a></li>
+</ul>
+Full qualified links links:
+<ul>
+    <li><a href="<%=response.encodeURL("/miniapp/index.jsp")%>">MiniApp</a></li>
+    <li><a href="<%=response.encodeURL("/miniapp/echo.jsp?test=eins&test=zwei&mehr=3&weiter=vier")%>">MiniApp - echo</a></li>
+</ul>
