@@ -123,7 +123,7 @@
 	  <groupId>org.jboss.arquillian.extension</groupId>
 	  <artifactId>arquillian-warp</artifactId>
 	  <type>pom</type>
-	  <version>1.0.0</version>
+	  <version>1.1.0.Final</version>
 	  <scope>test</scope>
 	</dependency>
 	<dependency>
