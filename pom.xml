@@ -260,7 +260,7 @@
             <plugin>
                <groupId>org.owasp</groupId>
                <artifactId>dependency-check-maven</artifactId>
-               <version>10.0.3</version>
+               <version>11.1.1</version>
                <configuration>
                    <nvdApiKey>${env.NVDAPIKEY}</nvdApiKey>
                </configuration>
