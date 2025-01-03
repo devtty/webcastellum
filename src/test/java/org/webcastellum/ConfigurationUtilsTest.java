@@ -27,13 +27,13 @@ public class ConfigurationUtilsTest {
     }
     
     @Test
-    public void testExtractMandatoryConfigValueWithoutConfigManager() throws FilterConfigurationException{
+    public void testExtractMandatoryConfigValueWithoutConfigManager(){
         NullPointerException npe = assertThrows(NullPointerException.class, () -> ConfigurationUtils.extractMandatoryConfigValue((ConfigurationManager) null, "test"));
         assertEquals("configurationManager must not be null", npe.getMessage());
     }
     
     @Test
-    public void testExtractMandatoryConfigValueWithPatternWithoutConfigManager() throws FilterConfigurationException{
+    public void testExtractMandatoryConfigValueWithPatternWithoutConfigManager(){
         NullPointerException npe = assertThrows(NullPointerException.class, () -> ConfigurationUtils.extractMandatoryConfigValue((ConfigurationManager) null, "test", Pattern.compile("regextest")));
         assertEquals("configurationManager must not be null", npe.getMessage());
     }
@@ -45,7 +45,7 @@ public class ConfigurationUtilsTest {
     }
     
     @Test
-    public void testExtractMandatoryConfigValueMissingWithPattern() throws FilterConfigurationException{
+    public void testExtractMandatoryConfigValueMissingWithPattern(){
         FilterConfigurationException fce = assertThrows(FilterConfigurationException.class, () -> ConfigurationUtils.extractMandatoryConfigValue(configurationManager, "test", Pattern.compile("regextest")));
         assertEquals("Missing mandatory filter init-param: test", fce.getMessage());
     }
@@ -82,13 +82,13 @@ public class ConfigurationUtilsTest {
     }
 
     @Test
-    public void testExtractOptionalConfigValueWithoutFilterConfig() throws FilterConfigurationException{
+    public void testExtractOptionalConfigValueWithoutFilterConfig(){
         NullPointerException npe = assertThrows(NullPointerException.class, () -> ConfigurationUtils.extractOptionalConfigValue((FilterConfig) null, "test", "default"));
         assertEquals("filterConfig must not be null", npe.getMessage());
     }
     
     @Test
-    public void testExtractOptionalConfigValueWithoutConfigManager() throws FilterConfigurationException{
+    public void testExtractOptionalConfigValueWithoutConfigManager(){
         NullPointerException npe = assertThrows(NullPointerException.class, () -> ConfigurationUtils.extractOptionalConfigValue((ConfigurationManager) null, "test", "default"));
         assertEquals("configurationManager must not be null", npe.getMessage());
     }

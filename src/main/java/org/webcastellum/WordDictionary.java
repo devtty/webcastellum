@@ -23,7 +23,7 @@ public final class WordDictionary implements Serializable {
 	}
 
         public WordDictionary(final Collection<String> wordsOriginalUntrimmed) {
-            this( (String[])wordsOriginalUntrimmed.toArray(new String[0]) );
+            this(wordsOriginalUntrimmed.toArray(String[]::new) );
 	}
 	
         public WordDictionary(final String whitespaceOrCommaSeparatedWords) {
