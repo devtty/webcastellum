@@ -21,7 +21,7 @@ public final class ClasspathZipRuleFileLoader extends AbstractFilebasedRuleFileL
         
     
     
-    //1.5@Override
+    @Override
     public void setFilterConfig(final FilterConfig filterConfig) throws FilterConfigurationException {
         super.setFilterConfig(filterConfig);
         final ConfigurationManager configManager = ConfigurationUtils.createConfigurationManager(filterConfig);
@@ -34,7 +34,7 @@ public final class ClasspathZipRuleFileLoader extends AbstractFilebasedRuleFileL
         if (this.path == null) throw new IllegalStateException("Path must be set before loading rules files");
         ZipInputStream zipper = null;
         try {
-            final List/*<RuleFile>*/ rules = new ArrayList();
+            final List<RuleFile> rules = new ArrayList<>();
             final InputStream input = getClass().getClassLoader().getResourceAsStream(this.classpathReference);
             if (input == null) throw new FileNotFoundException("Unable to locate zipped rule file on classpath: "+this.classpathReference);
             zipper = new ZipInputStream( new BufferedInputStream(input) );
