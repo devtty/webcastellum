@@ -21,19 +21,22 @@ public class TotalExcludeDefinitionTest{
         assertProperties(definition, true, null);
     }
     
-    @Test(expected = NullPointerException.class)
+    @Test
     public void testTotalExcludeDefinitionWithoutIdentification(){
-        new TotalExcludeDefinition(true, null, "description", servletPathOrRequestURIPrefilter, servletPathOrRequestURIPattern);
+        NullPointerException npe = assertThrows(NullPointerException.class, () -> new TotalExcludeDefinition(true, null, "description", servletPathOrRequestURIPrefilter, servletPathOrRequestURIPattern));
+        assertEquals("identification must not be null", npe.getMessage());
     }
     
-    @Test(expected = NullPointerException.class)
+    @Test
     public void testTotalExcludeDefinitionWithoutDescription(){
-        new TotalExcludeDefinition(true, "identification", null, servletPathOrRequestURIPrefilter, servletPathOrRequestURIPattern);
+        NullPointerException npe = assertThrows(NullPointerException.class, () -> new TotalExcludeDefinition(true, "identification", null, servletPathOrRequestURIPrefilter, servletPathOrRequestURIPattern));
+        assertEquals("description must not be null", npe.getMessage());
     }
     
-    @Test(expected = NullPointerException.class)
+    @Test
     public void testTotalExcludeDefinitionWithoutPattern(){
-        new TotalExcludeDefinition(true, "identification", "description", servletPathOrRequestURIPrefilter, null);
+        NullPointerException npe = assertThrows(NullPointerException.class, () -> new TotalExcludeDefinition(true, "identification", "description", servletPathOrRequestURIPrefilter, null));
+        assertEquals("servletPathOrRequestURIPattern must not be null", npe.getMessage());
     }
 
     private void assertProperties(TotalExcludeDefinition definition, boolean expectedEnabled, WordDictionary expectedPrefilter) {

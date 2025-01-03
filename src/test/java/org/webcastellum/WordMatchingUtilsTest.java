@@ -5,10 +5,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class WordMatchingUtilsTest {
-    
-    public WordMatchingUtilsTest() {
-    }
-   
+       
     @Test
     public void testMatchesWord() {
         assertTrue(WordMatchingUtils.matchesWord(null, "text", 0));
@@ -16,7 +13,7 @@ public class WordMatchingUtilsTest {
         WordDictionary wordDictionary = new WordDictionary(Collections.emptyList());
         assertFalse(WordMatchingUtils.matchesWord(wordDictionary, "text", 0));
         
-        wordDictionary = new WordDictionary("test1,test22");
+        wordDictionary = WordDictionary.createInstance("test1,test22");
         assertFalse(WordMatchingUtils.matchesWord(wordDictionary, null, 0));
         assertFalse(WordMatchingUtils.matchesWord(wordDictionary, "", 0));
         

@@ -147,9 +147,10 @@ public class ResponseUtilsTest {
         assertFalse(ResponseUtils.isAlreadyEncrypted(null, "test"));
     }
     
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testEncryptQueryStringInURLWithBothRemovals(){
-        ResponseUtils.encryptQueryStringInURL("", "", "", "", true, true, Boolean.TRUE, true, "", cipher, key, true, true, true, response, true);
+        IllegalArgumentException iae = assertThrows(IllegalArgumentException.class, () -> ResponseUtils.encryptQueryStringInURL("", "", "", "", true, true, Boolean.TRUE, true, "", cipher, key, true, true, true, response, true));
+        assertEquals("additionalFullResourceRemoval AND additionalMediumResourceRemoval is impossible", iae.getMessage());
     }
 
     @Test
@@ -243,9 +244,10 @@ public class ResponseUtilsTest {
         assertEquals("param=value", ResponseUtils.extractQueryStringOfActionUrl("test?param=value"));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testRemoveQueryStringFromActionUrlOfCurrentFormWithAllRemoves() {
-        ResponseUtils.removeQueryStringFromActionUrlOfCurrentForm("", true, true, "", null, true, true);
+        IllegalArgumentException iae = assertThrows(IllegalArgumentException.class, () -> ResponseUtils.removeQueryStringFromActionUrlOfCurrentForm("", true, true, "", null, true, true));
+        assertEquals("additionalFullResourceRemoval AND additionalMediumResourceRemoval is impossible", iae.getMessage());
     }
     
     @Test

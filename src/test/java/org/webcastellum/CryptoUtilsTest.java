@@ -308,12 +308,13 @@ public class CryptoUtilsTest {
 
     }
     
-    @Test(expected = NullPointerException.class)
+    @Test
     public void testDecryptURLSafeWithoutContent(){
         try{
             CryptoKeyAndSalt ckas = CryptoUtils.generateRandomCryptoKeyAndSalt(true);
-            CryptoUtils.decryptURLSafe(null, ckas);
-        }catch (UnsupportedEncodingException | InvalidKeyException | NoSuchAlgorithmException | BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException ex){
+            NullPointerException npe = assertThrows(NullPointerException.class, () -> CryptoUtils.decryptURLSafe(null, ckas));
+            assertEquals("content must not be null", npe.getMessage());
+        }catch (NoSuchAlgorithmException e){
             fail("En-/De-cryption failed");
         }
     }

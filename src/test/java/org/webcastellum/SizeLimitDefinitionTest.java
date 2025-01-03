@@ -45,19 +45,22 @@ public class SizeLimitDefinitionTest{
         assertEquals(servletPathOrRequestURIPattern, sld.getServletPathOrRequestURIPattern());
     }
         
-    @Test(expected = NullPointerException.class)
+    @Test
     public void testSizeLimitDefinitionWithoutIdentification(){
-        new SizeLimitDefinition(true, null, "description", new WordDictionary("a b"), Pattern.compile("/"));
+        NullPointerException npe = assertThrows(NullPointerException.class, () -> new SizeLimitDefinition(true, null, "description", new WordDictionary("a b"), Pattern.compile("/")));
+        assertEquals("identification must not be null", npe.getMessage());
     }
     
-    @Test(expected = NullPointerException.class)
+    @Test
     public void testSizeLimitDefinitionWithoutDescription(){
-        new SizeLimitDefinition(true, "identification", null, new WordDictionary("a b"), Pattern.compile("/"));
+        NullPointerException npe = assertThrows(NullPointerException.class, () -> new SizeLimitDefinition(true, "identification", null, new WordDictionary("a b"), Pattern.compile("/")));
+        assertEquals("description must not be null", npe.getMessage());
     }
         
-    @Test(expected = NullPointerException.class)
+    @Test
     public void testSizeLimitDefinitionWithoutPattern(){
-        new SizeLimitDefinition(true, "identification", "description", new WordDictionary("a b"), null);
+        NullPointerException npe = assertThrows(NullPointerException.class, () -> new SizeLimitDefinition(true, "identification", "description", new WordDictionary("a b"), null));
+        assertEquals("servletPathOrRequestURIPattern must not be null", npe.getMessage());
     }
     
 }

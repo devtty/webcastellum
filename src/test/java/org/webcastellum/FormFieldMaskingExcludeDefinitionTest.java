@@ -21,19 +21,22 @@ public class FormFieldMaskingExcludeDefinitionTest{
         assertProperties(def, true, null);
     }
     
-    @Test(expected = NullPointerException.class)
+    @Test
     public void testFormFieldMaskingExcludeDefinitionWithoutIdentification(){
-        new FormFieldMaskingExcludeDefinition(true, null, "description", servletPathOrRequestURIPrefilter, servletPathOrRequestURIPattern);
+        NullPointerException npe = assertThrows(NullPointerException.class, () -> new FormFieldMaskingExcludeDefinition(true, null, "description", servletPathOrRequestURIPrefilter, servletPathOrRequestURIPattern));
+        assertEquals("identification must not be null", npe.getMessage());
     }
     
-    @Test(expected = NullPointerException.class)
+    @Test
     public void testFormFieldMaskingExcludeDefinitionWithoutDescription(){
-        new FormFieldMaskingExcludeDefinition(true, "identification", null, servletPathOrRequestURIPrefilter, servletPathOrRequestURIPattern);
+        NullPointerException npe = assertThrows(NullPointerException.class, () -> new FormFieldMaskingExcludeDefinition(true, "identification", null, servletPathOrRequestURIPrefilter, servletPathOrRequestURIPattern));
+        assertEquals("description must not be null", npe.getMessage());
     }
     
-    @Test(expected = NullPointerException.class)
+    @Test
     public void testFormFieldMaskingExcludeDefinitionWithoutPattern(){
-        new FormFieldMaskingExcludeDefinition(true, "identification", "description", servletPathOrRequestURIPrefilter, null);
+        NullPointerException npe = assertThrows(NullPointerException.class, () -> new FormFieldMaskingExcludeDefinition(true, "identification", "description", servletPathOrRequestURIPrefilter, null));
+        assertEquals("servletPathOrRequestURIPattern must not be null", npe.getMessage());
     }
     
     private void assertProperties(FormFieldMaskingExcludeDefinition def, boolean expectedEnabled, WordDictionary expectedPrefilter){
