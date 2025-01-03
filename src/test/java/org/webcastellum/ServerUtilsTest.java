@@ -7,7 +7,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import static java.util.Map.entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.servlet.http.HttpSession;
@@ -15,7 +14,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import org.junit.Before;
-import static org.mockito.ArgumentMatchers.any;
 import org.mockito.Mockito;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -141,14 +139,16 @@ public class ServerUtilsTest {
         Assert.assertArrayEquals(expected, ServerUtils.convertArrayIntegerListTo2DimIntArray(values));
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void testIsSameServerWithoutReferrer() {
-        ServerUtils.isSameServer(null, "test");
+        NullPointerException npe = assertThrows(NullPointerException.class, () -> ServerUtils.isSameServer(null, "test"));
+        assertEquals("referrer must not be null", npe.getMessage());
     }
     
-    @Test(expected = NullPointerException.class)
+    @Test
     public void testIsSameServerWithoutUrl() {
-        ServerUtils.isSameServer("test",null);
+        NullPointerException npe = assertThrows(NullPointerException.class, () -> ServerUtils.isSameServer("test",null));
+        assertEquals("url must not be null", npe.getMessage());
     }
     
     @Test
@@ -176,14 +176,16 @@ public class ServerUtilsTest {
         assertTrue(ServerUtils.containsColonBeforeFirstSlashOrQuestionmark("has:colon"));
     }
     
-    @Test(expected = NullPointerException.class)
+    @Test
     public void testIsInternalHostURLWithoutCompareWith(){
-        ServerUtils.isInternalHostURL(null, "linkedUrl");
+        NullPointerException npe = assertThrows(NullPointerException.class, () -> ServerUtils.isInternalHostURL(null, "linkedUrl"));
+        assertEquals("currentRequestUrlToCompareWith must not be null", npe.getMessage());
     }
     
-    @Test(expected = NullPointerException.class)
+    @Test
     public void testIsInternalHostURLWithoutUrl(){
-        ServerUtils.isInternalHostURL("url", null);
+        NullPointerException npe = assertThrows(NullPointerException.class, () -> ServerUtils.isInternalHostURL("url", null));
+        assertEquals("linkedUrl must not be null", npe.getMessage());
     }
     
     @Test
@@ -316,9 +318,10 @@ public class ServerUtilsTest {
         assertEquals("Hello \\World \\Test", ServerUtils.removeBackslashes("Hello \\\\World \\\\\\Test"));
     }
     
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testPermutateVariantsWithNegativeLevel(){
-        ServerUtils.permutateVariants("", true, (byte) -1);
+        IllegalArgumentException iae = assertThrows(IllegalArgumentException.class, () -> ServerUtils.permutateVariants("", true, (byte) -1));
+        assertEquals("decodingPermutationLevel must not be negative", iae.getMessage());
     }
     
     
@@ -489,9 +492,10 @@ public class ServerUtilsTest {
 
     
     
-    @Test(expected = NullPointerException.class)
+    @Test
     public void testFindReusableSessionContentKeyOrCreateNewOneWithoutContent() {
-        ServerUtils.findReusableSessionContentKeyOrCreateNewOne(session, null, true, true);
+        NullPointerException npe = assertThrows(NullPointerException.class, () -> ServerUtils.findReusableSessionContentKeyOrCreateNewOne(session, null, true, true));
+        assertEquals("content must not be null", npe.getMessage());
     }
 
     @Test
@@ -567,9 +571,10 @@ public class ServerUtilsTest {
         assertEquals("te\\$t", ServerUtils.quoteReplacement("te$t"));
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void testGetAttributeNamesIncludingInternalWithoutSession(){
-        ServerUtils.getAttributeNamesIncludingInternal(null);
+        NullPointerException npe = assertThrows(NullPointerException.class, () -> ServerUtils.getAttributeNamesIncludingInternal(null));
+        assertEquals("session must not be null", npe.getMessage());
     }
     
     @Test
@@ -582,9 +587,10 @@ public class ServerUtilsTest {
         });
     }
     
-    @Test(expected = NullPointerException.class)
+    @Test
     public void testGetAttributeIncludingInternalWithoutSession() {
-        ServerUtils.getAttributeIncludingInternal(null,"");
+        NullPointerException npe = assertThrows(NullPointerException.class, () -> ServerUtils.getAttributeIncludingInternal(null,""));
+        assertEquals("session must not be null", npe.getMessage());
     }
     
     @Test

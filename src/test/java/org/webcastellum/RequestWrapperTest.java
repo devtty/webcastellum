@@ -40,19 +40,22 @@ public class RequestWrapperTest {
         sessionCreationTracker = new SessionCreationTracker(attackHandler, 0, 600000, 300000, 0, "", "", "", "");        
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void testRequestWrapperConstructorWithoutContentInjectionHelper(){
-        new RequestWrapper(request, null, sessionCreationTracker, "", false, false, false);
+        NullPointerException npe = assertThrows(NullPointerException.class, () -> new RequestWrapper(request, null, sessionCreationTracker, "", false, false, false));
+        assertEquals("contentInjectionHelper must not be null", npe.getMessage());
     }
     
-    @Test(expected = NullPointerException.class)
+    @Test
     public void testRequestWrapperConstructorWithoutSessionCreationTracker(){
-        new RequestWrapper(request, helper, null, "", false, false, false);
+        NullPointerException npe = assertThrows(NullPointerException.class, () -> new RequestWrapper(request, helper, null, "", false, false, false));
+        assertEquals("sessionCreationTracker must not be null", npe.getMessage());
     }
     
-    @Test(expected = NullPointerException.class)
+    @Test
     public void testRequestWrapperConstructorWithoutClient(){
-        new RequestWrapper(request, helper, sessionCreationTracker, null, false, false, false);
+        NullPointerException npe = assertThrows(NullPointerException.class, () -> new RequestWrapper(request, helper, sessionCreationTracker, null, false, false, false));
+        assertEquals("client must not be null", npe.getMessage());
     }
     
     @Test

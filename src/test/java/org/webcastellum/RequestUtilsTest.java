@@ -217,24 +217,28 @@ public class RequestUtilsTest {
         System.out.println(s);
     }*/
     
-    @Test(expected = NullPointerException.class)
+    @Test
     public void testDecryptQueryStringInServletPathWithQueryStringWithoutContextPath(){
-        RequestUtils.decryptQueryStringInServletPathWithQueryString(null, "", "", "", key, "", true, true, true, true, true);
+        NullPointerException npe = assertThrows(NullPointerException.class, () -> RequestUtils.decryptQueryStringInServletPathWithQueryString(null, "", "", "", key, "", true, true, true, true, true));
+        assertEquals("contextPath must not be null", npe.getMessage());
     }
     
-    @Test(expected = NullPointerException.class)
+    @Test
     public void testDecryptQueryStringInServletPathWithQueryStringWithoutCryptoDetectionString(){
-        RequestUtils.decryptQueryStringInServletPathWithQueryString("", "", "", null, key, "", true, true, true, true, true);
+        NullPointerException npe = assertThrows(NullPointerException.class, () -> RequestUtils.decryptQueryStringInServletPathWithQueryString("", "", "", null, key, "", true, true, true, true, true));
+        assertEquals("cryptoDetectionString must not be null", npe.getMessage());
     }
     
-    @Test(expected = NullPointerException.class)
+    @Test
     public void testDecryptQueryStringInServletPathWithQueryStringWithoutKey(){
-        RequestUtils.decryptQueryStringInServletPathWithQueryString("", "", "", "", null, "", true, true, true, true, true);
+        NullPointerException npe = assertThrows(NullPointerException.class, () -> RequestUtils.decryptQueryStringInServletPathWithQueryString("", "", "", "", null, "", true, true, true, true, true));
+        assertEquals("key must not be null", npe.getMessage());
     }
     
-    @Test(expected = NullPointerException.class)
+    @Test
     public void testDecryptQueryStringInServletPathWithQueryStringWithoutRequestUri(){
-        RequestUtils.decryptQueryStringInServletPathWithQueryString("", "", "", "", key, null, true, true, true, true, true);
+        NullPointerException npe = assertThrows(NullPointerException.class, () -> RequestUtils.decryptQueryStringInServletPathWithQueryString("", "", "", "", key, null, true, true, true, true, true));
+        assertEquals("uriRequested must not be null", npe.getMessage());
     }
     
     @Test
@@ -259,10 +263,11 @@ public class RequestUtilsTest {
         assertFalse(RequestUtils.isMismatch(new ArrayList<>(Arrays.asList("test1", "test2", "test3")), actualSubmittedValues));
     }
     
-    @Test(expected = NullPointerException.class)
+    @Test
     public void testIsMismatchWithoutExpected(){
         String[] actualSubmittedValues = new String[]{"test1", "test2"};
-        RequestUtils.isMismatch(null, actualSubmittedValues);
+        NullPointerException npe = assertThrows(NullPointerException.class, () -> RequestUtils.isMismatch(null, actualSubmittedValues));
+        assertEquals("expectedValues must not be null", npe.getMessage());
     }
     
     

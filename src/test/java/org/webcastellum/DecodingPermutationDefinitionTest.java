@@ -21,19 +21,22 @@ public class DecodingPermutationDefinitionTest{
         assertProperties(def, true, null);
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void testDecodingPermutationDefinitionWithoutIdentification() {
-        new DecodingPermutationDefinition(true, null, "description", servletPathOrRequestURIPrefilter, servletPathOrRequestURIPattern);        
+        NullPointerException npe = assertThrows(NullPointerException.class, () -> new DecodingPermutationDefinition(true, null, "description", servletPathOrRequestURIPrefilter, servletPathOrRequestURIPattern));
+        assertEquals("identification must not be null", npe.getMessage());
     }
     
-    @Test(expected = NullPointerException.class)
+    @Test
     public void testDecodingPermutationDefinitionWithoutDescription() {
-        new DecodingPermutationDefinition(true, "identification", null, servletPathOrRequestURIPrefilter, servletPathOrRequestURIPattern);        
+        NullPointerException npe = assertThrows(NullPointerException.class, () -> new DecodingPermutationDefinition(true, "identification", null, servletPathOrRequestURIPrefilter, servletPathOrRequestURIPattern));
+        assertEquals("description must not be null", npe.getMessage());
     }
     
-    @Test(expected = NullPointerException.class)
+    @Test
     public void testDecodingPermutationDefinitionWithoutPattern() {
-        new DecodingPermutationDefinition(true, "identification", "description", servletPathOrRequestURIPrefilter, null);        
+        NullPointerException npe = assertThrows(NullPointerException.class, () -> new DecodingPermutationDefinition(true, "identification", "description", servletPathOrRequestURIPrefilter, null));
+        assertEquals("servletPathOrRequestURIPattern must not be null", npe.getMessage());
     }
         
     private void assertProperties(DecodingPermutationDefinition def, boolean expectedEnabled, WordDictionary expectedPrefilter){

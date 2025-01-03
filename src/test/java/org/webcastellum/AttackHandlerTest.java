@@ -24,19 +24,22 @@ public class AttackHandlerTest {
     public AttackHandlerTest() {
     }
     
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testConstructorWithNegativeThreshold(){
-        new AttackHandler(attackLogger, -1, 0, 0, 0, 0, "/tmp", "applicationName", true, true, 0, true, true, removeSensitiveDataRequestParamNamePattern, removeSensitiveDataValuePattern, true);
+        IllegalArgumentException iae = assertThrows(IllegalArgumentException.class, () -> new AttackHandler(attackLogger, -1, 0, 0, 0, 0, "/tmp", "applicationName", true, true, 0, true, true, removeSensitiveDataRequestParamNamePattern, removeSensitiveDataValuePattern, true));
+        assertEquals("Threshold must not be negative", iae.getMessage());
     }
     
-    @Test(expected = NullPointerException.class)
+    @Test
     public void testConstructorWithoutSensitiveDataRequestParamNamePattern(){
-        new AttackHandler(attackLogger, 2, 0, 0, 0, 0, "/tmp", "applicationName", true, true, 0, true, true, null, removeSensitiveDataValuePattern, true);
+        NullPointerException npe = assertThrows(NullPointerException.class, () -> new AttackHandler(attackLogger, 2, 0, 0, 0, 0, "/tmp", "applicationName", true, true, 0, true, true, null, removeSensitiveDataValuePattern, true));
+        assertEquals("removeSensitiveDataRequestParamNamePattern must not be null", npe.getMessage());
     }
     
-    @Test(expected = NullPointerException.class)
+    @Test
     public void testConstructorWithoutSensitiveDataValuePattern(){
-        new AttackHandler(attackLogger, 2, 0, 0, 0, 0, "/tmp", "applicationName", true, true, 0, true, true, removeSensitiveDataRequestParamNamePattern, null, true);
+        NullPointerException npe = assertThrows(NullPointerException.class, () -> new AttackHandler(attackLogger, 2, 0, 0, 0, 0, "/tmp", "applicationName", true, true, 0, true, true, removeSensitiveDataRequestParamNamePattern, null, true));
+        assertEquals("removeSensitiveDataValuePattern must not be null", npe.getMessage());
     }
 
     @Test

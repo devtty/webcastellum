@@ -21,19 +21,22 @@ public class ContentModificationExcludeDefinitionTest{
         assertProperties(definition, true, null);
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void testContentModificationExcludeDefinitionWithoutIdentification(){
-        new ContentModificationExcludeDefinition(true, null, "description", servletPathOrRequestURIPrefilter, servletPathOrRequestURIPattern);
+        NullPointerException npe = assertThrows(NullPointerException.class, () -> new ContentModificationExcludeDefinition(true, null, "description", servletPathOrRequestURIPrefilter, servletPathOrRequestURIPattern));
+        assertEquals("identification must not be null", npe.getMessage());
     }
     
-    @Test(expected = NullPointerException.class)
+    @Test
     public void testContentModificationExcludeDefinitionWithoutDescription(){
-        new ContentModificationExcludeDefinition(true, "identification", null, servletPathOrRequestURIPrefilter, servletPathOrRequestURIPattern);
+        NullPointerException npe = assertThrows(NullPointerException.class, () -> new ContentModificationExcludeDefinition(true, "identification", null, servletPathOrRequestURIPrefilter, servletPathOrRequestURIPattern));
+        assertEquals("description must not be null", npe.getMessage());
     }
     
-    @Test(expected = NullPointerException.class)
+    @Test
     public void testContentModificationExcludeDefinitionWithoutPattern(){
-        new ContentModificationExcludeDefinition(true, "identification", "description", servletPathOrRequestURIPrefilter, null);
+        NullPointerException npe = assertThrows(NullPointerException.class, () -> new ContentModificationExcludeDefinition(true, "identification", "description", servletPathOrRequestURIPrefilter, null));
+        assertEquals("servletPathOrRequestURIPattern must not be null", npe.getMessage());
     }
     
     private void assertProperties(ContentModificationExcludeDefinition def, boolean  expectedEnabled, WordDictionary expectedPrefilter){
