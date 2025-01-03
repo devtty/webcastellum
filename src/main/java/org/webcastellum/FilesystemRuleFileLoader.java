@@ -52,7 +52,7 @@ public final class FilesystemRuleFileLoader extends AbstractFilebasedRuleFileLoa
                 }
             }
             return rules.toArray(RuleFile[]::new);
-        } catch (Exception e) {
+        } catch (IOException | IllegalArgumentException e) {
             throw new RuleLoadingException(e);
         }
     }
