@@ -263,6 +263,8 @@
                <version>12.1.0</version>
                <configuration>
                    <nvdApiKey>${env.NVDAPIKEY}</nvdApiKey>
+                   <ossIndexUsername>denis@devtty.de</ossIndexUsername>
+                   <ossIndexPassword>${env.SONATYPETOKEN}</ossIndexPassword>
                </configuration>
                <executions>
 		 <execution><goals><goal>check</goal></goals></execution>
