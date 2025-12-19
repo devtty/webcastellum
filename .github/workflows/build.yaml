@@ -13,6 +13,7 @@ jobs:
     env:
       CATALINA_HOME: /home/runner/work/webcastellum/webcastellum/apache-tomcat-8.5.100
       NVDAPIKEY: ${{ secrets.NVD_API_KEY }}
+      SONATYPETOKEN: ${{ secrets.SONATYPE_TOKEN }}
     steps:
       - uses: actions/checkout@v4
         with:
