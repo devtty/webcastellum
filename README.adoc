@@ -3,6 +3,7 @@
 :sonar: https://sonarcloud.io/dashboard?id=devtty_webcastellum
 :openssf: https://scorecard.dev/viewer/?uri=github.com/devtty/webcastellum
 
+
 image:https://github.com/devtty/webcastellum/actions/workflows/build.yaml/badge.svg["Build Status", link={ci}]
 image:https://sonarcloud.io/api/project_badges/measure?project=devtty_webcastellum&metric=alert_status["Quality Gate Status", link={sonar}]
 image:https://img.shields.io/ossf-scorecard/github.com/devtty/webcastellum?label=openssf%20scorecard&style=flat["OpenSSF", link={openssf}]
